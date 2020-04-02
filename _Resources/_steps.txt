@@ -293,7 +293,7 @@ pool 3.ch.pool.ntp.org iburst
 
 -- Device Config --
 
-Grafana Variable $Device erstellen. IPs abfüllen
+Grafana Variable $Device erstellen. IPs abfï¿½llen
 
 
 
@@ -312,3 +312,95 @@ disable "boot net wait" in "8 Network Options: NAS/Misc"
 
 crontab -e 
 00 00 * * * /usr/bin/nanobackup backup false true false
+
+
+
+----------------------------------------------------------
+
+
+
+
+
+nano /etc/resolv.conf
+-> nameserver 192.168.42.1
+
+
+== NanoHome Backup ==
+
+mkdir /mnt/backup
+
+nano /etc/fstab
+
+//dietpi.nano.lan/media/Backup/NanoHome /mnt/backup cifs uid=0,credentials=/root/.creds,iocharset=utf8,noperm 0 0
+
+
+Grafana: API Key Admin erstellen
+
+pip install --upgrade pip
+pip install requests
+
+git clone https://github.com/ysde/grafana-backup-tool.git
+
+cd cd grafana-backup-tool/
+
+nano src/grafanaSettings.py
+
+GRAFANA_URL = os.getenv('GRAFANA_URL', 'http://127.0.0.1:3001')
+TOKEN = os.getenv('GRAFANA_TOKEN', 'eyJrIjoiSUpjNHFtSE9JTjA0RnAya2Eyd3FWSVNwSEt1UmJ1Z1YiLCJuIjoiYmFja3VwIiwiaWQiOjF9')
+
+find ${backup_dir} -name "*.tar" -type f -mtime +30 -exec rm -f {} \;
+
+
+nano backup_grafana.sh
+
+backup_dir="/mnt/backup/Grafana"
+
+chmod +x backup_grafana.sh
+
+crontab -e
+
+* * /7 * * /root/grafana-backup-tool/backup_grafana.sh
+
+
+
+
+
+
+
+
+
+
+== Gesamtbackup ==
+
+mount -t cifs //dietpi.nano.lan/media/Backup/NanoHome /mnt/backup -o credentials=/root/.creds
+/root/grafana-backup-tool/backup_grafana.sh
+
+influxd backup -portable /mnt/backup/influxdb
+
+cp /etc/wpa_supplicant/wpa_supplicant* /mnt/backup/wpa_supplicant
+
+
+== Gesamtrestore ==
+mount -t cifs //dietpi.nano.lan/media/Backup/NanoHome /mnt/backup -o credentials=/root/.creds
+/root/grafana-backup-tool/restore_grafana.sh
+
+
+influxd restore -portable /mnt/backup/influxdb
+
+cp /mnt/backup/wpa_supplicant/wpa_supplicant*  /etc/wpa_supplicant
+
+
+
+-> Reboot Meldung
+
+
+-> restore_grafana.sh Script umschrieben, damit das letzte Backup genommen wird
+
+grafana-cli plugins install grafana-piechart-panel
+grafana-cli plugins install michaeldmoore-annunciator-panel
+grafana-cli plugins install farski-blendstat-panel
+grafana-cli plugins install novalabs-annotations-panel
+grafana-cli plugins install neocat-cal-heatmap-panel
+grafana-cli plugins install petrslavotinek-carpetplot-panel
+grafana-cli plugins install briangann-gauge-panel
+grafana-cli plugins install pierosavi-imageit-panel
