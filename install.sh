@@ -7,68 +7,50 @@ if [ $(id -u) -ne 0 ]; then
   exit 1
 fi
 
-# Settings
-
 # Install Software
-
 wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key && sudo apt-key add mosquitto-repo.gpg.key && rm mosquitto-repo.gpg.key || (echo "Failed to add mosquitto repository" && set -e)
 wget http://repo.mosquitto.org/debian/mosquitto-stretch.list -O /etc/apt/sources.list.d/
 apt-get update
-apt-get install mosquitto
-
+apt-get install mosquitto grafana influxdb
 
 # Install dependencies
 apt-get -y install mosquitto-clients python3 python3-pip python3-setuptools hostapd dnsmasq build-essential git libfreetype6-dev libjpeg-dev || (echo "Failed to install dependencies" && set -e)
 
-systemctl disable dnsmasq hostapd
+systemctl disable dnsmasq hostapd wpa_supplicant
 dietpi-services disable hostapd
 dietpi-services disable dnsmasq
 
 # Install Python Modules
 pip3 install wheel paho-mqtt influxdb ssd1306 || (echo "Failed to install Python Modules" && set -e)
 
-# Create Mosquitto Users
-mosquitto_passwd -b /etc/mosquitto/passwd mqtt_shell MQTT2Shell || (echo "Failed to create mosquitto user mqtt_shell" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd mqtt_bridge MQTT2InfluxDB || (echo "Failed to create mosquitto user mqtt_bridge" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd mqtt_grafana Grafana2MQTT || (echo "Failed to create mosquitto user mqtt_grafana" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd shelly_mqtt Shelly2MQTT || (echo "Failed to create mosquitto user shelly_mqtt" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd tasker_mqtt Tasker2MQTT || (echo "Failed to create mosquitto user shelly_mqtt" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd esp_mqtt ESP2MQTT || (echo "Failed to create mosquitto user shelly_mqtt" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd multiswitch_mqtt MULTISWITCH2MQTT || (echo "Failed to create mosquitto user shelly_mqtt" && set -e)
-mosquitto_passwd -b /etc/mosquitto/passwd mqtt_dash DASH2MQTT || (echo "Failed to create mosquitto user shelly_mqtt" && set -e)
+# Copy NanoHome Files
+cp -R ./etc/* /etc/
+cp -R ./usr/* /usr/
 
-# Install and configure MQTT_Shell 
-cp ./mqtt_shell /usr/bin/mqtt_shell || (echo "Failed to copy mqtt_shell" && set -e)
-chmod +x /usr/bin/mqtt_shell
+# Make NnaoHome Scripts executable
+chmod +x /usr/local/nanohome/bin/*
 
-cp ./services/mqtt_shell.service /lib/systemd/system/mqtt_shell.service
-
+# Start services
+systemctl start autohotspot.service || (echo "Failed to start autohotspot service" && set -e)
+systemctl enable autohotspot.service
+systemctl start nanohatoled.service || (echo "Failed to start nanohatoled service" && set -e)
+systemctl enable nanohatoled.service
 systemctl start mqtt_shell.service || (echo "Failed to start mqtt_shell service" && set -e)
 systemctl enable mqtt_shell.service
-
-touch /etc/mosquitto/conf.d/NanoPi.conf
-
-echo listener 1883 0.0.0.0 >> /etc/mosquitto/conf.d/NanoPi.conf
-echo listener 1884 >> /etc/mosquitto/conf.d/NanoPi.conf
-echo protocol websockets >> /etc/mosquitto/conf.d/NanoPi.conf
+systemctl start mqtt_bridge_shellyht.service || (echo "Failed to start mqtt_bridge_shellyht service" && set -e)
+systemctl enable mqtt_bridge_shellyht.service
+systemctl start mqtt_bridge_shelly.service || (echo "Failed to start mqtt_bridge_shelly service" && set -e)
+systemctl enable mqtt_bridge_shelly.service
+systemctl start mqtt_bridge_home.service || (echo "Failed to start mqtt_bridge_home service" && set -e)
+systemctl enable mqtt_bridge_home.service
 
 # Install and configure InfluxDB
-# Prepare Database
 influx -execute 'CREATE DATABASE NanoPi' || (echo "Failed to create Influx Database" && set -e)
 influx -execute 'CREATE USER admin WITH PASSWORD "DitoPI64" WITH ALL PRIVILEGES' || (echo "Failed to create Influx user admin" && set -e)
 influx -execute 'CREATE USER mqtt_bridge WITH PASSWORD "MQTT2InfluxDB"' || (echo "Failed to create Influx user mqtt_bridge" && set -e)
 influx -execute 'CREATE USER grafana WITH PASSWORD "InfluxDB2Grafana"' || (echo "Failed to create Influx user grafana" && set -e)
 influx -execute 'GRANT ALL ON "NanoPi" TO "mqtt_bridge"' || (echo "Failed to grant privileges for Influx user mqtt_bridge" && set -e)
 influx -execute 'GRANT ALL ON "NanoPi" TO "grafana"' || (echo "Failed to grant privileges for Influx user grafana" && set -e)
-
-# Create mqtt influx script
-cp ./mqtt_influxdb_bridge.py /usr/bin/mqtt_influxdb_bridge.py || (echo "Failed to copy mqtt_influxdb_bridge.py" && set -e)
-chmod +x /usr/bin/mqtt_influxdb_bridge.py
-
-cp ./services/mqtt_influxdb_bridge.service /lib/systemd/system/mqtt_influxdb_bridge.service
-
-systemctl start mqtt_influxdb_bridge.service || (echo "Failed to start mqtt_influxdb_bridge service" && set -e)
-systemctl enable mqtt_influxdb_bridge.service
 
 # Change dirty html in grafana
 sed -i "s/;disable_sanitize_html.*/disable_sanitize_html = true/g" /etc/grafana/grafana.ini
@@ -77,68 +59,10 @@ sed -i "s/;disable_sanitize_html.*/disable_sanitize_html = true/g" /etc/grafana/
 wget https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js -O /usr/share/grafana/public/ || (echo "Failed to get mqttws31.min.js" && set -e)
 
 # Create CPU Temperature Monitoring
-cp ./cputemp /usr/bin/cputemp
-chmod +x /usr/bin/cputemp
-
-crontab -l | { cat; echo "*/1 * * * * /usr/bin/cputemp"; } | crontab - || (echo "Failed to add cputemp crontab" && set -e)
+crontab -l | { cat; echo "*/1 * * * * /usr/local/nanohome/bin/cputemp"; } | crontab - || (echo "Failed to add cputemp crontab" && set -e)
 
 # Create Free Disk Monitoring
-cp ./diskspace /usr/bin/diskspace
-chmod +x /usr/bin/diskspace
-
-crontab -l | { cat; echo "*/15 * * * * /usr/bin/diskspace"; } | crontab - || (echo "Failed to add diskspace crontab" && set -e)
+crontab -l | { cat; echo "*/15 * * * * /usr/local/nanohome/bin/diskspace"; } | crontab - || (echo "Failed to add diskspace crontab" && set -e)
 
 # Create IP Monitoring
-cp ./ip_to_mqtt /usr/bin/ip_to_mqtt
-chmod +x /usr/bin/ip_to_mqtt
-
-# Create autohotspot script
-cp ./hostapd.conf /etc/hostapd/hostapd.conf
-
-sed -i "s/#DAEMON_CONF.*/DAEMON_CONF="/etc/hostapd/hostapd.conf"/g" /etc/default/hostapd
-
-systemctl disable wpa_supplicant
-
-cp ./autohotspot /usr/bin/autohotspot
-chmod +x /usr/bin/autohotspot
-
-cp ./services/autohotspot.service /etc/systemd/system/autohotspot.service
-
-systemctl start autohotspot || (echo "Failed to start autohotspot service" && set -e)
-systemctl enable autohotspot
-
-# Create WifiConnect Script
-cp ./wcon /usr/bin/wcon
-chmod +x /usr/bin/wcon
-
-# Configure NanoHat OLED
-systemctl enable rc-local.service
-
-gcc NanoHatOLED/Source/daemonize.c NanoHatOLED/Source/main.c -lrt -lpthread -o NanoHatOLED || (echo "Failed to compile NanoHat OLED" && set -e)
-
-if [ ! -f /usr/local/bin/oled-start ]; then
-    cat >/usr/local/bin/oled-start 
-	
-    echo "cd $PWD" >> /usr/local/bin/oled-start
-    echo "./NanoHatOLED" >> /usr/local/bin/oled-start
-    sed -i -e '$i \/usr/local/bin/oled-start\n' /etc/rc.local
-    chmod 755 /usr/local/bin/oled-start
-fi
-
-if [ ! -f NanoHatOLED/BakeBit/Script/install.sh ]; then
-    git submodule init
-    git submodule update
-fi
-
-# Create NanoHatOLED actions
-
-cp ./ldhcp /usr/bin/ldhcp
-chmod +x /usr/bin/ldhcp
-
-cp ./wmod /usr/bin/wmod
-chmod +x /usr/bin/wmod
-
-cp ./wstat /usr/bin/wstat
-chmod +x /usr/bin/wstat
-
-cp ./wpa_supplicant.conf.nanogateway /etc/wpa_supplicant/wpa_supplicant.conf.nanogateway
+crontab -l | { cat; echo "* */1 * * * /usr/local/nanohome/bin/ip_to_mqtt"; } | crontab - || (echo "Failed to add ip_mqtt crontab" && set -e)
