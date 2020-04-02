@@ -1,0 +1,11 @@
+[Unit]
+Wants=mosquitto.service
+Description=Multiswitch -dev2 [-value2] if -dev1 [-value1]
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/local/nanohome/bin/multiswitch service -dev1 -dev2 -value1 -value2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

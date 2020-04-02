@@ -1,0 +1,30 @@
+#!/bin/bash
+# dev_cmopatibility
+
+if [ -z "$1" ]; then
+
+	echo "-------------------------------"
+	echo "Zu wenig Parameter definiert"
+	echo "Usage: dev_cmopatibility device"
+	echo "-------------------------------"
+	echo
+
+	exit 1
+fi
+
+# Parameters
+device="$1"
+
+# Geräteunterstützung
+if [[ "$device" =~ "sonoff" ]]; then
+
+	power_topic="sonoff/$device/stat/POWER"
+	control_topic="sonoff/$device/cmnd/POWER"
+
+	
+elif [[ "$device" =~ "shelly" ]]; then
+
+	power_topic="shellies/$device/relay/0/power"
+	control_topic="shellies/$device/relay/0/command"
+
+fi

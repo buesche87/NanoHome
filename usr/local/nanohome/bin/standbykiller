@@ -1,0 +1,141 @@
+#!/bin/bash
+# Standbykiller - Sends OFF to Topic if device falls below standby-power
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+
+	echo "----------------------------------------"
+	echo "Zu wenig Parameter definiert"
+	echo "Usage: standbykiller device standbypower"
+	echo "----------------------------------------"
+	echo
+
+	exit 1
+fi
+
+
+# Settings
+server="localhost"
+user="cron_mqtt"
+pass="Cron2MQTT"
+
+# Parameters
+device="$2"
+maxpower="$3"
+
+# Geräteunterstützung
+. /usr/local/nanohome/dev_compatibility $device
+
+# Environment
+command="off"
+service_name="standbykiller.$device.service"
+service_file="/etc/systemd/system/$service_name"
+service_template="/usr/local/nanohome/templates/standbykiller.service.template"
+
+if [ "$1" = "show" ]; then
+
+	if [ "$device" = "all" ]; then
+
+		echo "(TBD) Alle Geräte:"
+		echo "$(ls /etc/systemd/system/ | grep standbykiller)"
+
+	elif test -f "$service_file"; then
+
+		show_stby=$(cat $service_file | grep "standbykiller service $device" | awk '{ printf $4 " bei " $5"\n" }')
+
+		echo "-----------------------------------------------------------------------"
+		echo "Stanbykiller für ${show_stby}W"
+		echo "-----------------------------------------------------------------------"
+
+	else
+
+		echo "-----------------------------------------------------------------------"
+		echo "Kein Standbykiller für $device"
+		echo "-----------------------------------------------------------------------"
+
+	fi
+
+	exit 1
+
+fi
+
+
+if [ "$1" = "remove" ]; then
+
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+
+	echo "-----------------------------------------------------------------------"
+	echo "Standbykiller für $device deaktiviert"
+	echo "Message: $service_name gelöscht"
+	echo "-----------------------------------------------------------------------"
+	echo
+
+	exit 1
+fi
+
+if [ "$1" = "add" ]; then
+
+	if test -f "$service_file"; then
+		echo "-----------------------------------------------------------------------"
+		echo "Standbykiller für $device bereits aktiv"
+		echo "Löschen um zu überschreiben"
+		echo "Message: $service_name existiert"
+		echo "-----------------------------------------------------------------------"
+		echo
+
+	else
+		cp $service_template $service_file
+
+		sed -i "s/-dev/$device/" $service_file
+		sed -i "s/-sbpwr/$maxpower/" $service_file
+
+		systemctl start $service_name
+		systemctl enable $service_name
+
+		echo "-----------------------------------------------------------------------"
+		echo "$device: Standbykiller bei ${maxpower}W aktiviert"
+		echo "Message: $service_name erstellt"
+		echo "-----------------------------------------------------------------------"
+		echo
+
+	fi
+fi
+
+if [ "$1" == "service" ]; then
+
+	lastmsg="off"
+
+	while read curpower;
+	do
+
+		now=$(date +"%T")
+
+		if (( $(echo "$curpower == 0" | bc -l) )); then
+
+			echo "[$now] $device: off"
+			lastmsg="off"
+
+		elif (( $(echo "$curpower < $maxpower" | bc -l) )); then
+
+			if [ "$lastmsg" == "off" ]; then
+
+				echo "[$now] $device just started, wait 5 Minutes"
+
+				sleep 5
+			else
+
+				echo "[$now] $device: ${curpower}W, less than ${maxpower}W - killing standby"
+				echo "$server $user $pass $control_topic $command"
+				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $command
+			fi
+
+		else
+			echo "[$now] $device: ${curpower}W, more than ${maxpower}W - keeping Alive"
+			lastmsg="running"
+		fi
+
+	done < <(mosquitto_sub -h $server -u $user -P $pass -t $power_topic -q 2)
+
+fi

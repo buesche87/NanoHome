@@ -1,0 +1,29 @@
+<div><h5>NanoGateway Wifi Key eingeben</h5></div>
+<hr>
+
+<div id="mqtt_nanogw_panel">
+
+  <table style="width:100%;">
+  <tbody>
+  <tr>
+  <td style="width:120px">PSK</td>
+  <td><input type="password" id="psk_nanogw_input" name="psk_nanogw_input" requiredminlength="8" style="width:100%"></input></td>
+  </tr>
+  <tr>
+  <td /><td><center><button style="background-color: #ffbdbd" type="button" onclick="message_wcon_nanogw()"><font size="4">Senden</font></button></center></td>
+  </tr>
+  </tbody>
+  </table>
+</div>
+
+<script>
+
+    var message_wcon_nanogw = function () {
+        var psk_nanogw = document.getElementById("psk_nanogw_input").value;
+        var wcon_nanogw = "wcon_nanogw " + "'" + psk_nanogw + "'";
+        
+        publish_settings(message_wcon_nanogw);
+        
+    }
+
+</script>

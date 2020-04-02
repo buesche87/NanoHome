@@ -1,0 +1,78 @@
+#!/bin/bash
+# usermgmt - Manages MQTT devices on Grafana Dashboards
+
+if [ -z "$1" ]; then
+	
+	echo "---------------------"
+	echo "Zu wenig Argumente"
+	echo "---------------------"
+	
+	exit 1
+fi
+
+# Parameter
+user="$2"
+pwd="$3"
+
+# Settings
+pwdfile="/etc/mosquitto/passwd"
+
+
+# Functions
+show_users () {
+	
+	echo "---------------------"
+	echo "MQTT-User List:"
+	echo "---------------------"
+	cat /etc/mosquitto/passwd | cut -d : -f 1
+	
+}
+
+if [ "$1" = "show" ]; then
+	
+	show_users "$user" "$pwd"
+
+fi
+
+if [ "$1" = "add" ]; then
+
+	if [ -z "$2" ] || [ -z "$3" ]; then
+	
+		echo "---------------------"
+		echo "Zu wenig Argumente"
+		echo "---------------------"
+	
+		exit 1
+	fi
+	
+	mosquitto_passwd -b /etc/mosquitto/passwd "$user" "$pwd"
+
+	echo "---------------------"	
+	echo "User hinzugefügt"
+	echo "..."
+	
+	show_users "$user" "$pwd"
+
+fi
+
+if [ "$1" = "remove" ]; then
+
+	if [ -z "$2" ]; then
+	
+		echo "---------------------"
+		echo "Zu wenig Argumente"
+		echo "---------------------"
+	
+		exit 1
+	fi
+	
+	mosquitto_passwd -D /etc/mosquitto/passwd "$user"
+
+	echo "---------------------"	
+	echo "User gelöscht"
+	echo "..."
+	
+	show_users
+
+fi
+

@@ -1,0 +1,29 @@
+<div><h5>NanoHome Wifi Key ändern</h5></div>
+<hr>
+
+<div id="mqtt_nanohome_panel">
+
+  <table style="width:100%;">
+  <tbody>
+  <tr>
+  <td style="width:120px">PSK</td>
+  <td><input type="password" id="psk_nanohome_input" name="psk_nanohome_input" requiredminlength="8" style="width:100%"></input></td>
+  </tr>
+  <tr>
+  <td /><td><center><button style="background-color: #ffbdbd" type="button" onclick="message_wcon_nanohome()"><font size="4">Senden</font></button></center></td>
+  </tr>
+  </tbody>
+  </table>
+</div>
+
+<script>
+
+    var message_wcon_nanohome = function () {
+        var psk_nanohome = document.getElementById("psk_nanohome_input").value;
+        var wcon_nanohome = "pskc " + "'" + psk_nanohome + "'";
+        
+        publish_settings(wcon_nanohome);
+
+    }
+
+</script>

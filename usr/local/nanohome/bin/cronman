@@ -1,0 +1,195 @@
+#!/bin/bash
+# cronman - Manages switches with crontab
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+
+		echo "-----------------------------------------------------"
+		echo "Zu wenig Parameter definiert"
+		echo "Usage: cronman option device|all (on_time) (off_time)"
+		echo "options: add, remove, show"
+		echo "-----------------------------------------------------"
+		echo
+
+		exit 1
+fi
+
+# Parameter
+device="$2"
+
+# Settings
+server="localhost"
+user="cron_mqtt"
+pass="Cron2MQTT"
+
+# Geräteunterstützung
+. /usr/local/nanohome/dev_compatibility $device
+topic=$(echo $power_topic)
+
+
+# Geräte auslesen und ZSP ausgeben
+get_dev () {
+
+	# Zu prüfendes Gerät definieren
+	check_dev="$1"
+	
+	# Geräte mit aktiver Schaltuhr suchen
+	aktive_zsp=$(crontab -l | grep mosquitto | awk '{ printf $14"\n" }'  | awk '!NF || !seen[$0]++' | awk -F'/' '{print $2}')
+	
+	while IFS= read -r line
+	do
+		
+		if [ "$check_dev" = "all" ] || [ "$check_dev" = "$line" ]; then
+			
+			curdev="$line"
+			show_zsp "$curdev"
+
+		fi
+	done < <(printf '%s\n' "$aktive_zsp")
+
+}
+
+show_zsp () {
+	
+	curdev="$1"
+	
+	echo "-------------------------------"
+	echo "<font size=5>$curdev</font><br>"
+	
+	zsp=$(crontab -l | grep $curdev)
+
+	while IFS= read -r line
+	 do
+		
+		dev_state_temp=$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " | " $16 } ')
+		dev_state=$(echo $dev_state_temp | sed 's/^*: /Täglich: /g' | sed 's/^1: /Montag: /g' | sed 's/^2: /Dienstag: /g' | sed 's/^3: /Mittwoch: /g' | sed 's/^4: /Donnerstag: /g' | sed 's/^5: /Freitag: /g' | sed 's/^6: /Samstag: /g' | sed 's/^0: /Sonntag: /g' | sed 's/^6-7: /Wochenende: /g' | sed 's/^1-5: /Werktags: /g' | sed 's/ | on/ | Ein/g' | sed 's/ | off/ | Aus/g')
+		
+		echo "$dev_state"
+
+	done < <(printf '%s\n' "$zsp")	
+
+	echo "-------------------------------"
+	echo
+
+}
+
+if [ "$1" = "add" ]; then
+
+	if [ "$device" = "all" ]; then
+	
+		echo "--------------------------"
+        echo "Nur ein Gerät auswählen..."
+        echo "--------------------------"
+		
+		exit 1
+	
+	fi	
+
+	if [ -z "$3" || -z "$4" ]; then
+
+		echo "---------------------------------------------"
+        echo "Keine Schaltzeiten definiert"
+        echo "Usage: cronman option device on_time off_time"
+        echo "example: cronman add sonoff_1 18:00 20:00"
+        echo "---------------------------------------------"
+		echo
+
+        exit 1
+	
+	fi
+
+	# Wochentag
+	day="$3"
+
+	# ON /OFF Zeitpunkte
+	on="$4"
+	off="$5"
+
+	# Split & Trennzeichen filtern
+	on_hour="${on:0:2}"
+	on_min="${on:3:5}"
+	off_hour="${off:0:2}"
+	off_min="${off:3:5}"
+
+	# Cronjob definieren
+	zsp_on="$on_min $on_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $topic -m on"
+	zsp_off="$off_min $off_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $topic -m off"
+	
+	# Debug
+	# echo "$zsp_on"
+	# echo "$zsp_off"
+	
+	# Cronnjob eintragen
+	if [ ! "$on" = "-" ]; then
+		(crontab -l ; echo "$zsp_on") | crontab -
+	fi	
+	
+	if [ ! "$off" = "-" ]; then
+		(crontab -l ; echo "$zsp_off") | crontab -
+	fi
+
+	# Schaltuhr ausgeben
+	show_zsp "$2"
+
+
+elif [ "$1" = "remove" ]; then
+
+	if [ "$device" == "all" ]; then
+	
+		echo "-----------------------------"
+        echo "Mehrere Löschen nicht möglich"
+        echo "-----------------------------"
+
+        exit 1
+	fi
+		
+	get_dev "$device"
+	curdev = "$?"
+	
+	if [ "$curdev" == "" ]; then
+
+		echo "------------------------------------------------"
+        echo "$2: Keine Schaltuhr für dieses Gerät"
+        echo "------------------------------------------------"
+
+        exit 1
+	
+	fi
+
+	# Cronjob entfernen
+	echo "<h4>Gelöscht</h4>"
+	crontab -l | grep -v "$curdev" | crontab -
+
+	
+elif [ "$1" = "show" ]; then
+	
+	if [ ! -z "$topic" ] || [ "$device" = "all" ]; then
+	
+		get_dev "$device"
+		
+		if [ "$curdev" == "" ]; then
+
+			echo "------------------------------------------------"
+			echo "$device: Keine Schaltuhr für dieses Gerät"
+			echo "------------------------------------------------"
+
+        exit 1
+		
+		fi
+		
+	else
+	
+		echo "---------------------"
+        echo "Keine Schaltuhr Aktiv"
+        echo "---------------------"
+
+        exit 1
+	
+	fi
+
+else
+
+	echo "Wrong parameter"
+
+fi
+
+

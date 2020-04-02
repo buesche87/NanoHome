@@ -1,0 +1,11 @@
+[Unit]
+Description=NanoHAT OLED
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/local/nanohome/bin/oled-start
+
+[Install]
+WantedBy=multi-user.target
+

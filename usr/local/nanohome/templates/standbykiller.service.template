@@ -1,0 +1,11 @@
+[Unit]
+Wants=mosquitto.service
+Description=Stanbykiller for -dev
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/local/nanohome/bin/standbykiller service -dev -sbpwr
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

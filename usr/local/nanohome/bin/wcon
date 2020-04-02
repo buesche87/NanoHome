@@ -1,0 +1,84 @@
+#!/bin/bash
+## A simple `wifi` command for Debian that will add a new WPA2 WiFi network
+## usage:
+## sudo ./wcon <ssid> <psk> (<ip>) (<subnet>)
+
+if [ -z "$1" ] || [ -z "$2" ]; then
+
+    echo "------------------------------------------"
+    echo "Usage: wcon 'SSID' 'PSK' ('IP') ('Subnet')"
+    echo "------------------------------------------"
+
+	exit 1
+
+fi
+
+new_ssid=$1
+new_psk=$2
+
+if [ ! -z "$3" ]
+  then
+    new_ip=$3"/"$4
+else
+    new_ip="DHCP"
+fi
+
+echo
+echo "[ SSID: $new_ssid ]"
+echo "[ KEY: $new_psk ]"
+echo "[ IP: $new_ip ]"
+echo
+
+check_ssid='ssid="'$1'"'
+
+IFSdef=$IFS
+usedssids=$(awk '/ssid="/{ print $0 }' /etc/wpa_supplicant/wpa_supplicant.conf.wificlient | awk -F'ssid=' '{ print $2 }' ORS=',' | sed 's/\"/''/g' | sed 's/,$//')
+IFS=","
+ssids=($usedssids)
+IFS=$IFSdef
+
+
+for i in "${ssids[@]}"; do
+	echo "SSID gefunden: $i"
+    
+	if [ "$1" == "$i" ]; then
+		lineNum="$(grep -n "$1" /etc/wpa_supplicant/wpa_supplicant.conf.wificlient | head -n 1 | cut -d: -f1)"
+		lineNum=$(($lineNum + 3))
+
+		echo
+		echo "... aktualisiere WLAN '$i'"
+		echo
+
+		sed -i ""$lineNum"s/.*/psk="\""$new_psk""\"/"  /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		newssid=0
+	fi
+done
+
+if [ "$newssid" != "0" ]; then
+		echo
+		echo "... adding new WLAN"
+		echo 'network={' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo 'ssid="'$new_ssid'"' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo 'scan_ssid=1' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo 'key_mgmt=WPA-PSK' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo 'psk="'$new_psk'"' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo '}' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+		echo
+		echo "... WLAN hinzugefügt"
+		echo
+fi
+
+if [ "$3" != "DHCP" ] && [ ! -z "$4" ]; then
+        #ip addr flush dev wlan0
+        echo "ip a add $new_ip brd + dev wlan0"
+        echo "IP Adresse gesetzt"
+        #ifdown wlan0
+        #sleep 3
+        #ifup wlan0
+    elif [ ! -z "$3" ] && [ -z "$4" ]; then
+        echo "IP Adresse ohne Subnetzmaske angegeben"
+        echo "Beispiel: /24 = 255.255.255.0"
+    fi
+fi
+

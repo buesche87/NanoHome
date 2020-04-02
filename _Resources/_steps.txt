@@ -1,0 +1,314 @@
+--- Vorbereitungen ---
+
+#Download image / extract
+wget 'https://dietpi.com/downloads/images/DietPi_NanoPiNEOAir-ARMv7-Stretch.7z' -O image.7z
+
+7z x -aoa image.7z
+
+#Mount image to set WiFi creds in dietpi.txt:
+modprobe loop
+losetup -f
+losetup /dev/loop2 "$(ls | grep -m1 'DietPi_v'*'.img')"
+partprobe /dev/loop2
+mkdir -p /mnt/loop2p1
+mkdir -p /mnt/loop2p2
+mount /dev/loop2p1 /mnt/loop2p1
+mount /dev/loop2p2 /mnt/loop2p2
+
+# - Enter Wifi creds and enable wifi, then save and exit
+cp /boot/dietpi.txt  /mnt/loop2p1/dietpi.txt
+
+# root Passwort setzen und kontrollieren 
+nano  /mnt/loop2p1/dietpi.txt
+
+# Add Wifi Credentials
+nano /mnt/loop2p1/dietpi-wifi.txt
+
+# Unmount image
+sync
+umount -f /mnt/loop2p1
+umount -f /mnt/loop2p2
+losetup -d /dev/loop2
+
+#Write to EMMC
+# - Following assumes you have no other files in this directory with name 'DietPi_v*.img' (other than the one we downloaded above)
+dd if="$(ls | grep -m1 'DietPi_v'*'.img')" of=/dev/mmcblk1
+
+--- Installation Software per dietpi-software ---
+
+Mosquitto, InfluxDB & Grafana installieren
+
+
+--- Installation Software per apt ---
+
+apt-get install mosquitto-clients python3 python3-pip python3-setuptools
+
+ 
+
+--- Installation Python Modules ---
+
+pip3 install wheel paho-mqtt influxdb
+
+
+
+--- MQTT_shell konfigurieren ---
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_shell
+
+MQTT2Shell
+
+nano /usr/bin/mqtt_shell
+chmod +x /usr/bin/mqtt_shell
+
+nano /etc/systemd/system/mqtt_shell.service
+
+systemctl start mqtt_shell.service
+systemctl status mqtt_shell.service
+systemctl enable mqtt_shell.service
+
+
+nano /etc/mosquitto/conf.d/NanoPi.conf
+
+listener 1883 0.0.0.0
+listener 1884
+protocol websockets
+
+
+--- InfluxDB konfigurieren ---
+
+influx
+
+create database NanoPi
+
+CREATE USER admin WITH PASSWORD 'wokesa64' WITH ALL PRIVILEGES
+CREATE USER mqtt_bridge WITH PASSWORD 'MQTT2InfluxDB'
+GRANT ALL ON "NanoPi" TO "mqtt_bridge"
+CREATE USER grafana WITH PASSWORD 'InfluxDB2Grafana'
+GRANT ALL ON "NanoPi" TO "grafana"
+
+
+-- MQTT Bridge --
+
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_bridge
+MQTT2InfluxDB
+
+nano /usr/bin/mqtt_bridge_shellies.py
+nano /usr/bin/mqtt_bridge_home.py
+
+chmod +x /usr/bin/mqtt_bridge_shellies.py
+chmod +x /usr/bin/mqtt_bridge_home.py
+
+nano mqtt_bridge_shellies.service
+nano mqtt_bridge_home.service
+
+systemctl start mqtt_bridge_shellies.service
+systemctl start mqtt_bridge_home.service
+systemctl status mqtt_bridge_shellies.service
+systemctl status mqtt_bridge_home.service
+systemctl enable mqtt_bridge_shellies.service
+systemctl enable mqtt_bridge_home.service
+
+
+
+--- Grafana Wetter ---
+
+nano /etc/grafana/grafana.ini
+
+ctrl+w -> Panel
+
+disable_sanitize_html = true
+
+
+
+--- Grafana Button ---
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_grafana
+
+Grafana2MQTT
+
+wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
+sudo apt-key add mosquitto-repo.gpg.key
+cd /etc/apt/sources.list.d/
+sudo wget http://repo.mosquitto.org/debian/mosquitto-stretch.list
+sudo apt-get update
+
+sudo apt-get upgrade
+
+
+wget https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js
+
+mkdir /usr/share/grafana/tools/mqttws/
+
+cp mqttws31.min.js /usr/share/grafana/public/
+
+
+-> grafana_cmd_output.html als TEXT erstellen
+
+
+--- CPU Temperatur ---
+
+nano /usr/bin/cputemp
+chmod +x /usr/bin/cputemp
+
+crontab -e
+
+*/1 * * * * /usr/bin/cputemp
+
+
+--- Sonoff / Shelly ---
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd sonoff_mqtt
+
+Sonoff2MQTT
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd shelly_mqtt
+
+Shelly2MQTT
+
+Sonoff Flashen
+
+
+--- Grafana Plugins ---
+
+grafana-cli plugins install grafana-clock-panel
+
+
+--- free disk space ---
+
+nano /usr/bin/diskspace
+chmod +x /usr/bin/diskspace
+
+crontab -e 
+
+*/15 * * * * /usr/bin/diskspace
+
+
+--- Autohotspot ---
+
+apt-get install hostapd dnsmasq
+
+nano /etc/hostapd/hostapd.conf
+
+nano /etc/default/hostapd
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
+
+systemctl disable dnsmasq
+systemctl disable hostapd
+systemctl disable wpa_supplicant
+
+nano /usr/bin/autohotspot
+chmod +x /usr/bin/autohotspot
+
+nano /lib/systemd/system/autohotspot.service
+
+systemctl start autohotspot
+systemctl status autohotspot
+
+systemctl enable autohotspot
+
+crontab -e
+
+*/5 * * * * /usr/bin/autohotspot >/dev/null 2>&1
+
+
+--- Wcon ---
+
+nano /usr/bin/wcon
+chmod +x wcon
+
+
+--- Current IP ---
+
+nano /usr/bin/ip_to_mqtt
+chmod +x /usr/bin/ip_to_mqtt
+
+
+--- NanoHat OLED ---
+
+Login mit dietpi User
+
+<Software Additional> => 130 Python Pip
+<Software Additional> => 16 Build Essentials
+<Software Additional> => 17 Git
+
+
+apt-get install libfreetype6-dev libjpeg-dev
+pip install --upgrade ssd1306
+
+
+Copy "NanoHatOLED" to home directore -> cd
+
+./install.sh
+
+
+nano /lib/systemd/system/nanohatoled.service
+systemctl start nanohatoled
+systemctl enable nanohatoled
+
+nano /etc/rc.local
+
+  remove nanohat line
+
+
+nano /usr/bin/wstat
+nano /usr/bin/wificlient
+nano /usr/bin/hotspot
+
+chmod +x /usr/bin/wstat
+chmod +x /usr/bin/wificlient
+chmod +x /usr/bin/hotspot
+
+
+-- Dietpi-Services --
+
+dietpi-services disable hostapd
+dietpi-services disable dnsmasq
+
+
+-- Shellys --
+
+UART -> Wifi Details
+Advaned -> MQTT Details
+Internet & Security -> Restrict Login
+Admin/DitoPI64
+
+-- NanoGateway PSK change --
+
+nano /usr/bin/wcon_nanogw
+chmod +x /usr/bin/wcon_nanogw
+
+
+-- Zeitserver --
+
+apt-get install ntp
+
+nano /etc/ntp.conf
+
+pool 0.ch.pool.ntp.org iburst
+pool 1.ch.pool.ntp.org iburst
+pool 2.ch.pool.ntp.org iburst
+pool 3.ch.pool.ntp.org iburst
+
+
+-- Device Config --
+
+Grafana Variable $Device erstellen. IPs abfüllen
+
+
+
+-- ESP32 --
+
+sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_esp32
+
+ESP322MQTT
+
+-- More ---
+
+dietpi-services disable brcm_patchram_plus
+disable "boot net wait" in "8 Network Options: NAS/Misc"
+
+-- Backup & Recovery --
+
+crontab -e 
+00 00 * * * /usr/bin/nanobackup backup false true false

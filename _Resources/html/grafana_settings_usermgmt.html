@@ -1,0 +1,54 @@
+<div><h5>MQTT Benutezrmanagement</h5></div>
+
+<div>
+<hr>
+<table style="width:100%">
+  <tbody>
+  <tr>
+  <td style="width:120px">Username</td>
+  <td><input type="text" id="mqtt_user" name="mqtt_user" style="width:100%" requiredminlength="4" /></td>
+  </tr>
+  <tr>
+  <td>Passwort</td>
+  <td><input type="text" id="mqtt_pwd" name="mqtt_pwd" style="width:100%" requiredminlength="8" /></td>
+  </tr>
+  <tr>
+  <td /><td><center>
+  <button style="background-color: #adfc95" type="button" onclick="user_show();"><font size="4">Auslesen</font></button>
+  <button style="background-color: #adfc95" type="button" onclick="user_add();"><font size="4">Senden</font></button>
+  <button style="background-color: #ffbdbd" type="button" onclick="user_del();"><font size="4">Löschen</font></button>
+  </center></td>
+  </tr>
+  </tbody>
+  </table>
+</div>
+
+<script>
+
+    var user_show = function () {
+
+        var usershow = "usermgmt show";
+
+        publish_settings(usershow);
+
+    }
+
+    var user_add = function () {
+        var mqtt_user = document.getElementById("mqtt_user").value;
+        var mqtt_pwd = document.getElementById("mqtt_pwd").value;
+        var useradd = "usermgmt add '" + mqtt_user + "' '" + mqtt_pwd + "'";
+
+        publish_settings(useradd);
+
+    }
+    
+    var user_del = function () {
+        var mqtt_user = document.getElementById("mqtt_user").value;
+        var mqtt_pwd = document.getElementById("mqtt_pwd").value;
+        var useradel = "usermgmt remove '" + mqtt_user + "' '" + mqtt_pwd + "'";
+
+        publish_settings(useradel);
+
+    }
+
+</script>

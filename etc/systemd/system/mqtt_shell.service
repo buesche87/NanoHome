@@ -1,0 +1,13 @@
+[Unit]
+Wants=mosquitto.service
+Description=MQTT_shell systemd service.
+
+[Service]
+Type=simple
+ExecStartPre=/bin/sleep 5
+ExecStart=/bin/bash /usr/local/nanohome/driver/mqtt_shell -s
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

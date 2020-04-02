@@ -1,0 +1,121 @@
+<div><center><h4>Multiswitch</h4></center></div>
+<hr>
+
+<div>
+<center>
+<table>
+<tr>
+<td><font size=4>Wenn</font></td>
+<td>
+<select id="multi_dev1" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
+
+  <option value="shelly1pm-76DAD6">TV</option>
+  <option value="sonoff_3">Büro</option>
+  <option value="sonoff_1">TV Deko</option>
+  <option value="shelly1pm-E641C5">Sideboard</option>
+  <option value="shelly1pm-766A83">Soundbar</option>
+  <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+</select>
+  </td>
+</tr>
+<tr>
+  <td><font size=4></font></td>
+  <td>
+    <select name="multi_value1" id="multi_value1" style="width: 166px; font-size:18px; text-align-last: center; background-color: #c7e9ff">
+      <option value="on">on</option>
+      <option value="off">off</option>
+      <option value="toggle">toggle</option>
+    </select>
+  </td>
+</tr>
+<tr>
+<td><font size=4>Dann</font></td>
+<td>
+<select id="multi_dev2" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
+
+  <option value="shelly1pm-76DAD6">TV</option>
+  <option value="sonoff_3">Büro</option>
+  <option value="sonoff_1">TV Deko</option>
+  <option value="shelly1pm-E641C5">Sideboard</option>
+  <option value="shelly1pm-766A83">Soundbar</option>
+  <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+</select>
+  </td>
+</tr>
+<tr>
+  <td><font size=4></font></td>
+  <td>
+    <select name="multi_value2" id="multi_value2" style="width: 166px; font-size:18px; text-align-last: center; background-color: #c7e9ff">
+      <option value="on">on</option>
+      <option value="off">off</option>
+      <option value="toggle">toggle</option>
+    </select>
+  </td>
+</tr>
+</table>
+
+<br><p>
+  <button style="width: 100px; height: 35px; background-color: #c7e9ff" type="button" onclick="add_multi()"><font size="3">Senden</font></button>
+  <button style="width: 100px; height: 35px; background-color: #fff4bd" type="button" onclick="show_multi()"><font size="3">Auslesen</font></button>
+  <button style="width: 100px; height: 35px; background-color: #ffbdbd" type="button" onclick="delete_multi()"><font size="3">Löschen</font></button>
+</center>
+</div>
+
+<script>
+
+    var show_multi = function () {
+
+      var multi_dev1 = document.getElementById("multi_dev1").value;
+      var multi_dev2 = document.getElementById("multi_dev2").value;
+      var multi_value1 = document.getElementById("multi_value1").value;		
+      var multi_value2 = document.getElementById("multi_value2").value;	
+
+      var showmulti = "multiswitch show '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
+		
+      publish_multi(showmulti); 
+    }
+
+    var add_multi = function () {
+
+      var multi_dev1 = document.getElementById("multi_dev1").value;
+      var multi_dev2 = document.getElementById("multi_dev2").value;
+      var multi_value1 = document.getElementById("multi_value1").value;		
+      var multi_value2 = document.getElementById("multi_value2").value;	
+      
+      var addmulti = "multiswitch add '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
+        
+      publish_multi(addmulti); 
+    }
+
+    var delete_multi = function () {
+
+      var multi_dev1 = document.getElementById("multi_dev1").value;
+      var multi_dev2 = document.getElementById("multi_dev2").value;
+      var multi_value1 = document.getElementById("multi_value1").value;		
+      var multi_value2 = document.getElementById("multi_value2").value;	
+
+      var delmulti = "multiswitch remove '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
+		
+      publish_multi(delmulti); 
+    }
+
+
+      var publish_multi = function (multi_payload) {
+      mqtt.subscribe("output", {
+		  qos: 2
+	    });
+	
+	    console.log('Sending: ' + JSON.stringify(multi_payload));
+    
+	    var multi_message = new Paho.MQTT.Message(multi_payload);
+		      multi_message.destinationName = "input";
+		      multi_message.qos = 2;
+
+	    mqtt.send(multi_message);
+	    
+	    setTimeout(() => { mqtt.unsubscribe("output"); }, 5000);
+	
+	  };
+
+
+</script>

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+Server="localhost"
+DB="NanoPi"
+Topic="diskspace"
+Sensor="NanoPi_Disk"
+
+disk=$(df -m /dev/mmcblk0p2 | tail -1 | awk '{print $4}')
+
+curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$disk
+

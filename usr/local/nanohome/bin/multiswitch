@@ -1,0 +1,165 @@
+#!/bin/bash
+# multiswitch - Sends value to Topic if device sends value
+
+if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
+
+	echo "-----------------------------------------------------"
+	echo "Zu wenig Parameter definiert"
+	echo "Usage: multiswitch show|add|remove dev1 dev2 value1 value2"
+	echo "-----------------------------------------------------"
+	echo
+
+	exit 1
+fi
+
+# Settings
+server="localhost"
+user="multiswitch_mqtt"
+pass="MULTISWITCH2MQTT"
+
+# Parameters
+dev1="$2"
+dev2="$3"
+value1="$4"
+value2="$5"
+
+# Geräteunterstützung
+. /usr/local/nanohome/dev_compatibility $dev1
+dev1_power_topic=$(echo $power_topic)
+. /usr/local/nanohome/dev_compatibility $dev2
+dev2_control_topic=$(echo $control_topic)
+
+# Environment
+service_name="multiswitch.$dev1.$value1-$dev2.$value2.service"
+service_file="/etc/systemd/system/$service_name"
+service_template="/usr/local/nanohome/templates/multiswitch.service.template"
+
+if [ "$1" = "show" ]; then
+
+	if [ "$dev1" = "$dev2" ]; then
+
+		echo "(TBD) Alle Geräte:"
+		echo "$(ls /etc/systemd/system/ | grep multiswitch)"
+
+	else
+
+		if test -f "$service_file"; then
+
+			show_if=$(cat $service_file | grep "multiswitch service $dev1 $dev2" | awk '{ printf $5 " ["$7 "] wenn "$4 " ["$6"] \n" }')
+
+			echo "-----------------------------------------------------------------------"			
+			echo "Bedingung: ${show_if}"
+			echo "-----------------------------------------------------------------------"
+
+		else 
+			echo "-----------------------------------------------------------------------"
+			echo "Keine Bedingung für $dev2 wenn $dev1 [$value1]"
+			echo "-----------------------------------------------------------------------"
+
+		fi
+
+		exit 1
+	fi
+fi
+
+if [ "$1" = "remove" ]; then
+
+	if [ "$dev1" = "$dev2" ]; then
+
+		echo "---------------------------------------"
+		echo "Bitte unterschiedliche Geräte auswählen"
+		echo "---------------------------------------"
+
+		exit 1
+	
+	fi
+
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+
+	echo "--------------------------------------------------------------------"
+	echo "$dev2: [$value2] bei $dev1 [$value1] deaktiviert."
+	echo "--------------------------------------------------------------------"
+	echo
+
+	exit 1
+fi
+
+if [ "$1" = "add" ]; then
+
+	if [ "$dev1" = "$dev2" ]; then
+
+		echo "---------------------------------------"
+		echo "Bitte unterschiedliche Geräte auswählen"
+		echo "---------------------------------------"
+
+		exit 1
+	
+	fi
+
+	if [ -z "$value1" ] || [ -z "$value2" ]; then
+
+		echo "-----------------------------------------------------"
+		echo "Zu wenig Parameter definiert"
+		echo "Usage: multiswitch show|add|remove dev1 dev2 value1 value2"
+		echo "-----------------------------------------------------"
+		echo
+
+		exit 1
+	fi
+
+	if test -f "$service_file"; then
+		echo "--------------------------------------------------------------------"
+		echo "$dev2: [$value2] bei $dev1 [$value1] bereits aktiv."
+		echo "Löschen um zu überschreiben"
+		echo "--------------------------------------------------------------------"
+		echo
+
+	else
+		cp $service_template $service_file
+
+		sed -i "s/-dev1/$dev1/" $service_file
+		sed -i "s/-dev2/$dev2/" $service_file
+		sed -i "s/-value1/$value1/" $service_file
+		sed -i "s/-value2/$value2/" $service_file
+
+		systemctl start $service_name
+		systemctl enable $service_name
+
+		echo "--------------------------------------------------------------------"
+		echo "$dev2: [$value2] bei $dev1 [$value1] aktiviert."
+		echo "--------------------------------------------------------------------"
+		echo
+
+	fi
+fi
+
+if [ "$1" = "service" ]; then
+	
+	lastvalue="none"
+	
+	while read curvalue;
+	do
+		if [ "$curvalue" = "$lastvalue" ]; then
+			
+			echo "$dev1 <$curvalue>: Nothing changed"
+			lastvalue="none"
+			
+		elif [ "$curvalue" = "$value1" ]; then
+		
+			mosquitto_pub -h $server -u $user -P $pass -t $dev2_control_topic -m $value2
+			echo "$dev1 <$curvalue> -> $dev2: <$value2>"
+			lastvalue="$curvalue"
+			
+		else
+		
+			echo "$dev1 <$curvalue>: Nothing todo"
+			lastvalue="none"
+			
+		fi
+	
+	done < <(mosquitto_sub -h $server -u $user -P $pass -t $dev1_power_topic -q 2)
+
+fi

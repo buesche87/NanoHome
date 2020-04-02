@@ -1,0 +1,28 @@
+button.home {
+
+  background-color: #206cb3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 10px;
+  padding-left: 5px;
+  width:60px;
+  height:100px;
+  text-align:left;
+  
+}
+
+select.nanohome { 
+
+  width: 166px;
+  font-size:18px;
+  text-align-last: center;
+  background-color: #fff4bd;
+
+}
+
+
+table, th, td {
+
+  border-style : hidden!important;
+  
+}
