@@ -1,10 +1,9 @@
 #!/bin/bash
-# Standbykiller - Sends OFF to Topic if device falls below standby-power
+# Standbykiller - sends OFF to topic if device falls below [W]
 
 if [ -z "$1" ] || [ -z "$2" ]; then
 
 	echo "----------------------------------------"
-	echo "Zu wenig Parameter definiert"
 	echo "Usage: standbykiller device standbypower"
 	echo "----------------------------------------"
 	echo
@@ -12,8 +11,7 @@ if [ -z "$1" ] || [ -z "$2" ]; then
 	exit 1
 fi
 
-
-# Settings
+# settings
 server="localhost"
 user="cron_mqtt"
 pass="Cron2MQTT"
@@ -22,35 +20,56 @@ pass="Cron2MQTT"
 device="$2"
 maxpower="$3"
 
-# Geräteunterstützung
+# device support
 . /usr/local/nanohome/dev_compatibility $device
+dev=$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )
 
-# Environment
+# environment
 command="off"
 service_name="standbykiller.$device.service"
 service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/standbykiller.service.template"
+show_stby=$(cat $service_file | grep "standbykiller service $device" | awk '{ printf $5"\n" }')
 
+# show devices
 if [ "$1" = "show" ]; then
 
 	if [ "$device" = "all" ]; then
-
-		echo "(TBD) Alle Geräte:"
-		echo "$(ls /etc/systemd/system/ | grep standbykiller)"
-
+		
+		# -------- To be done ---------#
+		
+		active="$(ls /etc/systemd/system/ | grep standbykiller )"
+		
+		if [ ! -z "$active" ]; then
+		
+			echo "<font size='6' color='white'>Standbykiller - </font><font size='6' color='green'>Aktiv:</font><br>"
+			
+			while IFS= read -r line
+			do
+				
+				dev="$(cat /etc/systemd/system/$line | grep standbykiller | awk '{ printf $4 }' )"
+				val="$(cat /etc/systemd/system/$line | grep standbykiller | awk '{ printf $5 }' )"
+				
+				desc_dev=$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )
+				
+				echo "<font color='hotpink'>$desc_dev</font> @ [${val}W]"
+				
+			done <<< "$active"
+		
+		else
+		
+			statusmsg "Standbykiller - " "white" "Inaktiv" "grey" "" "" "Kein Standbykiller definiert" "white"
+		
+		fi
+		
+		
 	elif test -f "$service_file"; then
-
-		show_stby=$(cat $service_file | grep "standbykiller service $device" | awk '{ printf $4 " bei " $5"\n" }')
-
-		echo "-----------------------------------------------------------------------"
-		echo "Stanbykiller für ${show_stby}W"
-		echo "-----------------------------------------------------------------------"
+		
+		statusmsg "Standbykiller - " "white" "$dev: " "hotpink" "Aktiv [${show_stby}W]" "green"
 
 	else
-
-		echo "-----------------------------------------------------------------------"
-		echo "Kein Standbykiller für $device"
-		echo "-----------------------------------------------------------------------"
+		
+		statusmsg "Standbykiller - " "white" "$dev: " "hotpink" "Inaktiv" "grey"
 
 	fi
 
@@ -58,34 +77,23 @@ if [ "$1" = "show" ]; then
 
 fi
 
-
-if [ "$1" = "remove" ]; then
-
-	systemctl stop $service_name
-	systemctl disable $service_name
-
-	rm -r $service_file
-
-	echo "-----------------------------------------------------------------------"
-	echo "Standbykiller für $device deaktiviert"
-	echo "Message: $service_name gelöscht"
-	echo "-----------------------------------------------------------------------"
-	echo
-
-	exit 1
-fi
-
+# add device
 if [ "$1" = "add" ]; then
 
-	if test -f "$service_file"; then
-		echo "-----------------------------------------------------------------------"
-		echo "Standbykiller für $device bereits aktiv"
-		echo "Löschen um zu überschreiben"
-		echo "Message: $service_name existiert"
-		echo "-----------------------------------------------------------------------"
-		echo
+	if [ "$2" = "all" ]; then
+		
+		
+		statusmsg "Error" "red" "" "" "" "" "Alle aktivieren nicht unterstützt" "white"
+		
+		exit 1
+	fi
 
+	if test -f "$service_file"; then
+		
+		statusmsg "Standbykiller - " "white" "$dev: " "hotpink" "Aktiv [${maxpower}W]" "green"
+	
 	else
+	
 		cp $service_template $service_file
 
 		sed -i "s/-dev/$device/" $service_file
@@ -93,16 +101,33 @@ if [ "$1" = "add" ]; then
 
 		systemctl start $service_name
 		systemctl enable $service_name
-
-		echo "-----------------------------------------------------------------------"
-		echo "$device: Standbykiller bei ${maxpower}W aktiviert"
-		echo "Message: $service_name erstellt"
-		echo "-----------------------------------------------------------------------"
-		echo
+		
+		statusmsg "Standbykiller - " "white" "$dev: " "hotpink" "Aktiviert [${maxpower}W]" "green"
 
 	fi
 fi
 
+# remove device
+if [ "$1" = "remove" ]; then
+	
+	if [ "$2" = "all" ]; then
+		
+		statusmsg "Error" "red" "" "" "" "" "Alle deaktivieren nicht unterstützt" "white"
+		
+		exit 1
+	fi
+	
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+	
+	statusmsg "Standbykiller - " "white" "$dev: " "hotpink" "Deaktiviert" "grey"
+	
+	exit 0
+fi
+
+# service mode
 if [ "$1" == "service" ]; then
 
 	lastmsg="off"
@@ -128,7 +153,7 @@ if [ "$1" == "service" ]; then
 
 				echo "[$now] $device: ${curpower}W, less than ${maxpower}W - killing standby"
 				echo "$server $user $pass $control_topic $command"
-				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $command
+				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $command >/dev/null 2>&1
 			fi
 
 		else

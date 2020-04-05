@@ -3,10 +3,11 @@
 
 if [ -z "$1" ]; then
 	
-	echo "---------------------"
-	echo "Zu wenig Argumente"
-	echo "---------------------"
-	
+	echo "-------------------------------------------------"
+	echo "Usage: usermgmt show|add|remove username password"
+	echo "-------------------------------------------------"
+	echo
+
 	exit 1
 fi
 
@@ -17,20 +18,26 @@ pwd="$3"
 # Settings
 pwdfile="/etc/mosquitto/passwd"
 
-
 # Functions
 show_users () {
 	
-	echo "---------------------"
-	echo "MQTT-User List:"
-	echo "---------------------"
-	cat /etc/mosquitto/passwd | cut -d : -f 1
+	list=$(cat /etc/mosquitto/passwd | cut -d : -f 1 | grep -v cron_mqtt | grep -v mqtt_shell | grep -v multiswitch_mqtt | grep -v mqtt_bridge | grep -v mqtt_grafana)
 	
+	statusmsg "MQTT-Benutzerliste" "white" "" "" "" "" "$list" "hotpink"
+	
+}
+
+err_exit () {
+	
+	statusmsg "Error" "red" "" "" "" "" "Zu wenig Parameter definiert \nUsage: usermgmt show|add|remove username password" "white"
+	
+	exit 1
+
 }
 
 if [ "$1" = "show" ]; then
 	
-	show_users "$user" "$pwd"
+	show_users
 
 fi
 
@@ -38,20 +45,12 @@ if [ "$1" = "add" ]; then
 
 	if [ -z "$2" ] || [ -z "$3" ]; then
 	
-		echo "---------------------"
-		echo "Zu wenig Argumente"
-		echo "---------------------"
-	
-		exit 1
+		err_exit
 	fi
 	
 	mosquitto_passwd -b /etc/mosquitto/passwd "$user" "$pwd"
-
-	echo "---------------------"	
-	echo "User hinzugefügt"
-	echo "..."
 	
-	show_users "$user" "$pwd"
+	show_users
 
 fi
 
@@ -59,18 +58,10 @@ if [ "$1" = "remove" ]; then
 
 	if [ -z "$2" ]; then
 	
-		echo "---------------------"
-		echo "Zu wenig Argumente"
-		echo "---------------------"
-	
-		exit 1
+		err_exit
 	fi
 	
 	mosquitto_passwd -D /etc/mosquitto/passwd "$user"
-
-	echo "---------------------"	
-	echo "User gelöscht"
-	echo "..."
 	
 	show_users
 

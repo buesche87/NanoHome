@@ -3,58 +3,84 @@
 
 if [ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ]; then
 
-	echo "-----------------------------------------------------"
-	echo "Zu wenig Parameter definiert"
+	echo "----------------------------------------------------------"
 	echo "Usage: multiswitch show|add|remove dev1 dev2 value1 value2"
-	echo "-----------------------------------------------------"
+	echo "----------------------------------------------------------"
 	echo
 
 	exit 1
 fi
 
-# Settings
+# settings
 server="localhost"
 user="multiswitch_mqtt"
 pass="MULTISWITCH2MQTT"
 
-# Parameters
+# parameters
 dev1="$2"
 dev2="$3"
 value1="$4"
 value2="$5"
 
-# Geräteunterstützung
+# device support
 . /usr/local/nanohome/dev_compatibility $dev1
 dev1_power_topic=$(echo $power_topic)
 . /usr/local/nanohome/dev_compatibility $dev2
 dev2_control_topic=$(echo $control_topic)
+desc_dev1=$(cat /usr/local/nanohome/devlist | grep $dev1 | cut -d: -f2 )
+desc_dev2=$(cat /usr/local/nanohome/devlist | grep $dev2 | cut -d: -f2 )
 
-# Environment
+# environment
 service_name="multiswitch.$dev1.$value1-$dev2.$value2.service"
 service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/multiswitch.service.template"
 
+
+# show multiswitch
 if [ "$1" = "show" ]; then
 
 	if [ "$dev1" = "$dev2" ]; then
 
-		echo "(TBD) Alle Geräte:"
-		echo "$(ls /etc/systemd/system/ | grep multiswitch)"
+		#-------- To be done ---------#
+		active="$(ls /etc/systemd/system/ | grep multiswitch )"
+		
+		if [ ! -z "$active" ]; then
+		
+			echo "<font size='6' color='white'>Multiswitch - </font><font size='6' color='green'>Aktiv:</font><br>"
+		
+			while IFS= read -r line
+			do
+				
+				dev1="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $4 }' )"
+				dev2="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $5 }' )"
+				val1="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $6 }' )"
+				val2="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $7 }' )"
+				
+				desc_dev1=$(cat /usr/local/nanohome/devlist | grep $dev1 | cut -d: -f2 )
+				desc_dev2=$(cat /usr/local/nanohome/devlist | grep $dev2 | cut -d: -f2 )
+				
+				echo "<font color='hotpink'>$desc_dev2</font> [$val2] <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> [$val1]"
+				
+			done <<< "$active"
 
+		else
+		
+			statusmsg "Multiswitch - " "white" "Inaktiv" "grey" "" "" "Kein Multiswitch definiert" "white"
+		
+		fi
+		
 	else
 
 		if test -f "$service_file"; then
-
-			show_if=$(cat $service_file | grep "multiswitch service $dev1 $dev2" | awk '{ printf $5 " ["$7 "] wenn "$4 " ["$6"] \n" }')
-
-			echo "-----------------------------------------------------------------------"			
-			echo "Bedingung: ${show_if}"
-			echo "-----------------------------------------------------------------------"
-
+			
+			if_state=$(cat $service_file | grep "multiswitch service" | awk '{ printf "["$6"]" }')
+			then_state=$(cat $service_file | grep "multiswitch service" | awk '{ printf "["$7"]" }')
+																						
+			statusmsg "Multiswitch - " "white" "$desc_dev1: " "hotpink" "Aktiv" "green" "<font color='hotpink'>$desc_dev2</font> $then_state <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> $if_state" "white"
+			
 		else 
-			echo "-----------------------------------------------------------------------"
-			echo "Keine Bedingung für $dev2 wenn $dev1 [$value1]"
-			echo "-----------------------------------------------------------------------"
+			
+			statusmsg "Multiswitch - " "white" "$desc_dev1: " "hotpink" "Inaktiv" "grey" "<font color='hotpink'>$desc_dev2</font> [$value2] <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> [$value1]" "white"
 
 		fi
 
@@ -62,62 +88,30 @@ if [ "$1" = "show" ]; then
 	fi
 fi
 
-if [ "$1" = "remove" ]; then
-
-	if [ "$dev1" = "$dev2" ]; then
-
-		echo "---------------------------------------"
-		echo "Bitte unterschiedliche Geräte auswählen"
-		echo "---------------------------------------"
-
-		exit 1
-	
-	fi
-
-	systemctl stop $service_name
-	systemctl disable $service_name
-
-	rm -r $service_file
-
-	echo "--------------------------------------------------------------------"
-	echo "$dev2: [$value2] bei $dev1 [$value1] deaktiviert."
-	echo "--------------------------------------------------------------------"
-	echo
-
-	exit 1
-fi
-
+# add multiswitch
 if [ "$1" = "add" ]; then
 
 	if [ "$dev1" = "$dev2" ]; then
-
-		echo "---------------------------------------"
-		echo "Bitte unterschiedliche Geräte auswählen"
-		echo "---------------------------------------"
-
+		
+		statusmsg "Error" "red" "" "" "" "" "Unterschiedliche Geräte auswählen" "white"
+		
 		exit 1
 	
 	fi
 
 	if [ -z "$value1" ] || [ -z "$value2" ]; then
-
-		echo "-----------------------------------------------------"
-		echo "Zu wenig Parameter definiert"
-		echo "Usage: multiswitch show|add|remove dev1 dev2 value1 value2"
-		echo "-----------------------------------------------------"
-		echo
-
+		
+		statusmsg "Error" "red" "" "" "" "" "Zu wenig Parameter definiert \n Usage: multiswitch show|add|remove dev1 dev2 value1 value2" "white"
+		
 		exit 1
 	fi
 
 	if test -f "$service_file"; then
-		echo "--------------------------------------------------------------------"
-		echo "$dev2: [$value2] bei $dev1 [$value1] bereits aktiv."
-		echo "Löschen um zu überschreiben"
-		echo "--------------------------------------------------------------------"
-		echo
+		
+		statusmsg "Multiswitch - " "white" "$desc_dev1: " "hotpink" "Aktiv" "green" "<font color='hotpink'>$desc_dev2</font> [$value2] <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> [$value1]" "white"
 
 	else
+	
 		cp $service_template $service_file
 
 		sed -i "s/-dev1/$dev1/" $service_file
@@ -127,27 +121,48 @@ if [ "$1" = "add" ]; then
 
 		systemctl start $service_name
 		systemctl enable $service_name
-
-		echo "--------------------------------------------------------------------"
-		echo "$dev2: [$value2] bei $dev1 [$value1] aktiviert."
-		echo "--------------------------------------------------------------------"
-		echo
+		
+		statusmsg "Multiswitch - " "white" "$desc_dev1: " "hotpink" "Aktiviert" "green" "<font color='hotpink'>$desc_dev2</font> [$value2] <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> [$value1]" "white"
 
 	fi
 fi
 
+# remove multiswitch
+if [ "$1" = "remove" ]; then
+
+	if [ "$dev1" = "$dev2" ]; then
+		
+		statusmsg "Error" "red" "" "" "" "" "Unterschiedliche Geräte auswählen" "white"
+
+		exit 1
+	
+	fi
+
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+	
+	statusmsg "Multiswitch - " "white" "$desc_dev1: " "hotpink" "Deaktiviert" "grey" "<font color='hotpink'>$desc_dev2</font> [$value2] <font color='grey'>wenn</font> <font color='hotpink'>$desc_dev1</font> [$value1]" "white"
+
+	exit 1
+fi
+
+# service mode
 if [ "$1" = "service" ]; then
 	
-	lastvalue="none"
+	lastvalue=""
 	
 	while read curvalue;
 	do
+		echo "last: $curvalue"
+		
 		if [ "$curvalue" = "$lastvalue" ]; then
 			
 			echo "$dev1 <$curvalue>: Nothing changed"
-			lastvalue="none"
+			lastvalue=""
 			
-		elif [ "$curvalue" = "$value1" ]; then
+		elif [ "${curvalue^^}" = "${value1^^}" ]; then
 		
 			mosquitto_pub -h $server -u $user -P $pass -t $dev2_control_topic -m $value2
 			echo "$dev1 <$curvalue> -> $dev2: <$value2>"

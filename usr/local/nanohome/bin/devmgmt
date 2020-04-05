@@ -1,23 +1,26 @@
 #!/bin/bash
-# devmgmt - Manages MQTT devices on Grafana Dashboards
+# devmgmt - manages MQTT devices on grafana dashboards
 
-if [ -z "$1" ] || [ -z "$2" ]; then
+if [ -z "$1" ]; then
 	
-	echo "---------------------"
+	echo "----------------------------------------------------------"
 	echo "Zu wenig Argumente"
-	echo "---------------------"
+	echo "Usage: devmgmt add|remove sn description device devicetype"
+	echo "----------------------------------------------------------"
+	echo
 	
 	exit 1
+	
 fi
 
-# Parameter
+# parameter
 sn="$2"
-device="$3"
-devicetype="$4"
-bezeichnung="$5"
+desc="$3"
+device="$4"
+devicetype="$5"
 random="$(date +%s)"
 
-# Settings
+# settings
 home_uid="XieEaLmRk"
 devmgr_uid="Uhzl9yRgk"
 zsp_uid="_H3fwdmRz"
@@ -25,7 +28,7 @@ settings_uid="sYOGRUiRz"
 api_key="eyJrIjoiWk9YZDVmbGhRMkpmYjdsT3h3VjhSVjR5cXlwZUh1d3MiLCJuIjoiY3JlYXRlX2VsZW1lbnRzIiwiaWQiOjF9"
 template_folder="/usr/local/nanohome/templates"
 
-# Functions
+# functions
 get_dashboard () {
 	
 	uid="$1"
@@ -45,43 +48,59 @@ update_dashboard () {
 	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @/tmp/merge_panel_final.json http://localhost:3001/api/dashboards/db
 }
 
+err_exit () {
+	
+	statusmsg "Error" "red" "" "" "" "" "Zu wenig Parameter definiert \nUsage: devmgmt add|remove sn description device devicetype" "white"
+	
+	exit 1
+}
 
+# show devices
+if [ "$1" = "show" ]; then
+	
+	msg=$(cat /usr/local/nanohome/devlist | awk -F':' '{printf "<font color='hotpink'>"$2 ":</font> " $1 "<br>"}')
 
-# Main
+	statusmsg "Geräteliste" "white" "" "" "" "" "$msg" "white"
 
+	exit 0
+	
+fi
+
+# add device
 if [ "$1" = "add" ]; then
 
-	if [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ]; then
+	if  [ -z "$2" ] || [ -z "$3" ] || [ -z "$4" ] || [ -z "$5" ]; then
 	
-		echo "---------------------"
-		echo "Zu wenig Argumente"
-		echo "---------------------"
-	
-		exit 1
+		err_exit
+		
 	fi
-
+	
+	# add device to devlist
+	echo -e "\n$sn:$desc" >> /usr/local/nanohome/devlist
+	
 	# get devicemanager dashboard & make it readable
 	get_dashboard "$devmgr_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 
-	# Add new option to dropdown
-	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'.nnao.lan\\">'$bezeichnung'</option>\\r\\n#g' /tmp/merge_panel_output.json
+	# add new option to dropdown
+	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'.nnao.lan\\">'$desc'</option>#g' /tmp/merge_panel_output.json
 
 	add_json_options
 	update_dashboard
 
-	# Cleanup
+	# cleanup
 	rm /tmp/merge_panel_*
 
 
-	# add button to home panel if device is a switch
+	# add specific elements if device is a switch
 	if [ "$devicetype" == "switch" ]; then
 		
+		## button on home dashboard
 		# create new button from template
 		cp $template_folder"/"$device"_switch.json.template" "/tmp/merge_panel_input.json"
 
 		sed -i "s/_DEVID_/"$sn"/g"  /tmp/merge_panel_input.json
-		sed -i "s/_DESCRIPTION_/"$bezeichnung"/g"  /tmp/merge_panel_input.json
+		sed -i "s/_DESCRIPTION_/"$desc"/g"  /tmp/merge_panel_input.json
 		sed -i "s/_RAND_/"$random"/"  /tmp/merge_panel_input.json
 		
 		get_dashboard "$home_uid"
@@ -92,100 +111,108 @@ if [ "$1" = "add" ]; then
 		
 		update_dashboard
 		
-		# Cleanup
+		# cleanup
 		rm /tmp/merge_panel_*
 		
-		## Schaltuhr
-
-
-		# Get ZSP Dashboard & make it readable
+		
+		## dropdown on timer dashboard
+		# get timer dashboard & make it readable
 		get_dashboard "$zsp_uid"
 		jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 		
-		# Add new option to dropdown
-		sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'\\">'$bezeichnung'</option>\\r\\n#g' /tmp/merge_panel_output.json
+		# add new option to dropdown
+		sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'\\">'$desc'</option>#g' /tmp/merge_panel_output.json
 		
 		add_json_options
 		update_dashboard
 		
-		# Cleanup
+		# cleanup
 		rm /tmp/merge_panel_*
 		
-		
-		# Get Settings Dashboard & make it readable
+		## dropdowns in ettings dashboard
+		# Ggt Settings Dashboard & make it readable
 		get_dashboard "$settings_uid"
 		jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 		
-		# Add new option to dropdown
-		sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'\\">'$bezeichnung'</option>\\r\\n#g' /tmp/merge_panel_output.json
+		# add new option to dropdown
+		sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n<option value=\\"'$sn'\\">'$desc'</option>#g' /tmp/merge_panel_output.json
 		
 		add_json_options
 		update_dashboard
 		
-		# Cleanup
+		# cleanup
 		rm /tmp/merge_panel_*
 		
 	fi
 	
-	# Message
-	echo "<p>"
-	echo "Gerät hinzugefügt"
+	# message
+	
+	statusmsg "Device Manager" "white" "$desc:" "hotpink" " Gerät $sn hinzugefügt" "white"
+	
+	exit 0
 	
 fi
 
+# remove device
 if [ "$1" = "remove" ]; then
 	
-	echo "TBD"
+	if  [ -z "$2" ] || [ -z "$3" ]; then
 	
-	bezeichnung="$3"
+		err_exit
+		
+	fi
 	
+	# remove device from devlist
+	sed -i '/'$sn'/d' /usr/local/nanohome/devlist
+	
+	## remove from device manager dashboard
 	# get devicemanager dashboard & make it readable
 	get_dashboard "$devmgr_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 
-	# Remove option from dropdown
-	sed -i 's#<option value=\\"http://'$sn'.nano.lan\\">'$bezeichnung'</option>\\r\\n##g' /tmp/merge_panel_output.json
+	# remove option from dropdown
+	sed -i 's#<option value=\\"'$sn'.nano.lan\\">'$desc'</option>\\r\\n##g' /tmp/merge_panel_output.json
 
 	add_json_options
 	update_dashboard		
 
-	# Cleanup
+	# cleanup
 	rm /tmp/merge_panel_*
 
-
-	# Get ZSP Dashboard & make it readable
+	## remove from timer dashboard
+	# get timer dashboard & make it readable
 	get_dashboard "$zsp_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 	
-	# Add new option to dropdown
-	sed -i 's#<option value=\\"'$sn'\\">'$bezeichnung'</option>\\r\\n##g' /tmp/merge_panel_output.json
+	# remove option from dropdown
+	sed -i 's#<option value=\\"'$sn'\\">'$desc'</option>\\r\\n##g' /tmp/merge_panel_output.json
 	
 	<option value=\"TEMP\">TEMP</option>\r\n
 	
 	add_json_options
 	update_dashboard
-	
-	
-	# Cleanup
+
+	# cleanup
 	rm /tmp/merge_panel_*
 
-	# Get Settings Dashboard & make it readable
+	## remove from settings dashboard
+	# get settings dashboard & make it readable
 	get_dashboard "$settings_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 	
-	# Add new option to dropdown
-	sed -i 's#<option value=\\"'$sn'\\">'$bezeichnung'</option>\\r\\n##g' /tmp/merge_panel_output.json
+	# remove option to dropdown
+	sed -i 's#<option value=\\"'$sn'\\">'$desc'</option>\\r\\n##g' /tmp/merge_panel_output.json
 	
 	add_json_options
 	update_dashboard
 	
-	# Cleanup
+	# cleanup
 	rm /tmp/merge_panel_*
 	
-	echo "<p>"
-	echo "Gerät entfernt"
-	echo "<br>"
-	echo "Button auf Home manuell löschen"
+	# message
+	
+	statusmsg "Device Manager" "white" "$desc:" "hotpink" " Gerät $sn gelösch\nButton auf Home manuell löschent" "white"
+	
+	exit 0
 
 fi
-

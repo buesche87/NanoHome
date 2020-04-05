@@ -1,5 +1,4 @@
-<div><center><h4>Multiswitch</h4></center></div>
-<hr>
+<div><center><font size=5 color='hotpink'>Multiswitch</font></center><hr></div>
 
 <div>
 <center>
@@ -8,15 +7,14 @@
 <td><font size=4>Wenn</font></td>
 <td>
 <select id="multi_dev1" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
-
-  <option value="shelly1pm-76DAD6">TV</option>
-  <option value="sonoff_3">Büro</option>
-  <option value="sonoff_1">TV Deko</option>
-  <option value="shelly1pm-E641C5">Sideboard</option>
-  <option value="shelly1pm-766A83">Soundbar</option>
-  <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+<option value="shelly1pm-76DAD6">TV</option>
+<option value="sonoff_3">Büro</option>
+<option value="sonoff_1">TV Deko</option>
+<option value="shelly1pm-E641C5">Sideboard</option>
+<option value="shelly1pm-766A83">Soundbar</option>
+<option value="shelly1pm-8CAAB5056FE7">Joris</option>
 </select>
-  </td>
+</td>
 </tr>
 <tr>
   <td><font size=4></font></td>
@@ -32,15 +30,14 @@
 <td><font size=4>Dann</font></td>
 <td>
 <select id="multi_dev2" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
-
-  <option value="shelly1pm-76DAD6">TV</option>
-  <option value="sonoff_3">Büro</option>
-  <option value="sonoff_1">TV Deko</option>
-  <option value="shelly1pm-E641C5">Sideboard</option>
-  <option value="shelly1pm-766A83">Soundbar</option>
-  <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+<option value="shelly1pm-76DAD6">TV</option>
+<option value="sonoff_3">Büro</option>
+<option value="sonoff_1">TV Deko</option>
+<option value="shelly1pm-E641C5">Sideboard</option>
+<option value="shelly1pm-766A83">Soundbar</option>
+<option value="shelly1pm-8CAAB5056FE7">Joris</option>
 </select>
-  </td>
+</td>
 </tr>
 <tr>
   <td><font size=4></font></td>
@@ -73,6 +70,7 @@
       var showmulti = "multiswitch show '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
 		
       publish_multi(showmulti); 
+
     }
 
     var add_multi = function () {
@@ -97,10 +95,11 @@
       var delmulti = "multiswitch remove '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
 		
       publish_multi(delmulti); 
+      
     }
 
+    var publish_multi = function (multi_payload) {
 
-      var publish_multi = function (multi_payload) {
       mqtt.subscribe("output", {
 		  qos: 2
 	    });
@@ -116,6 +115,5 @@
 	    setTimeout(() => { mqtt.unsubscribe("output"); }, 5000);
 	
 	  };
-
 
 </script>

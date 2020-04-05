@@ -1,47 +1,48 @@
 #!/bin/bash
-# cronman - Manages switches with crontab
+# cronman - manages switches with crontab
 
 if [ -z "$1" ] || [ -z "$2" ]; then
 
-		echo "-----------------------------------------------------"
-		echo "Zu wenig Parameter definiert"
-		echo "Usage: cronman option device|all (on_time) (off_time)"
-		echo "options: add, remove, show"
-		echo "-----------------------------------------------------"
+		echo "--------------------------------------------------------------"
+		echo "Usage: cronman show|add|remove device|all (on_time) (off_time)"
+		echo "--------------------------------------------------------------"
 		echo
 
 		exit 1
 fi
 
-# Parameter
+# parameter
 device="$2"
+dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
 
-# Settings
+# settings
 server="localhost"
 user="cron_mqtt"
 pass="Cron2MQTT"
 
-# Geräteunterstützung
+# device support
 . /usr/local/nanohome/dev_compatibility $device
 topic=$(echo $power_topic)
 
-
-# Geräte auslesen und ZSP ausgeben
+# functions
 get_dev () {
 
 	# Zu prüfendes Gerät definieren
 	check_dev="$1"
+	print="$2"
 	
 	# Geräte mit aktiver Schaltuhr suchen
-	aktive_zsp=$(crontab -l | grep mosquitto | awk '{ printf $14"\n" }'  | awk '!NF || !seen[$0]++' | awk -F'/' '{print $2}')
+	aktive_zsp="$(crontab -l | grep mosquitto | awk '{ printf $14"\n" }'  | awk '!NF || !seen[$0]++' | awk -F'/' '{print $2}')"
 	
 	while IFS= read -r line
-	do
-		
+	do		
 		if [ "$check_dev" = "all" ] || [ "$check_dev" = "$line" ]; then
 			
 			curdev="$line"
-			show_zsp "$curdev"
+			
+			if [ "$print" = "yes" ]; then			
+				show_zsp "$curdev" 
+			fi
 
 		fi
 	done < <(printf '%s\n' "$aktive_zsp")
@@ -51,9 +52,9 @@ get_dev () {
 show_zsp () {
 	
 	curdev="$1"
+	dev=$(cat /usr/local/nanohome/devlist | grep $curdev | cut -d: -f2 )
 	
-	echo "-------------------------------"
-	echo "<font size=5>$curdev</font><br>"
+	echo "<font size=6 color='white'>Schaltuhr - <font color='hotpink'>$dev: </font></font><font size=6 color='green'>Aktiv</font><br><font size=5 color='white'>"
 	
 	zsp=$(crontab -l | grep $curdev)
 
@@ -66,40 +67,40 @@ show_zsp () {
 		echo "$dev_state"
 
 	done < <(printf '%s\n' "$zsp")	
-
-	echo "-------------------------------"
+	
+	echo "</font><hr style='border-top: dotted 1px;' />"
 	echo
 
 }
 
+# add timer
 if [ "$1" = "add" ]; then
 
 	if [ "$device" = "all" ]; then
-	
-		echo "--------------------------"
-        echo "Nur ein Gerät auswählen..."
-        echo "--------------------------"
+		
+		statusmsg "Error" "red" "" "" "" "" "Nur ein Gerät auswählen" "white"
 		
 		exit 1
 	
 	fi	
 
-	if [ -z "$3" || -z "$4" ]; then
-
-		echo "---------------------------------------------"
-        echo "Keine Schaltzeiten definiert"
-        echo "Usage: cronman option device on_time off_time"
-        echo "example: cronman add sonoff_1 18:00 20:00"
-        echo "---------------------------------------------"
-		echo
+	if [ -z "$3" ] || [ -z "$4" ]; then
+		
+		statusmsg "Error" "red" "" "" "" "" "Zu wenig Parameter definiert \nUsage: cronman show|add|remove device|all shedule (on_time) (off_time)" "white"
 
         exit 1
-	
+		
+	elif [ "$4" = "-" ] && [ "$5" = "-" ]; then
+		
+		statusmsg "Error" "red" "" "" "" "" "Das geht nicht" "white"
+		
+		exit 1
+		
 	fi
 
 	# Wochentag
 	day="$3"
-
+	
 	# ON /OFF Zeitpunkte
 	on="$4"
 	off="$5"
@@ -118,78 +119,80 @@ if [ "$1" = "add" ]; then
 	# echo "$zsp_on"
 	# echo "$zsp_off"
 	
-	# Cronnjob eintragen
-	if [ ! "$on" = "-" ]; then
+	onlen=$(echo -n $on | wc -m)
+	oflen=$(echo -n $off | wc -m)
+	
+	# Cronjob eintragen
+	if [ $onlen -eq 5 ]; then
 		(crontab -l ; echo "$zsp_on") | crontab -
 	fi	
 	
-	if [ ! "$off" = "-" ]; then
+	if [ $oflen -eq 5 ]; then
 		(crontab -l ; echo "$zsp_off") | crontab -
 	fi
 
 	# Schaltuhr ausgeben
-	show_zsp "$2"
+	get_dev "$device" "yes"
+	
+fi
 
-
-elif [ "$1" = "remove" ]; then
+# remove timer
+if [ "$1" = "remove" ]; then
 
 	if [ "$device" == "all" ]; then
-	
-		echo "-----------------------------"
-        echo "Mehrere Löschen nicht möglich"
-        echo "-----------------------------"
+		
+		statusmsg "Error" "red" "" "" "" "" "Mehrere löschen nicht möglich" "white"
 
         exit 1
 	fi
 		
-	get_dev "$device"
+	get_dev "$device" "no"
 	curdev = "$?"
 	
-	if [ "$curdev" == "" ]; then
-
-		echo "------------------------------------------------"
-        echo "$2: Keine Schaltuhr für dieses Gerät"
-        echo "------------------------------------------------"
+	if [ "$device" == "" ]; then
+				
+		statusmsg "Schaltuhr " "white" "Inaktiv" "grey"
 
         exit 1
 	
 	fi
 
 	# Cronjob entfernen
-	echo "<h4>Gelöscht</h4>"
+	
+	# dev_desc=$(cat /usr/local/nanohome/devlist | grep $devive | cut -d: -f2 )
+	statusmsg "Schaltuhr - " "white" "$dev_desc: " "hotpink" "Deaktiviert" "grey" 
+	
+	
 	crontab -l | grep -v "$curdev" | crontab -
-
-	
-elif [ "$1" = "show" ]; then
-	
-	if [ ! -z "$topic" ] || [ "$device" = "all" ]; then
-	
-		get_dev "$device"
-		
-		if [ "$curdev" == "" ]; then
-
-			echo "------------------------------------------------"
-			echo "$device: Keine Schaltuhr für dieses Gerät"
-			echo "------------------------------------------------"
-
-        exit 1
-		
-		fi
-		
-	else
-	
-		echo "---------------------"
-        echo "Keine Schaltuhr Aktiv"
-        echo "---------------------"
-
-        exit 1
-	
-	fi
-
-else
-
-	echo "Wrong parameter"
 
 fi
 
+# show timer
+if [ "$1" = "show" ]; then
+	
+	if crontab -l | grep cron_mqtt 1> /dev/null 2>&1; then
+	
+		if [ ! -z "$topic" ] || [ "$device" = "all" ]; then
 
+			get_dev "$device" "yes"
+
+			if [ "$curdev" == "" ]; then
+
+				dev=$( cat /usr/local/nanohome/devlist | grep $curdev | cut -d: -f2 )
+			
+				statusmsg "Schaltuhr - " "white" "$dev_desc: " "hotpink" "Inaktiv" "grey" 
+
+				exit 1
+		
+			fi
+		fi	
+	
+	else
+		
+	statusmsg "Schaltuhr - " "white" "Inaktiv" "grey" "" "" "Es wurde keine Schaltuhr definiert" "white"
+
+	exit 1
+	
+	fi
+
+fi

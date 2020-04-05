@@ -1,0 +1,7 @@
+#!/bin/bash
+# messagesend -sends messages to dashboard
+
+# echo -e "<hr style='border-top: dotted 1px;' />"
+echo -e "<font size='6' color='$2'>$1</font><font size='6' color='$4'>$3</font><font size='6' color='$6'>$5</font><br>"
+echo -e "<font size='5' color='$8'>$7</font><font size='5' color='$10'>$9</font>"
+#echo -e "<hr style='border-top: dotted 1px;' />"
