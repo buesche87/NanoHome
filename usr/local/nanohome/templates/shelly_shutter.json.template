@@ -1,0 +1,19 @@
+{
+  "datasource": null,
+  "content": "<table style=\"height:100%; width:100%\"> \r\n\t<tr style=\"height:30%\"> \r\n\t\t<td style=\"width:100%; text-align:center\"><font size=\"5\" color=\"white\">_DESCRIPTION_</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td style=\"width:100px; text-align:center\">\r\n\t\t\t<button class=\"slider\" style=\"width:32%\" onclick=\"publish('0','shellies/_DEVID_/roller/0/command/pos','shellies/_DEVID_/roller/0/pos','_DESCRIPTION_',2);\"><font size=\"4\" color=\"white\">▲</font></button>\r\n\t\t\t<button class=\"slider\" style=\"width:32%\" onclick=\"publish('100','shellies/_DEVID_/roller/0/command/pos','shellies/_DEVID_/roller/0/pos','_DESCRIPTION_',2);\"><font size=\"4\" color=\"white\">▼</font></button>\r\n\t\t\t<button class=\"slider\" style=\"width:32%\" onclick=\"_RAND__shutter_pressed(); \"><font size=\"4\" color=\"white\">≡</font></button>\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar _RAND__shutter_pressed = function() { \r\n\r\n\tpublish('100','shellies/_DEVID_/roller/0/command/pos','shellies/_DEVID_/roller/0/pos','_DESCRIPTION_',2); \r\n\tsetTimeout(() => { publish('99','shellies/_DEVID_/roller/0/command/pos','shellies/_DEVID_/roller/0/pos','_DESCRIPTION_',2); }, 20000); \r\n\r\n}\r\n\r\n</script>",
+  "gridPos": {
+    "h": 4,
+    "w": 6,
+    "x": 0,
+    "y": 8
+  },
+  "id": _RAND_,
+  "links": [],
+  "mode": "html",
+  "options": {},
+  "timeFrom": null,
+  "timeShift": null,
+  "title": "",
+  "transparent": true,
+  "type": "text"
+}

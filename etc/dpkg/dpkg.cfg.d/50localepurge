@@ -1,0 +1,52 @@
+# DO NOT MODIFY/REMOVE THIS FILE - IT IS AUTO-GENERATED
+#
+# To remove/disable this, run dpkg-reconfigure localepurge
+# and say no to/disable the "Use dpkg --path-exclude" option.
+#
+# To change what patterns are affected use:
+# * dpkg-reconfigure localepurge
+#   (to alter which locales are kept and whether manpages should
+#    be purged)
+# * Add a dpkg config file in /etc/dpkg/dpkg.cfg.d that is read
+#   after this file with the necessary --path-include and
+#   --path-exclude options.
+#
+# Report faulty patterns against the localepurge package.
+#
+
+# Paths to purge
+path-exclude=/usr/share/locale/*
+path-exclude=/usr/share/gnome/help/*/*
+path-exclude=/usr/share/doc/kde/HTML/*/*
+path-exclude=/usr/share/omf/*/*-*.emf
+path-exclude=/usr/share/man/*
+# Paths to keep
+path-include=/usr/share/locale/locale.alias
+path-include=/usr/share/locale/de/*
+path-include=/usr/share/locale/de_CH.UTF-8/*
+path-include=/usr/share/locale/en/*
+path-include=/usr/share/locale/en_GB.UTF-8/*
+path-include=/usr/share/gnome/help/*/C/*
+path-include=/usr/share/gnome/help/*/de/*
+path-include=/usr/share/gnome/help/*/de_CH.UTF-8/*
+path-include=/usr/share/gnome/help/*/en/*
+path-include=/usr/share/gnome/help/*/en_GB.UTF-8/*
+path-include=/usr/share/doc/kde/HTML/C/*
+path-include=/usr/share/doc/kde/HTML/de/*
+path-include=/usr/share/doc/kde/HTML/de_CH.UTF-8/*
+path-include=/usr/share/doc/kde/HTML/en/*
+path-include=/usr/share/doc/kde/HTML/en_GB.UTF-8/*
+path-include=/usr/share/omf/*/*-de.emf
+path-include=/usr/share/omf/*/*-de_CH.UTF-8.emf
+path-include=/usr/share/omf/*/*-en.emf
+path-include=/usr/share/omf/*/*-en_GB.UTF-8.emf
+path-include=/usr/share/omf/*/*-C.emf
+path-include=/usr/share/locale/languages
+path-include=/usr/share/locale/all_languages
+path-include=/usr/share/locale/currency/*
+path-include=/usr/share/locale/l10n/*
+path-include=/usr/share/man/de/*
+path-include=/usr/share/man/de_CH.UTF-8/*
+path-include=/usr/share/man/en/*
+path-include=/usr/share/man/en_GB.UTF-8/*
+path-include=/usr/share/man/man[0-9]/*

@@ -1,0 +1,19 @@
+{
+  "datasource": null,
+  "content": "<table style=\"width:100%;height:100%\"> \r\n\t<tr style=\"height:30%\">\r\n\t\t<td style=\"text-align:left; vertical-align:bottom\"><font size=\"4\" color=\"white\">▼</font></td>\r\n\t\t<td style=\"text-align:center\"><font size=\"5\"  color=\"white\">_DESCRIPTION_</font></td>\r\n\t\t<td style=\"text-align:right; vertical-align:bottom\"><font size=\"4\" color=\"white\">▲</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td colspan=\"3\" style=\"width:100%\">\r\n\t\t\t<input id=\"_DEVID_\" type=\"range\" class=\"slider\" min=\"0\" max=\"100\" onchange=\"update_value__RAND_()\" />\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar update_value__RAND_ = function() { \r\n\r\n\tvar _RAND__value = document.getElementById(\"_DEVID_\").value; \r\n\tpublish(_RAND__value, 'shellies/_DEVID_/roller/0/command/pos', 'shellies/_DEVID_/roller/0/pos', '_DESCRIPTION_', 2); \r\n\r\n}\r\n\r\n</script>",
+  "gridPos": {
+    "h": 4,
+    "w": 6,
+    "x": 0,
+    "y": 8
+  },
+  "id": _RAND_,
+  "links": [],
+  "mode": "html",
+  "options": {},
+  "timeFrom": null,
+  "timeShift": null,
+  "title": "",
+  "transparent": true,
+  "type": "text"
+}
