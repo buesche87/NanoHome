@@ -3,7 +3,7 @@ Wants=mosquitto.service
 Description=Stanbykiller for shelly1pm-76DAD6
 
 [Service]
-Type=idle
+Type=simple
 ExecStart=/bin/bash /usr/local/nanohome/bin/standbykiller service shelly1pm-76DAD6 37
 Restart=always
 

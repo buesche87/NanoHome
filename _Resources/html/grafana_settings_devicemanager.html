@@ -1,86 +1,91 @@
-<div>
-    <h4>MQTT Device Manager</h4>
-    <hr />
-</div>
+<div><h5>MQTT Device Manager</h5></div>
 
-<div>
-    <table style="width: 100%;">
-        <tr>
-            <td>
-                <select class="nanohome" id="device">
-                    <option value="shelly">Shelly</option>
-                    <option value="sonoff">Sonoff</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <select class="nanohome" id="devicetype">
-                    <option value="switch">Switch</option>
-                    <option value="sensor">Sensor</option>
-                    <option value="roller">Roller</option>
-                    <option value="shutter">Shutter</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="nanohome" id="devid" value="Device ID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="nanohome" id="desc" value="Bezeichnung" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Geräteliste anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="showdev()">🔎</button>
-                <button title="Gerät hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="adddev()">💾</button>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <select class="nanohome" id="del_dev" name="nanolist">
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="remdev()">❌</button>
-            </td>
-        </tr>
-    </table>
+<div id="add_remove_device">
+<hr>
+  <table style="width:100%">
+    <tbody>
+      <tr>
+        <td style="width:120px">Gerät</td>
+        <td><select name="device" id="device" style="width: 100%; background-color: #fff4bd; color:black">
+            <option value="shelly">Shelly</option>
+            <option value="sonoff">Sonoff</option>
+			</select>
+        </td>
+      </tr>
+      <tr>
+        <td>Art</td>
+        <td><select name="devicetype" id="devicetype" style="width: 100%; background-color: #fff4bd; color:black">
+            <option value="switch">Switch</option>
+            <option value="senros">Sensor</option>
+          </select>
+        </td>
+      </tr>
+    <tr>
+      <td>Device id</td>
+      <td><input type="text" id="devid" name="devid" style="width: 100%; background-color: #c7e9ff color: black"</input></td>
+    </tr>
+    <tr>
+      <td>Bezeichnung</td>
+      <td><input type="text" id="desc" name="desc" style="width: 100%; background-color: #c7e9ff color: black"</input></td>
+    </tr>
+    <tr>
+		<td />
+		<td>
+        <center>
+          <button style="background-color: #adfc95" type="button" onclick="adddev()"><font size="3">Hinzufügen</font></button>
+        </center>
+		</td>
+    </tr>
+    <tr>
+    <td></td>
+    <td>
+      <select name="del_dev" id="del_dev" onfocus="this.selectedIndex = -1;" style="width: 100%; font-size:18px; text-align-last: center; background-color: #fff4bd">
+        <option value="http://nanogate.nano.lan/cgi-bin/settings.cgi">NanoGate</option>
+        <option value="http://shelly1pm-76DAD6.nano.lan">TV</option>
+        <option value="http://sonoff_3.nano.lan">Büro</option>
+        <option value="http://sonoff_1.nano.lan">TV Deko</option>
+        <option value="http://shelly1pm-E641C5.nano.lan">Sideboard</option>
+        <option value="http://shelly1pm-766A83.nano.lan">Sofa</option>
+        <option value="http://shelly1pm-8CAAB5056FE7.nano.lan">Joris</option>
+        <option value="http://TEMP.nano.lan">TEMP</option>
+      </select>
+    </td>
+    </tr>
+    <tr>
+    <td></td>
+    <td>
+        <center>
+          <button style="background-color: #ffbdbd" type="button" onclick="remdev()"><font size="3">Löschen</font></button>
+        </center>
+		</td>
+    </tr>
+  </tbody>
+  </table>
 </div>
 
 <script>
-    var showdev = function () {
-        var showdev_str = "devmgmt show";
-        publish_settings(showdev_str);
-    };
 
     var adddev = function () {
-        var input_payload = "<font size='5'>Gerät wird hinzugefügt</font><br><br><font size='4'>Bitte warten...</font>";
-        $("#settings_output").html(input_payload);
 
-        var device = document.getElementById("device").value;
-        var devicetype = document.getElementById("devicetype").value;
-        var sn = document.getElementById("devid").value;
-        var desc = document.getElementById("desc").value;
-        var adddev_str = "devmgmt add '" + sn + "' '" + desc + "' '" + device + "' '" + devicetype + "'";
+		  var device = document.getElementById("device").value;
+      var devicetype = document.getElementById("devicetype").value;
+      var sn = document.getElementById("devid").value;
+      var desc = document.getElementById("desc").value;
+      var adddev_str = "devmgmt add '" + sn + "' '" + device + "' '" + devicetype + "' '" + desc + "'";
+       
+      publish_settings(adddev_str);
 
-        publish_settings(adddev_str);
-    };
+    }
 
     var remdev = function () {
-        var input_payload = "<font size='5'>Gerät wird gelöscht</font><br><br><font size='4'>Bitte warten...</font>";
-        $("#settings_output").html(input_payload);
 
-        var sn = document.getElementById("del_dev").value;
-        var text = document.getElementById("del_dev");
-        var desc = text.options[text.selectedIndex].text;
-        var remdev_str = "devmgmt remove '" + sn + "' '" + desc + "'";
+      var sn = document.getElementById("del_dev").value;
+      var text = document.getElementById("del_dev");
+      var desc = text.options[text.selectedIndex].text;
+      var remdev_str = "devmgmt remove '" + sn + "' '" + desc + "'";
+       
+      publish_settings(remdev_str);
 
-        publish_settings(remdev_str);
-    };
+    }
+
 </script>

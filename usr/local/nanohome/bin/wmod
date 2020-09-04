@@ -1,141 +1,106 @@
 #!/bin/bash
-#/////////////////////////////////////////////////////////////////////////////////////
-# WifiMode for NanoHome - Change WIfi Mode with Buttons
-#/////////////////////////////////////////////////////////////////////////////////////
+# Script to change Wifi Mode
 
-# Settings
 wifidev="wlan0" #device name to use. Default is wlan0. 
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Create Hotspot
-#/////////////////////////////////////////////////////////////////////////////////////
-function create_hotspot {
-
-	ip a add 10.0.0.5/24 brd + dev "$wifidev"
-	ip link set dev "$wifidev" up
-	systemctl unmask dnsmasq hostapd
-	systemctl start dnsmasq hostapd
-	echo "[$(date +'%H:%m:%S')] Hotspot created" >> /var/log/wmod.log
-
-}
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Shutdown Hotspot
-#/////////////////////////////////////////////////////////////////////////////////////
-function shutdown_hotspot {
-
-	if systemctl status hostapd | grep "(running)" >/dev/null 2>&1
-	  then # Shutting Down Hotspot
-		systemctl stop hostapd dnsmasq
-		systemctl mask dnsmasq hostapd
-		echo "[$(date +'%H:%m:%S')] Hotspot down" >> /var/log/wmod.log
-	fi
-
-}
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Disconnect Wifi
-#/////////////////////////////////////////////////////////////////////////////////////
-function disconnect_wifi {
-
-	# ip link set dev "$wifidev" down
-	ifdown "$wifidev"
-	wpa_cli terminate >/dev/null 2>&1
-	ip addr flush "$wifidev"
-	rm -r /var/run/wpa_supplicant >/dev/null 2>&1
-	echo "[$(date +'%H:%m:%S')] Wifi disconnected" >> /var/log/wmod.log
-	
-}
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Connect Wifi
-#/////////////////////////////////////////////////////////////////////////////////////
-function connect_wifi {
-
-	cp /etc/wpa_supplicant/wpa_supplicant.conf.$1 /etc/wpa_supplicant/wpa_supplicant.conf
-	# ip link set dev "$wifidev" up
-	ifup "$wifidev"
-	wpa_supplicant -B -i "$wifidev" -c /etc/wpa_supplicant/wpa_supplicant.conf >/dev/null 2>&1
-	
-	if grep static /etc/network/interfaces; then 
-		pkill -f "dhclient"
-	fi
-	
-	echo "[$(date +'%H:%m:%S')] Wifi connected" >> /var/log/wmod.log
-	
-}
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Check if Wifi up
-#/////////////////////////////////////////////////////////////////////////////////////
-function check_connection {
-	
-	sleep 10 # give wifi time
-	
-	checkwifi="$(iw $wifidev link | grep 'Connected to' | wc -l)"
-
-	echo $checkwifi >> /var/log/wmod.log 
-
-	if [ $checkwifi -eq 0 ]; then # not connected, back to hotspot
-		echo "[$(date +'%H:%m:%S')] Wifi failed to connect, falling back to Hotspot." >> /var/log/wmod.log
-	
-		disconnect_wifi
-		create_hotspot
-	
-	else
-		echo "[$(date +'%H:%m:%S')] Wifi connected" >> /var/log/wmod.log  
-	fi
-	
-}
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Main
-#/////////////////////////////////////////////////////////////////////////////////////
-if [ "$1" = "-wificlient" ]; then
-
-	echo "Wifi Client" >> /var/log/wmod.log
-	
-	echo "[$(date +'%H:%m:%S')] Disconnect Wifi" >> /var/log/wmod.log
-	disconnect_wifi
-	echo "[$(date +'%H:%m:%S')] Shutting down Hotspot" >> /var/log/wmod.log
-	shutdown_hotspot
-	echo "[$(date +'%H:%m:%S')] Connecting to Wifi" >> /var/log/wmod.log
-	connect_wifi wificlient
-	check_connection
-	
-elif [ "$1" = "-nanogate" ]; then
-
-	echo "NanoGate" >> /var/log/wmod.log
-	
-	echo "[$(date +'%H:%m:%S')] Disconnect Wifi" >> /var/log/wmod.log
-	disconnect_wifi
-	echo "[$(date +'%H:%m:%S')] Shutting down Hotspot" >> /var/log/wmod.log
-	shutdown_hotspot
-	echo "[$(date +'%H:%m:%S')] Connecting to NanoGate" >> /var/log/wmod.log
-	connect_wifi nanogate
-	check_connection
-
-elif  [ "$1" = "-hotspot" ]; then
-
-	echo "Hotspot" >> /var/log/wmod.log
-	
-	if { wpa_cli status | grep "$wifidev"; } >/dev/null 2>&1; then
-		
-		echo "[$(date +'%H:%m:%S')] Disconnect Wifi" >> /var/log/wmod.log
-		disconnect_wifi
-		echo "[$(date +'%H:%m:%S')]Create Hotspot" >> /var/log/wmod.log
-		create_hotspot
-	fi
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Err Exit
-#/////////////////////////////////////////////////////////////////////////////////////
-else
-
+if [ -z "$1" ]
+  then
     echo "-------------------------"
     echo "Keine Parameter definiert"
     echo "Usage: wmod -mode"
     echo "-------------------------"
 	exit 1
-
 fi
+
+function create_hotspot {
+	ifdown "$wifidev"
+	wpa_cli terminate >/dev/null 2>&1
+	ip addr flush "$wifidev"
+	rm -r /var/run/wpa_supplicant >/dev/null 2>&1
+	ip a add 10.0.0.5/24 brd + dev "$wifidev"
+	ip link set dev "$wifidev" up
+	systemctl unmask dnsmasq
+	systemctl unmask hostapd
+	systemctl start dnsmasq
+	systemctl start hostapd
+	ip_to_mqtt
+	echo "Hotspot created"
+	}
+
+function shutdown_hotspot {
+	if systemctl status hostapd | grep "(running)" >/dev/null 2>&1
+	  then # Shutting Down Hotspot
+		systemctl stop hostapd
+		systemctl stop dnsmasq
+		systemctl mask dnsmasq
+		systemctl mask hostapd
+		echo "Hotspot down"
+	
+	fi
+	}
+
+function connect_wifi {
+	ifdown "$wifidev"
+	cp /etc/wpa_supplicant/wpa_supplicant.conf.$1 /etc/wpa_supplicant/wpa_supplicant.conf
+	ip addr flush dev "$wifidev"
+	ifup "$wifidev"
+	dhcpcd -n "$wifidev" >/dev/null 2>&1
+	ip_to_mqtt
+	echo "Wifi connected"
+	}
+
+function backup_config {
+	echo "Backup Config"
+	if cat /etc/wpa_supplicant/wpa_supplicant.conf | grep "NanoGateway"; then
+		cp /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf.nanogateway
+	else
+		cp /etc/wpa_supplicant/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
+	fi
+	}
+
+if [ "$1" = "-wificlient" ]; then
+	echo "Wifi Client"
+		
+	backup_config
+	shutdown_hotspot
+	connect_wifi wificlient
+	
+	if { wpa_cli -i "$wifidev" status | grep 'ip_address'; } > /dev/null 2>&1
+	  then
+	    echo "Verbunden"
+	else
+		echo "Create Hotspot"
+		# create_hotspot
+	fi
+
+elif [ "$1" = "-nanogw" ]; then
+	echo "NanoGateway"
+	
+	backup_config 
+	shutdown_hotspot
+	connect_wifi nanogateway
+	
+	sleep 5
+	
+	if { wpa_cli -i "$wifidev" status | grep 'ssid=NanoGateway'; } >/dev/null 2>&1
+	  then
+	    echo "Verbunden"
+	else
+		echo "Create Hotspot"
+		create_hotspot
+	fi
+
+elif  [ "$1" = "-hotspot" ]; then
+	echo "Hotspot"
+	
+	if { wpa_cli status | grep "$wifidev"; } >/dev/null 2>&1
+	  then
+		create_hotspot
+	fi
+
+else
+	echo "Falscher Parameter"
+	echo "Usage: wmod -mode [wificlient hotspot nanogw]"
+fi
+
+

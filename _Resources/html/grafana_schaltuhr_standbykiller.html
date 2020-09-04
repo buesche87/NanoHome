@@ -1,48 +1,76 @@
-<div>
-    <h3>Standbykiller</h3>
-    <hr />
-</div>
+<div><center><h4>Stanbykiller</h4></center></div>
+<hr>
 
 <div>
-    <table align="center" style="width:100%">
-        <tr>
-            <td colspan="2">
-                <select class="nanohome" id="stby_device"onchange="standbykill('show')" name="nanolist_stbykill">
-                    <option value="shelly1pm-8CAAB505F81D">Schlafzimmer</option>
-                    <option value="shelly1pm-76DAD6">TV</option>
-                    <option value="sonoff_3">Büro</option>
-                    <option value="sonoff_1">Wohnzimmer</option>
-                    <option value="shelly1pm-E641C5">Sideboard</option>
-                    <option value="shelly1pm-766A83">Sofa</option>
-                    <option value="shelly1pm-8CAAB5056FE7">Joris</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td align="right"><font size="4">Standby [W]</font></td>
-            <td align="left" style="width:40%"><input class="nanohome" id="stbypwr" maxlength="5" value="20" /></td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <button class="nanohome" style="width: 30%; background-color: #c0fcb1;" onclick="standbykill('add')">💾</button>
-                <button class="nanohome" style="width: 30%; background-color: #fff4bd;" onclick="standbykill('show all')">🔎</button>
-                <button class="nanohome" style="width: 30%; background-color: #ffbdbd;" onclick="standbykill('remove')">❌</button>
-            </td>
-        </tr>
-    </table>
+<center>
+<br>
+<select id="stby_device" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
+
+  <option value="shelly1pm-76DAD6">TV</option>
+  <option value="sonoff_3">Büro</option>
+  <option value="sonoff_1">TV Deko</option>
+  <option value="shelly1pm-E641C5">Sideboard</option>
+  <option value="shelly1pm-766A83">Soundbar</option>
+  <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+  <option value="all">Alle</option>
+</select>
+<br><p>
+<table>
+<tr>
+<td><font size=4>Max Standby [W]</font></td>
+<td><input type="text" id="stbypwr" name="stbypwr" maxlength="5" style="width: 60px; text-align:center; font-size:18px; background-color: #c7e9ff" value="20"</input></td>
+</table>
+<br><p>
+  <button style="width: 100px; height: 35px; background-color: #c7e9ff" type="button" onclick="add_stby()"><font size="3">Senden</font></button>
+  <button style="width: 100px; height: 35px; background-color: #fff4bd" type="button" onclick="show_stby()"><font size="3">Auslesen</font></button>
+  <button style="width: 100px; height: 35px; background-color: #ffbdbd" type="button" onclick="delete_stby()"><font size="3">Löschen</font></button>
+</center>
 </div>
 
 <script>
 
-    function standbykill(param) {
-	
-        var stby_dev = document.getElementById("stby_device").value;
-        var stby_pwr = document.getElementById("stbypwr").value;
-		
-        var stdby_kill = "standbykiller " + param + " '" + stby_dev + "' '" + stby_pwr + "'";
+    var show_stby = function () {
 
-        publish_timer(stdby_kill);
+    		var stby_dev = document.getElementById("stby_device").value;
+        var stdby_kill = "standbykiller show '" + stby_dev + "'";
+		
+        publish_stby(stdby_kill); 
+    }
+
+    var add_stby = function () {
+
+		    var stby_dev = document.getElementById("stby_device").value;
+        var stby_pwr = document.getElementById("stbypwr").value;
+        var stdby_kill = "standbykiller add '" + stby_dev + "' '" + stby_pwr + "'";
         
-	};
+        publish_stby(stdby_kill); 
+    }
+
+    var delete_stby = function () {
+
+    		var stby_dev = document.getElementById("stby_device").value;
+        var stdby_kill = "standbykiller remove '" + stby_dev + "'";
+		
+        publish_stby(stdby_kill); 
+    }
+
+
+      var publish_stby = function (stby_payload) {
+      mqtt.subscribe("output", {
+		  qos: 2
+	    });
+	
+	    console.log('Sending: ' + JSON.stringify(stby_payload));
+    
+	    var stby_message = new Paho.MQTT.Message(stby_payload);
+		      stby_message.destinationName = "input";
+		      stby_message.qos = 2;
+
+	    mqtt.send(stby_message);
+	    
+	    setTimeout(() => { mqtt.unsubscribe("output"); }, 5000);
+	
+	  };
+
 
 </script>

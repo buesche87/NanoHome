@@ -1,19 +1,14 @@
 #!/bin/bash
-#/////////////////////////////////////////////////////////////////////////////////////
-# Show Last 4 DHCP Leases on OLED Screen
-#/////////////////////////////////////////////////////////////////////////////////////
+# Script to show last 4 dhcp leases
 
-# Settings
 Server="localhost"
 DB="NanoPi"
 Topic="ip"
 Sensor="NanoDevices"
 
-# Create Leases File
 cat /var/lib/misc/dnsmasq.leases | awk '{print $3" "$4}' > /tmp/dhcp.list
 cat /var/lib/misc/dnsmasq.leases | awk '{print $3}' > /tmp/ip.list
 
-# Output for OLED
 input="/tmp/ip.list"
 while IFS= read -r line
 do

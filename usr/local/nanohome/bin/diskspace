@@ -1,16 +1,11 @@
 #!/bin/bash
-#/////////////////////////////////////////////////////////////////////////////////////
-# Put Disk Space into InfluxDB
-#/////////////////////////////////////////////////////////////////////////////////////
 
-# Settings
 Server="localhost"
 DB="NanoPi"
 Topic="diskspace"
 Sensor="NanoPi_Disk"
 
-# Get Disk Space
 disk=$(df -m /dev/mmcblk0p2 | tail -1 | awk '{print $4}')
 
-# Send to InfluxDB
 curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$disk
+

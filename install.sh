@@ -1,6 +1,6 @@
 #!/bin/bash
 ######################################
-# NanoHome Automation Server Install (Early Alpha Installer)
+# NanoHome Automation Server Install
 
 if [ $(id -u) -ne 0 ]; then
   printf "Script must be run as root. Try 'sudo ./install.sh'\n"
@@ -9,6 +9,7 @@ fi
 
 # Install Software
 wget http://repo.mosquitto.org/debian/mosquitto-repo.gpg.key && sudo apt-key add mosquitto-repo.gpg.key && rm mosquitto-repo.gpg.key || (echo "Failed to add mosquitto repository" && set -e)
+wget http://repo.mosquitto.org/debian/mosquitto-stretch.list -O /etc/apt/sources.list.d/
 apt-get update
 apt-get install mosquitto grafana influxdb
 

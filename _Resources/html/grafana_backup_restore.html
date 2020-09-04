@@ -1,0 +1,99 @@
+<div><h5>Backup & Restore</h5></div>
+
+<div id="mqtt_backup_panel">
+
+<hr>
+
+<table style="width:100%">
+  <tbody>
+  <tr>
+  <td>
+    <label class="container">Dashboards
+      <input type="checkbox" id="grafana" checked="checked">
+      <span class="checkmark"></span>
+    </label>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <label class="container">Messwerte
+      <input type="checkbox" id="influxdb" checked="checked">
+      <span class="checkmark"></span>
+    </label>
+    </td>
+  </tr>
+  <tr>
+    <td>
+    <label class="container">Wifi
+      <input type="checkbox" id="wifi" checked="checked">
+      <span class="checkmark"></span>
+    </label>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <button style="background-color: #adfc95" type="button" onclick="showbackups()"><font size="4">Show</font></button>
+      <button style="background-color: #adfc95" type="button" onclick="backup()"><font size="4">Backup</font></button>
+      <button style="background-color: #ffbdbd" type="button" onclick="restore()"><font size="4">Restore</font></button>
+    </td>
+  </tr>  
+    <td>
+      <button style="background-color: #ffbdbd" type="button" onclick="reboot()"><font size="4">Recovery</font></button> &nbsp Reboot to recovery-sd
+    </td>
+  </tr>    
+  </tbody>
+  </table>
+</div>
+
+<script>
+
+    function showbackups() {
+
+        var cmnd = "nanobackup show";
+
+        publish_settings(cmnd);
+
+        };
+
+    function backup() {
+        
+        var input_payload = "Backing up... <br>This may take a while";
+        $('#full_output').html(input_payload);
+        
+        var grafana = document.getElementById("grafana").checked;
+        var influxdb = document.getElementById("influxdb").checked;
+        var wifi = document.getElementById("wifi").checked;
+
+        var cmnd = "nanobackup backup " + grafana + " " + influxdb + " " + wifi;
+
+        publish_settings(cmnd);
+
+        };
+
+    function restore() {
+  
+        var grafana = document.getElementById("grafana").checked;
+        var influxdb = document.getElementById("influxdb").checked;
+        var wifi = document.getElementById("wifi").checked;
+        
+        var cmnd = "nanobackup restore " + grafana + " " + influxdb + " " + wifi;
+
+        publish_settings(cmnd);
+
+        };
+
+    function reboot() {
+        
+        setTimeout(() => { window.open('http://nanohome.nano.lan') }, 20000);
+        
+        var input_payload = "Rebooting into Recovery...";
+        $('#full_output').html(input_payload);
+        
+        var cmnd = "reboot now";
+
+        publish_settings(cmnd);
+
+        };
+
+
+</script>

@@ -14,42 +14,17 @@ fi
 
 # Parameters
 device="$1"
-dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
-dev_vend="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f3 )"
-dev_type="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f4 )"
-if [[ "$device" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
-
-if [ "$dev_type" = "" ]; then
-
-	echo "Device not supported"
-	exit 1
-	
-fi
 
 # Geräteunterstützung
-if [ "$dev_vend" = "sonoff" ]; then
+if [[ "$device" =~ "sonoff" ]]; then
 
-	status_topic="sonoff/$device/stat/POWER"
+	power_topic="sonoff/$device/stat/POWER"
 	control_topic="sonoff/$device/cmnd/POWER"
-	off_command="OFF"
-	on_command="ON"
-	toggle_command="TOGGLE"
+
 	
-	
-elif [ "$dev_vend" = "shelly" ]; then
-	
-	# switch
-	control_topic="shellies/$device/relay/0/command"
-	status_topic="shellies/$device/relay/0"
+elif [[ "$device" =~ "shelly" ]]; then
+
 	power_topic="shellies/$device/relay/0/power"
-	off_command="off"
-	on_command="on"
-	toggle_command="toggle"
-	# roller
-	pos_control="shellies/$device/roller/0/command/pos"
-	pos_return="shellies/$device/roller/0/pos"
-	roller_updown="shellies/$device/roller/0/command"
-	open_command="open"
-	close_command="close"
-	
+	control_topic="shellies/$device/relay/0/command"
+
 fi

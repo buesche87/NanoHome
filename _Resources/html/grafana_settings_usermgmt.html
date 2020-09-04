@@ -1,49 +1,54 @@
-<div>
-    <h4>MQTT User Manager</h4>
-    <hr />
-</div>
+<div><h5>MQTT Benutezrmanagement</h5></div>
 
 <div>
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="mqtt_user" requiredminlength="4" value="Benutzername" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" type="password" id="mqtt_pwd" requiredminlength="8" value="Passwort" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" />
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Alle anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="usermgmt('show');">🔎</button>
-                <button title="Hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="usermgmt('add');">💾</button>
-                <button title="Löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="usermgmt('remove');">❌</button>
-                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_mqtt_pw()">🔑</button>
-            </td>
-        </tr>
-    </table>
+<hr>
+<table style="width:100%">
+  <tbody>
+  <tr>
+  <td style="width:120px">Username</td>
+  <td><input type="text" id="mqtt_user" name="mqtt_user" style="width:100%" requiredminlength="4" /></td>
+  </tr>
+  <tr>
+  <td>Passwort</td>
+  <td><input type="text" id="mqtt_pwd" name="mqtt_pwd" style="width:100%" requiredminlength="8" /></td>
+  </tr>
+  <tr>
+  <td /><td><center>
+  <button style="background-color: #adfc95" type="button" onclick="user_show();"><font size="4">Auslesen</font></button>
+  <button style="background-color: #adfc95" type="button" onclick="user_add();"><font size="4">Senden</font></button>
+  <button style="background-color: #ffbdbd" type="button" onclick="user_del();"><font size="4">Löschen</font></button>
+  </center></td>
+  </tr>
+  </tbody>
+  </table>
 </div>
 
 <script>
 
-	function usermgmt(param) {
-		
-        var mqtt_user = document.getElementById("mqtt_user").value;
-        var mqtt_pwd = document.getElementById("mqtt_pwd").value;		
-		
-		var usermgmt_message = "usermgmt '" + param + "' '" + mqtt_user + "' '" + mqtt_pwd + "'";
-		
-		publish_settings(usermgmt_message);
-	}
+    var user_show = function () {
 
-    function show_mqtt_pw() {
-        var x = document.getElementById("mqtt_pwd");
-        if (x.type === "password") {
-            x.type = "text";
-        } else {
-            x.type = "password";
-        }
+        var usershow = "usermgmt show";
+
+        publish_settings(usershow);
+
+    }
+
+    var user_add = function () {
+        var mqtt_user = document.getElementById("mqtt_user").value;
+        var mqtt_pwd = document.getElementById("mqtt_pwd").value;
+        var useradd = "usermgmt add '" + mqtt_user + "' '" + mqtt_pwd + "'";
+
+        publish_settings(useradd);
+
+    }
+    
+    var user_del = function () {
+        var mqtt_user = document.getElementById("mqtt_user").value;
+        var mqtt_pwd = document.getElementById("mqtt_pwd").value;
+        var useradel = "usermgmt remove '" + mqtt_user + "' '" + mqtt_pwd + "'";
+
+        publish_settings(useradel);
+
     }
 
 </script>

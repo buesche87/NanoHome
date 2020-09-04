@@ -1,108 +1,38 @@
-<head><link rel="stylesheet" type="text/css" href="../public/style.css" /></head>
+<div><span id="req_zsp_output" style="white-space: pre; font-family: monospace; display: block; unicode-bidi: embed; font-size:16px"></span></div>
 
-<div>
-    <h3>Output</h3>
-    <hr />
-</div>
+<style type="text/css">
+body {
 
-<div style="position: fixed;">
-    <div style="overflow-y: scroll; height: 600px;">
-    <span id="timer_output" style="white-space: pre; font-family: monospace; display: block; unicode-bidi: embed; font-size: 14px;"></span>
-    </div>
-</div>
+  background-image: url('../public/img/bg_image.jpg');
 
-<script>
-    
-    var mqtt;
-    var reconnectTimeout = 5000;
-    var port = 1884;
-    var useTLS = false;
-    var user = "mqtt_grafana";
-    var pwd = "Grafana2MQTT";
-    var cleansession = true;
-    var path = "";
-    var buttons = $('[type=button]');
-    var host = location.hostname;
-    
-    console.log(host);
-    
-    buttons.prop('disabled', true);
-   
-    function MQTTconnect() {
-        if (typeof path == "undefined") {
-            path = '/mqtt';
-        }
-        mqtt = new Paho.MQTT.Client(
-            host,
-            port,
-            path,
-            "web_grafanaPanel" + parseInt(Math.random() * 10000, 10)
-        );
-        var options = {
-            timeout: 3,
-            useSSL: useTLS,
-            cleanSession: cleansession,
-            onSuccess: onConnect,
-            onFailure: function (message) {
-                $('#status_output').html("Connection failed: " + message.errorMessage + "Retrying");
-                setTimeout(MQTTconnect, reconnectTimeout);
-            }
-        };
-		
-        mqtt.onConnectionLost = onConnectionLost;
-        mqtt.onMessageArrived = timer_inbound;
-	   
-		
-        if (user != null) {
-            options.userName = user;
-            options.password = pwd;
-        }
-        console.log("Host=" + host + ", port=" + port + ", path=" + path + " TLS = " + useTLS + " username=" + user + " password=" + pwd);
-        mqtt.connect(options);
-    }
-    
-    function onConnect() {
-        $('#status_output').html('Connected to: ' + host + ':' + port + path);
-        // Connection succeeded; subscribe to our topic(s)
-        buttons.prop('disabled', false);
-    }
+}
 
-    function onConnectionLost(response) {
-        setTimeout(MQTTconnect, reconnectTimeout);
-        $('#status_output').html("connection lost: " + response.errorMessage + ". Reconnecting");
-        buttons.prop('disabled', true);
-    };
- 
-    function timer_inbound(timer_message) {
-        var timer_output = timer_message.payloadString;
-        $("#timer_output").html(timer_output);
-    }
+table, tr, td {
+  border-style : hidden!important;
 
-    var publish_timer = function (timer_payload) {
-        mqtt.subscribe("output", {
-            qos: 2,
-        });
+}
 
-        console.log("Sending: " + JSON.stringify(timer_payload));
+input {
+  color: #081717;
+  border: 2px black;
+  border-radius: 4px;
+  
+}
 
-        var timer_message = new Paho.MQTT.Message(timer_payload);
-        timer_message.destinationName = "input";
-        timer_message.qos = 2;
+select {
+  color: #030505;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  
+}
 
-        mqtt.send(timer_message);
-        
-        // mqtt unsubscribe here if something goes havoc
+button {
+  color: #030505;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  
+}
 
-    };
- 
-    if (typeof Paho === 'undefined') {
-        var script = document.createElement('script');
-        document.body.appendChild(script);
-        script.onload = function () {
-            MQTTconnect();
-        }
-        script.src = '../public/mqttws31.min.js';
-    } else {
-       MQTTconnect();
-    }
-</script>
+</style>

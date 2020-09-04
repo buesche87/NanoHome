@@ -1,0 +1,59 @@
+<div><h5>System Update</h5></div>
+
+<div id="mqtt_update_panel">
+
+<hr>
+
+<table style="width:100%">
+  <tbody>
+  <tr>
+    <td>
+      <button style="background-color: #adfc95" type="button" onclick="checkupdate()"><font size="4">Check</font></button>
+      <button style="background-color: #ffbdbd" type="button" onclick="doupdate()"><font size="4">Update</font></button>
+    </td>
+  </tr>  
+    <td>
+      <button style="background-color: #ffbdbd" type="button" onclick="reboot()"><font size="4">Reboot</font></button> &nbsp Remove recovery-sd first
+    </td>
+  </tr>    
+  </tbody>
+  </table>
+</div>
+
+<script>
+
+    function checkupdate() {
+
+        var input_payload = "Checking for system updates... <br>This may take a while";
+        $('#full_output').html(input_payload);
+
+        var cmnd = "apt-get -u upgrade --assume-no";
+
+        publish_settings(cmnd);
+
+        };
+
+    function doupdate() {
+        
+        var input_payload = "Updating... <br>This may take a while";
+        $('#full_output').html(input_payload);
+        
+        var cmnd = "apt-get -y upgrade";
+
+        publish_settings(cmnd);
+
+        };
+
+
+    function reboot() {
+
+        var input_payload = "Rebooting...";
+        $('#full_output').html(input_payload);
+        
+        var cmnd = "reboot now";
+
+        publish_settings(cmnd);
+
+        };
+
+</script>

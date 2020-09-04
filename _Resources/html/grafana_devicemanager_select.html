@@ -1,23 +1,30 @@
-<head>
-    <link rel="stylesheet" type="text/css" href="../public/style.css" />
-</head>
-
+<center>
 <div>
-  <br>
-    <form style="text-align: center;">
-        <select class="nanohome" id="select_dev" onchange="document.getElementById('show_dev').src=this.value" name="nanolist">
-						<option value="http://shellyswitch25-BCDDC2776459.nano.lan">Rollo Rechts</option>
-						<option value="http://shellyswitch25-BCDDC277633D.nano.lan">Rollo Links</option>
-						<option value="http://nanogate.nano.lan">NanoGate</option>
-						<option value="http://shelly1pm-76DAD6.nano.lan">TV</option>
-						<option value="http://sonoff3.nano.lan">Büro</option>
-						<option value="http://sonoff1.nano.lan">Wohnzimmer</option>
-						<option value="http://shelly1pm-E641C5.nano.lan">Sideboard</option>
-						<option value="http://shelly1pm-766A83.nano.lan">Sofa</option>
-						<option value="http://shelly1pm-8CAAB5056FE7.nano.lan">Joris</option>
-						<option value="http://shelly1pm-8CAAB505F81D.nano.lan">Schlafzimmer</option>
-						<option value="http://shellyht-B895A5.nano.lan">Shelly Sensor</option>
-        </select>
-    </form>
-    <hr />
+<form>
+<select id="select_dev" onchange="document.getElementById('show_dev').src=this.value" onfocus="this.selectedIndex = -1;" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
+  <option value="http://nanogate.nano.lan/cgi-bin/settings.cgi">NanoGate</option>
+  <option value="http://shelly1pm-76DAD6.nano.lan">TV</option>
+  <option value="http://sonoff_3.nano.lan">Büro</option>
+  <option value="http://sonoff_1.nano.lan">TV Deko</option>
+  <option value="http://shelly1pm-E641C5.nano.lan">Sideboard</option>
+  <option value="http://shelly1pm-766A83.nano.lan">Sofa</option>
+  <option value="http://shelly1pm-8CAAB5056FE7.nano.lan">Joris</option>
+</select>
+</form>
 </div>
+</center>
+
+<style>
+
+button {
+
+  background-color: #c7e9ff;
+  color: #030505;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100px;
+  height: 35px;
+  
+}
+</style>
