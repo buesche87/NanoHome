@@ -1,0 +1,122 @@
+#!/bin/bash
+# update_dashboard - NanoHome Dashboard Updater
+
+# Catch Parameters
+random="$(date +%s)"
+
+# Settings
+home_uid="XieEaLmRk"
+devmgr_uid="Uhzl9yRgk"
+zsp_uid="_H3fwdmRz"
+settings_uid="sYOGRUiRz"
+api_key="eyJrIjoiWk9YZDVmbGhRMkpmYjdsT3h3VjhSVjR5cXlwZUh1d3MiLCJuIjoiY3JlYXRlX2VsZW1lbnRzIiwiaWQiOjF9"
+
+# Update Files
+devmgmt_update_file="/mnt/sd/boot/update/grafana/devmgmt.json"
+settings_update_file="/mnt/sd/boot/update/grafana/settings.json"
+timer_update_file="/mnt/sd/boot/update/grafana/timer.json"
+
+# Help Functions
+update_dashboard () {
+
+	folderid="$(cat /tmp/merge_panel_output.json | grep folderId | awk '{ sub(/^[ \t]+/, ""); print }')"
+	json_data="{ ${folderid} \"overwrite\": true }"
+
+	jq --argjson options "$json_data" '. += $options' /tmp/merge_panel_output.json > /tmp/merge_panel_final.json
+
+	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @/tmp/merge_panel_final.json http://localhost:3001/api/dashboards/db
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Get Device List
+#/////////////////////////////////////////////////////////////////////////////////////
+while IFS= read -r line
+do		
+	
+	type="$(cat /usr/local/nanohome/devlist | grep "$line" | cut -d: -f3 )"
+	dev="$(cat /usr/local/nanohome/devlist | grep "$line" | cut -d: -f1 )"
+	desc="$(cat /usr/local/nanohome/devlist | grep "$line" | cut -d: -f2 )"
+	
+	# options for devicemanager dashboard
+	devmgmtoption='\\r\\n\\t\\t\\t\\t\\t\\t<option value=\\"http://'"$dev"'.nano.lan\\">'"$desc"'</option>'
+	devmgmt_options+="${devmgmtoption}"
+	
+	# options for settings dashboard
+	devlistoption='\\r\\n\\t\\t\\t\\t\\t\\t<option value=\\"'"$dev"'\\">'"$desc"'</option>'
+	devlist_options+="${devlistoption}"
+	
+	# options for timer dashboard
+	if [ "$type" = "switch" ]; then
+
+		timerlistoption='\\r\\n\\t\\t\\t\\t\\t\\t<option value=\\"'"$dev"'\\">'"$desc"'</option>'
+		timerlist_options+="${timerlistoption}"	
+	
+	fi
+
+done < <(cat /usr/local/nanohome/devlist)
+
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Update Devicemanager Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+if test -f "$devmgmt_update_file"; then
+
+	# get updated devicemanager dashboard 
+	cp $devmgmt_update_file /tmp/merge_panel_output.json
+
+	# add options to device manager dashboard
+	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">'"$devmgmt_options"'#g' /tmp/merge_panel_output.json
+
+	update_dashboard
+
+	rm /tmp/merge_panel_*
+
+else
+
+	echo "Kein Update für das Gerätemanager Dashboard"
+
+fi
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Update Settings Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+if test -f "$settings_update_file"; then
+
+	update_file=$settings_update_file
+	
+	# get updated settings dashboard 
+	cp $settings_update_file /tmp/merge_panel_output.json
+
+	# add options to device manager dashboard
+	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">'"$devlist_options"'#g' /tmp/merge_panel_output.json
+
+	update_dashboard
+
+	rm /tmp/merge_panel_*
+
+else
+
+	echo "Kein Update für das Settings Dashboard"
+
+fi
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Update Timer Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+if test -f "$timer_update_file"; then
+
+	# get updated timer dashboard 
+	cp $timer_update_file /tmp/merge_panel_output.json
+
+	# add options to device manager dashboard
+	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">'"$timerlist_options"'#g' /tmp/merge_panel_output.json
+
+	update_dashboard
+
+	rm /tmp/merge_panel_*
+
+else
+
+	echo "Kein Update für das Schaltuhr Dashboard"
+
+fi

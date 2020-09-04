@@ -1,0 +1,72 @@
+<div>
+    <h3>Schaltuhr</h3>
+    <hr />
+</div>
+
+<div>
+    <table align="center" style="width:100%">
+        <tr>
+            <td colspan="2">
+                <select class="nanohome" id="timer_device" onchange="cronman('show')" name="nanolist">
+                    <option value="shelly1pm-8CAAB505F81D">Schlafzimmer</option>
+                    <option value="shelly1pm-76DAD6">TV</option>
+                    <option value="sonoff_3">Büro</option>
+                    <option value="sonoff_1">Wohnzimmer</option>
+                    <option value="shelly1pm-E641C5">Sideboard</option>
+                    <option value="shelly1pm-766A83">Sofa</option>
+                    <option value="shelly1pm-8CAAB5056FE7">Joris</option>
+                    <option value="shellyswitch25-BCDDC277633D">Rollo Links</option>
+                    <option value="shellyswitch25-BCDDC2776459">Rollo Rechts</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td align="right" style="width:50%"><font size="4">Ein / Auf</font></td>
+            <td align="left" ><input class="nanohome" id="timer_ein" pattern=".{5,5}" onfocus="this.value=''" value="08:00" autocomplete="off" /></td>
+        </tr>
+        <tr>
+            <td align="right"  style="width:50%"><font size="4">Aus / Zu</font></td>
+            <td align="left" ><input class="nanohome" id="timer_aus" pattern=".{5,5}" onfocus="this.value=''" value="22:00" autocomplete="off" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <select class="nanohome" id="timer_day" style="background-color: #c7e9ff;">
+                    <option value="*">Täglich</option>
+                    <option value="1">Montag</option>
+                    <option value="2">Dienstag</option>
+                    <option value="3">Mittwoch</option>
+                    <option value="4">Donnerstag</option>
+                    <option value="5">Freitag</option>
+                    <option value="6">Samstag</option>
+                    <option value="0">Sonntag</option>
+                    <option value="6-7">Wochenende</option>
+                    <option value="1-5">Werktags</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <button class="nanohome" style="width: 30%; background-color: #c0fcb1;" onclick="cronman('add')">💾</button>
+                <button class="nanohome" style="width: 30%; background-color: #fff4bd;" onclick="cronman('show all')">🔎</button>
+                <button class="nanohome" style="width: 30%; background-color: #ffbdbd;" onclick="cronman('remove')">❌</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+	function cronman(param) {
+	
+        var zsp_dev = document.getElementById("timer_device").value;
+        var zsp_tag = document.getElementById("timer_day").value;
+        var zsp_ein = document.getElementById("timer_ein").value;
+        var zsp_aus = document.getElementById("timer_aus").value;
+
+		    var zsp_message = "cronman " + param + " '" + zsp_dev + "' '" + zsp_tag + "' '" + zsp_ein + "' '" + zsp_aus + "'";
+	
+		    publish_timer(zsp_message);
+		    
+	};
+
+</script>

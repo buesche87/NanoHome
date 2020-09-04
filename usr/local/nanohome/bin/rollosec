@@ -1,0 +1,183 @@
+#!/bin/bash
+# rollersecurity for NanoHome - sends OFF to topic if current value exceeds a certain value
+
+
+##### TBD #####
+
+
+# settings
+server="localhost"
+user="cron_mqtt"
+pass="Cron2MQTT"
+
+# Parameters
+device="$2"
+value="$3"
+rain="$4"
+subscribe_topic="$5"
+dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
+msg="Aktiv wenn über ${$value}m/s" 
+msg2="Regensschutz aktiv: $rain"
+
+# device support
+if [ ! "$device" = "all" ]; then
+	. /usr/local/nanohome/dev_compatibility $device
+fi
+
+# environment
+service_description="rollosec"
+service_name="$service_description.$device.service"
+service_file="/etc/systemd/system/$service_name"
+service_template="/usr/local/nanohome/templates/$service_description.service.template"
+
+# functions
+print_rollosec () {
+	
+	status="Aktiv"
+
+	if [[ "$status" =~ "Aktiv" ]]; then
+		color="#c0fcb1"
+	else
+		color="grey"
+	fi
+
+	echo "<font size='5'><font color='white'>Rollosecurity: </font><font color='hotpink'>$desc</font><font color='white'> - </font><font color='$color'>$status</font></font><br>"
+	echo "$msg1"
+	echo "$msg2"
+
+	if [ ! -z "$service_name" ]; then
+
+		status="$(systemctl status $service_name | head -3 | tail -1 | sed -e 's/^[[:space:]]*//')"
+		lastmsg="$(systemctl status $service_name | tail -5 | sort -r )"
+
+		if [[ "$status" =~ "running" ]]; then
+			statuscolor="#c0fcb1"
+		else
+			statuscolor="grey"
+		fi
+
+		echo "<font size='4' color='$statuscolor'>$status</font>"
+		echo ""
+		echo "<font size='4'>Last Messages:</font>"
+		echo "<font size='3'>$lastmsg</font>"
+		echo ""
+
+	else
+		status="Inaktiv"
+		lstmsg=""
+	fi
+
+}
+
+
+# show devices
+if [ "$1" = "show" ] && [ ! -z "$device" ]; then
+
+	# show all devices
+	if [ "$device" = "all" ]; then
+
+		service_name="$(ls /etc/systemd/system/ | grep $service_description )"
+	
+	fi	
+	
+	if [ ! -z "$service_name" ]; then
+
+		while IFS= read -r line
+		do
+
+			device="$(cat /etc/systemd/system/$line | grep $service_description | awk '{ printf $4 }' )"
+			dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
+			value="$(cat /etc/systemd/system/$line | grep $service_description | awk '{ printf $5 }' )"
+			rain="$(cat /etc/systemd/system/$line | grep $service_description | awk '{ printf $6 }' )"
+
+			print_rollosec
+
+		done <<< "$service_name"
+
+	elif [ -z "$service_name" ] && [ ! "$device" = "all" ]; then 
+		
+		msg="Inaktiv"
+		msg2=""
+		
+		print_rollosec
+
+	else
+		msg="Inaktiv - Kein Standbykiller aktiviert"
+		msg2=""
+		
+		print_rollosec
+
+	fi
+
+# add device
+elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$value" ]; then
+
+	# check if service exists
+	if test -f "$service_file"; then
+
+		print_rollosec
+
+	# create new service
+	else
+
+		cp $service_template $service_file
+
+		sed -i "s/-dev/$device/" $service_file
+		sed -i "s/-value/$value/" $service_file
+		sed -i "s/-rain/$rain/" $service_file
+
+		systemctl start $service_name
+		systemctl enable $service_name
+
+		print_rollosec
+
+	fi
+
+# remove device
+elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
+
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+
+	msg="$dev_desc - Deaktiviert"
+	msg2=""
+	
+	print_rollosec
+
+
+# service mode
+elif [ "$1" == "service" ]; then
+
+	# lastmsg="off"
+
+	while read curval;
+	do
+
+		now=$(date +"%T")
+
+		if (( $(echo "$curval > $value" | bc -l) )); then
+		
+			echo "[$now] $device: ${curval}, more than ${value} - taking action"
+
+			mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $off_command >/dev/null 2>&1
+
+		else
+			
+			echo "[$now] $device: ${curval}, less than ${value} - nothing todo"
+			
+		fi
+
+	done < <(mosquitto_sub -h $server -u $user -P $pass -t $subscribe_topic -q 2)
+
+else
+
+	echo "-----------------------------------------------------------------"
+	echo "Usage: $service_description show|add|remove device (value) (true)"
+	echo "-----------------------------------------------------------------"
+	echo
+
+	exit 1
+
+fi

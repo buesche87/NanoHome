@@ -1,0 +1,268 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "content": "<div><center><hr /><h4>MQTT Device Manager</h4></center><hr /></div>\r\n\r\n<div>\r\n  <table style=\"width:100%\">\r\n    <tbody>\r\n      <tr>\r\n        <td>\r\n\t\t<select class=\"nanohome\" id=\"device\">\r\n\t\t\t<option value=\"shelly\">Shelly</option>\r\n            <option value=\"sonoff\">Sonoff</option>\r\n        </select>\r\n        </td>\r\n      </tr>\r\n      <tr>\r\n        <td>\r\n\t\t<select class=\"nanohome\" id=\"devicetype\">\r\n            <option value=\"switch\">Switch</option>\r\n            <option value=\"senros\">Sensor</option>\r\n        </select>\r\n        </td>\r\n      </tr>\r\n    <tr>\r\n      <td><input class=\"nanohome\" id=\"devid\" value=\"Device ID\" onfocus=this.value=\"\" onfocusout=\"focus_devid()\" autocomplete=\"off\" /></td>\r\n    </tr>\r\n    <tr>\r\n      <td><input class=\"nanohome\" id=\"desc\" value=\"Bezeichnung\" onfocus=this.value=\"\" onfocusout=\"focus_desc()\" autocomplete=\"off\" /></td>\r\n    </tr>\r\n    <tr>\r\n    <td>\r\n    <center>\r\n      <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"showdev()\">Anzeigen</button>\r\n      <button class=\"nanohome\" style=\"background-color: #adfc95\" onclick=\"adddev()\">Hinzufügen</button>\r\n\t</td>\r\n\t</tr>\r\n    </center>\r\n    <td>\r\n<select class=\"nanohome\" id=\"del_dev\" name=\"nanolist\">\r\n<option value=\"shelly1pm-8CAAB505F81D\">Schlafzimmer</option>\r\n<option value=\"shelly1pm-76DAD6\">TV</option>\r\n<option value=\"sonoff_3\">Büro</option>\r\n<option value=\"sonoff_1\">Wohnzimmer</option>\r\n<option value=\"shelly1pm-E641C5\">Sideboard</option>\r\n<option value=\"shelly1pm-766A83\">Sofa</option>\r\n<option value=\"shelly1pm-8CAAB5056FE7\">Joris</option>\r\n</select>\r\n</td>\r\n</tr>\r\n    <tr>\r\n\t<td>\r\n    <center>\r\n        <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"remdev()\">Löschen</button>\r\n    </center>\r\n\t</td>\r\n    </tr>\r\n  </tbody>\r\n  </table>\r\n</div>\r\n\r\n<script>\r\n\r\nvar showdev = function () {\r\n\r\n\tvar showdev_str = \"devmgmt show\";\r\n\tpublish_settings(showdev_str);\r\n}\r\n\r\nvar adddev = function () {\r\n\r\n    var x = document.getElementById(\"devid\");\r\n    var y = document.getElementById(\"desc\");\r\n    \r\n    if (x.value === \"Device ID\") {\r\n\t\tvar input_payload = \"Bitte Device ID ändern\";\r\n\t\t$('#full_output').html(input_payload);   \r\n    } \r\n    \r\n    else if (y.value === \"Bezeichnung\") {\r\n\t\tvar input_payload = \"Bitte Bezichnung ändern\";\r\n\t\t$('#full_output').html(input_payload);\r\n    } \r\n    \r\n    else {\r\n\t\tvar input_payload = \"Gerät wird hinzugefügt... <br>Bitte warten\";\r\n\t\t$('#full_output').html(input_payload);\r\n\t\t\r\n\t\tvar device = document.getElementById(\"device\").value;\r\n\t\tvar devicetype = document.getElementById(\"devicetype\").value;\r\n\t\tvar sn = document.getElementById(\"devid\").value;\r\n\t\tvar desc = document.getElementById(\"desc\").value;\r\n\t\tvar adddev_str = \"devmgmt add '\" + sn + \"' '\" + desc + \"' '\" + device + \"' '\" + devicetype + \"'\";\r\n\t\t\r\n\t\tpublish_settings(adddev_str);\r\n  }\r\n}\r\n\r\nvar remdev = function () {\r\n\r\n\tvar input_payload = \"Gerät wird gelöscht... <br>Bitte warten\";\r\n\t$('#full_output').html(input_payload);\r\n\t\r\n\tvar sn = document.getElementById(\"del_dev\").value;\r\n\tvar text = document.getElementById(\"del_dev\");\r\n\tvar desc = text.options[text.selectedIndex].text;\r\n\tvar remdev_str = \"devmgmt remove '\" + sn + \"' '\" + desc + \"'\";\r\n\t\r\n\tpublish_settings(remdev_str);\r\n}\r\n\r\nfunction focus_devid() {\r\n\tvar x = document.getElementById(\"devid\");\r\n\t\r\n\tif (x.value === \"\") {\r\n\t\tx.value = \"Device ID\"\r\n\t} \r\n}\r\n\r\nfunction focus_desc() {\r\n\tvar x = document.getElementById(\"desc\");\r\n\t\r\n\tif (x.value === \"\") {\r\n\t\tx.value = \"Bezeichnung\"\r\n\t} \r\n}\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 12,
+        "w": 9,
+        "x": 0,
+        "y": 0
+      },
+      "id": 14,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<head><link rel='stylesheet' type='text/css' href='../public/style.css'></head>\r\n<div ><center><hr /><h4>Output</h4></center><hr /></div>\r\n\r\n<div style=\"position: fixed;\" >\r\n<br>\r\n\t<div><span id=\"full_output\" style=\"text-align: left; white-space: pre; font-family: monospace; display: inline-block; unicode-bidi: embed\"></span></div>\r\n</div>\r\n\r\n<script>\r\n    \r\n    var publish_settings = function (settings_payload) {\r\n      mqtt.subscribe(\"output\", {\r\n\t\t  qos: 2\r\n\t    });\r\n\t\r\n\t    console.log('Sending: ' + JSON.stringify(settings_payload));\r\n    \r\n\t    var settings_message = new Paho.MQTT.Message(settings_payload);\r\n\t\t      settings_message.destinationName = \"input\";\r\n\t\t      settings_message.qos = 2;\r\n\r\n\t    mqtt.send(settings_message);\r\n\t    \r\n\t    setTimeout(() => { mqtt.unsubscribe(\"output\"); }, 300000);\r\n\t\r\n\t  };\r\n\r\n    mqtt.onMessageArrived = message_inbound;\r\n\r\n    function message_inbound(message) {\r\n        var input_payload = message.payloadString;\r\n        $('#full_output').html(input_payload);\r\n    };\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 15,
+        "w": 15,
+        "x": 9,
+        "y": 0
+      },
+      "id": 13,
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div><center><hr /><h4>MQTT Benutzermanagement</h4></center><hr /></div>\r\n\r\n<div>\r\n<table style=\"width:100%\">\r\n\t<tbody>\r\n\t<td style=\"width:100%\" >\r\n\t\t<input class=\"nanohome\" id=\"mqtt_user\" requiredminlength=\"4\" value=\"Benutzername\" onfocus=this.value=\"\" onfocusout=\"focus_user()\" autocomplete=\"off\" /></td>\r\n\t</tr>\r\n\t<tr>\r\n\t<td style=\"width:100%\" >\r\n\t\t<input class=\"nanohome\" type=\"password\" id=\"mqtt_pwd\" requiredminlength=\"8\" value=\"Passwort\" onfocus=this.value=\"\" onfocusout=\"focus_pw()\" autocomplete=\"off\" /></td>\r\n\t<td align=\"left\">\r\n\t\t<button class=\"nanohome\" style=\"width:70px; background-color: #fff4bd\" onclick=\"show_mqtt_pw()\">🔓</button>\r\n\t</td>  \r\n\t</tr>\r\n\t<tr>\r\n\t<td><center>\r\n\t\t<button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"user_show();\">Auslesen</button>\r\n\t\t<button class=\"nanohome\" style=\"background-color: #adfc95\" onclick=\"user_add();\">Speichern</button>\r\n\t\t<button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"user_del();\">Löschen</button>\r\n\t</center></td>\r\n\t</tr>\r\n\t</tbody>\r\n\t</table>\r\n</div>\r\n\r\n<script>\r\n\r\nvar user_show = function () {\r\n\r\n\tvar usershow = \"usermgmt show\";\r\n\tpublish_settings(usershow);\r\n}\r\n\r\nvar user_add = function () {\r\n\r\n\tvar mqtt_user = document.getElementById(\"mqtt_user\").value;\r\n\tvar mqtt_pwd = document.getElementById(\"mqtt_pwd\").value;\r\n\tvar useradd = \"usermgmt add '\" + mqtt_user + \"' '\" + mqtt_pwd + \"'\";\r\n\t\r\n\tpublish_settings(useradd);\r\n}\r\n    \r\nvar user_del = function () {\r\n      \r\n    var mqtt_user = document.getElementById(\"mqtt_user\").value;\r\n    var mqtt_pwd = document.getElementById(\"mqtt_pwd\").value;\r\n    var useradel = \"usermgmt remove '\" + mqtt_user + \"' '\" + mqtt_pwd + \"'\";\r\n\r\n    publish_settings(useradel);\r\n}\r\n\r\nfunction show_mqtt_pw() {\r\n\tvar x = document.getElementById(\"mqtt_pwd\");\r\n\tif (x.type === \"password\") {\r\n\t\tx.type = \"text\";\r\n\t} \r\n\telse {\r\n\t\tx.type = \"password\";\r\n\t}\r\n}\r\n\r\nfunction focus_user() {\r\n\tvar x = document.getElementById(\"mqtt_user\");\r\n\tif (x.value === \"\") {\r\n\t\tx.value = \"Benutzername\"\r\n\t} \r\n}\r\n\r\nfunction focus_pw() {\r\n\tvar x = document.getElementById(\"mqtt_pwd\");\r\n\tif (x.value === \"\") {\r\n\t\tx.value = \"Passwort\"\r\n\t} \r\n}\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 0,
+        "y": 12
+      },
+      "id": 20,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "activeThemeId": 0,
+      "datasource": null,
+      "gridPos": {
+        "h": 2,
+        "w": 14,
+        "x": 10,
+        "y": 15
+      },
+      "id": 22,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "themes": [
+        {
+          "name": "Nano Theme",
+          "styles": [
+            {
+              "props": {
+                "theme": "default"
+              },
+              "type": "basetheme"
+            },
+            {
+              "props": {
+                "url": "../public/img/nanohome.png"
+              },
+              "type": "bgimage"
+            },
+            {
+              "props": {
+                "text": ".panel-container {\n    background-color: rgba(0,0,0,0);\n}"
+              },
+              "type": "style"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "yesoreyeram-boomtheme-panel"
+    },
+    {
+      "content": "<div><center><hr /><h4>WLAN hinzufügen / ändern</h4></center><hr /></div>\r\n\r\n<div>\r\n<table style=\"width:100%\">\r\n\r\n  <tbody>\r\n  <tr>\r\n  <td style=\"width:100%\" ><input class=\"nanohome\" id=\"ssid\" requiredminlength=\"4\" value=\"WLAN SSID\" onfocus=this.value=\"\" onfocusout=\"ssid_focus()\" autocomplete=\"off\" ></td>\r\n  </tr>\r\n  \r\n  <tr>\r\n  <td style=\"width:100%\" ><input class=\"nanohome\" type=\"password\" id=\"psk\" requiredminlength=\"8\" value=\"WLAN Key\" onfocus=this.value=\"\" onfocusout=\"key_focus()\" autocomplete=\"off\" ></input></td>\r\n  <td align=\"left\"><button class=\"nanohome\" style=\"width:70px; background-color: #fff4bd\" onclick=\"show_key()\">🔓</button></td>  \r\n  </tr>\r\n  \r\n  <tr>\r\n  <td>\r\n    <center>\r\n    <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"show_wifi();\">Auslesen</button>\r\n    <button class=\"nanohome\" style=\"background-color: #adfc95\" onclick=\"add_wifi();\">Speichern</button>\r\n    <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"del_wifi();\">Löschen</button>\r\n    </center>\r\n  </td>\r\n  </tr>\r\n  \r\n  </tbody>\r\n  </table>\r\n\r\n</div>\r\n\r\n<script>\r\n\r\n    var add_wifi = function () {\r\n      \r\n      \r\n    var x = document.getElementById(\"ssid\");\r\n    var y = document.getElementById(\"psk\");\r\n    \r\n    if (x.value === \"WLAN SSID\") {\r\n      var input_payload = \"Bitte SSID ändern\";\r\n      $('#full_output').html(input_payload);   \r\n    } \r\n    \r\n    else if (y.value === \"WLAN Key\") {\r\n      var input_payload = \"Bitte WLAN Key ändern\";\r\n      $('#full_output').html(input_payload);\r\n    } \r\n    \r\n    else {\r\n      \r\n        var ssid_input = document.getElementById(\"ssid\").value;\r\n        var psk_input = document.getElementById(\"psk\").value;\r\n        var wcon = \"wcon add '\" + ssid_input + \"' '\" + psk_input + \"'\";\r\n\r\n        publish_settings(wcon);\r\n    }\r\n}\r\n\r\n    var show_wifi = function () {\r\n\r\n        var show_wlan = \"wcon show\";\r\n\r\n        publish_settings(show_wlan);\r\n    }\r\n\r\n    var del_wifi = function () {\r\n\r\n        var del_wlan = \"wcon delete\";\r\n\r\n        publish_settings(del_wlan);\r\n    }\r\n\r\nfunction show_key() {\r\n  var x = document.getElementById(\"psk\");\r\n  if (x.type === \"password\") {\r\n    x.type = \"text\";\r\n  } \r\n  else {\r\n    x.type = \"password\";\r\n  }\r\n}\r\n\r\nfunction ssid_focus() {\r\n  var ssidid = document.getElementById(\"ssid\");\r\n  if (ssidid.value === \"\") {\r\n    ssidid.value = \"WLAN SSID\"\r\n  } \r\n}\r\n\r\nfunction key_focus() {\r\n  var ssidkey = document.getElementById(\"psk\");\r\n  if (ssidkey.value === \"\") {\r\n    ssidkey.value = \"WLAN Key\"\r\n  } \r\n}\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 7,
+        "w": 9,
+        "x": 0,
+        "y": 19
+      },
+      "id": 4,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div><center><hr /><h4>WLAN Keys ändern</h4></center><hr /></div>\r\n\r\n<div>\r\n<table style=\"width:100%\">\r\n<tbody>\r\n<tr>\r\n  <td style=\"width:100%\" ><input class=\"nanohome\" type=\"text\" id=\"psk_nanogw_input\" requiredminlength=\"8\" value=\"NanoGateway WLAN Key\" onfocus=\"ngw_focus();this.value=''\" onfocusout=\"ngw_focus()\" autocomplete=\"off\" ></input></td>\r\n  <td style=\"width:120px\" align=\"left\"><button class=\"nanohome\" style=\"background-color: #ffbdbd\"onclick=\"message_wcon_nanogw()\">Speichern</button></td>\r\n  <td align=\"left\"><button class=\"nanohome\" style=\"width:70px; background-color: #fff4bd\" onclick=\"show_ngw_pw()\">🔓</button></td>\r\n</tr>\r\n<tr>\r\n  <td  style=\"width:100%\" ><input class=\"nanohome\" type=\"text\" id=\"psk_nanohome_input\" requiredminlength=\"8\" value=\"NanoHome WLAN Key\" onfocus=\"nho_focus();this.value=''\" onfocusout=\"nho_focus()\" autocomplete=\"off\" ></input></td>\r\n  <td style=\"width:120px\" align=\"left\"><button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"message_wcon_nanohome()\">Speichern</button></td>\r\n  <td align=\"left\"><button class=\"nanohome\" style=\"width:70px; background-color: #fff4bd\" onclick=\"show_nho_pw()\">🔓</button></td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n\r\n<script>\r\n\r\nvar message_wcon_nanohome = function () {\r\n  \r\n    var nho_psk = document.getElementById(\"psk_nanohome_input\");\r\n    \r\n    if (nho_psk.value === \"NanoHome WLAN Key\") {\r\n      var input_payload = \"Bitte Key ändern\";\r\n      $('#full_output').html(input_payload);   \r\n    } \r\n    \r\n    else {\r\n  \r\n      var psk_nanohome = document.getElementById(\"psk_nanohome_input\").value;\r\n      var wcon_nanohome = \"pskc \" + \"'\" + psk_nanohome + \"'\";\r\n    \r\n      publish_settings(wcon_nanohome);\r\n    }\r\n}\r\n\r\nvar message_wcon_nanogw = function () {\r\n  \r\n    var nhgw_psk = document.getElementById(\"psk_nanogw_input\");\r\n    \r\n    if (nhgw_psk.value === \"NanoGateway WLAN Key\") {\r\n      var input_payload = \"Bitte Key ändern\";\r\n      $('#full_output').html(input_payload);   \r\n    } \r\n    \r\n    else {\r\n      \r\n      var psk_nanogw = document.getElementById(\"psk_nanogw_input\").value;\r\n      var wcon_nanogw = \"wcon_nanogw \" + \"'\" + psk_nanogw + \"'\";\r\n    \r\n      publish_settings(wcon_nanogw);\r\n    }\r\n}\r\n\r\nfunction show_nho_pw() {\r\n  var x = document.getElementById(\"psk_nanohome_input\");\r\n  if (x.type === \"password\") {\r\n    x.type = \"text\";\r\n  } \r\n  else {\r\n    x.type = \"password\";\r\n  }\r\n}\r\n\r\nfunction show_ngw_pw() {\r\n  var x = document.getElementById(\"psk_nanogw_input\");\r\n  if (x.type === \"password\") {\r\n    x.type = \"text\";\r\n  } \r\n  else {\r\n    x.type = \"password\";\r\n  }\r\n}\r\n\r\nfunction ngw_focus() {\r\n  var x = document.getElementById(\"psk_nanogw_input\");\r\n  if (x.value === \"\") {\r\n    x.value = \"NanoGateway WLAN Key\";\r\n    x.type=\"text\";\r\n  } \r\n  else {\r\n    x.type=\"password\"\r\n  }\r\n}\r\n\r\nfunction nho_focus() {\r\n  var x = document.getElementById(\"psk_nanohome_input\");\r\n  if (x.value === \"\") {\r\n    x.value = \"NanoHome WLAN Key\";\r\n    x.type=\"text\";\r\n  }\r\n  else {\r\n    x.type=\"password\"\r\n  }\r\n}\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 6,
+        "w": 9,
+        "x": 0,
+        "y": 26
+      },
+      "id": 8,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div><center><hr /><h4>Backup & Restore</h4></center><hr /></div>\r\n\r\n<div>\r\n<table style=\"margin-left:auto;margin-right:auto;\">\r\n  <tbody>\r\n  <tr>\r\n  <td>\r\n    <label class=\"container\"><font size=\"3\">Dashboards</font>\r\n      <input type=\"checkbox\" id=\"grafana\" checked=\"checked\">\r\n      <span class=\"checkmark\"></span>\r\n    </label>\r\n    </td>\r\n  </tr>\r\n  <tr>\r\n    <td>\r\n    <label class=\"container\"><font size=\"3\">Messwerte</font>\r\n      <input type=\"checkbox\" id=\"influxdb\" checked=\"checked\">\r\n      <span class=\"checkmark\"></span>\r\n    </label>\r\n    </td>\r\n  </tr>\r\n  <tr>\r\n    <td>\r\n    <label class=\"container\"><font size=\"3\">Wifi</font>\r\n      <input type=\"checkbox\" id=\"wifi\" checked=\"checked\">\r\n      <span class=\"checkmark\"></span>\r\n    </label>\r\n    </td>\r\n  </tr>\r\n  <tr>\r\n    <td>\r\n      <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"showbackups()\">Anzeigen</button>\r\n      <button class=\"nanohome\" style=\"background-color: #adfc95\" onclick=\"backup()\">Backup</button>\r\n      <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"restore()\">Restore</button>\r\n    </td>\r\n  </tr>\r\n  </tbody>\r\n  </table>\r\n</div>\r\n\r\n<script>\r\n\r\n    function showbackups() {\r\n\r\n      var input_payload = \"<font size=5 color='hotpink'>Wird berechnet</font><p><br>Bitte warten...\";\r\n      $('#full_output').html(input_payload);\r\n\r\n      var cmnd = \"nanobackup show\";\r\n\r\n      publish_settings(cmnd);\r\n\r\n      };\r\n\r\n    function backup() {\r\n \r\n        var input_payload = \"<font size=5 color='hotpink'>Backup gestartet</font><p><br>Bitte warten... (Das kann dauern)\";\r\n        $('#full_output').html(input_payload);\r\n        \r\n        var grafana = document.getElementById(\"grafana\").checked;\r\n        var influxdb = document.getElementById(\"influxdb\").checked;\r\n        var wifi = document.getElementById(\"wifi\").checked;\r\n\r\n        var cmnd = \"nanobackup backup \" + grafana + \" \" + influxdb + \" \" + wifi;\r\n\r\n        publish_settings(cmnd);\r\n\r\n        };\r\n\r\n    function restore() {\r\n  \r\n        var input_payload = \"<font size=5 color='hotpink'>Restore gestartet</font><p><br>Bitte warten...\";\r\n        $('#full_output').html(input_payload);\r\n  \r\n        var grafana = document.getElementById(\"grafana\").checked;\r\n        var influxdb = document.getElementById(\"influxdb\").checked;\r\n        var wifi = document.getElementById(\"wifi\").checked;\r\n        \r\n        var cmnd = \"nanobackup restore \" + grafana + \" \" + influxdb + \" \" + wifi;\r\n\r\n        publish_settings(cmnd);\r\n\r\n        };\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 8,
+        "w": 9,
+        "x": 0,
+        "y": 32
+      },
+      "id": 18,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div><center><hr /><h4>System Update</h4></center><hr /></div>\r\n\r\n<div>\r\n<table style=\"margin-left:auto;margin-right:auto;\">\r\n  <tbody>\r\n  <tr>\r\n    <td>\r\n      <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"checkupdate()\">Prüfen</button>\r\n      <button class=\"nanohome\" style=\"background-color: #adfc95\" onclick=\"doupdate()\">Update</button>\r\n    </td>\r\n  </tr>\r\n  <tr><td><font size=\"3\"><center>Für Recovery SD einlegen</center></td></tr>\r\n  <tr>\r\n    <td>\r\n      <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"reboot()\">Reboot</button>\r\n      <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"reboot()\">Recovery</button>\r\n    </td>\r\n  </tr>\r\n  </tbody>\r\n  </table>\r\n</div>\r\n\r\n<script>\r\n\r\n    function checkupdate() {\r\n        var input_payload = \"<font size=5 color='hotpink'>Prüfe auf Systemupdates</font><p><br>Bitte warten...\";\r\n        $('#full_output').html(input_payload);\r\n\r\n        var cmnd = \"apt-get -u upgrade --assume-no\";\r\n\r\n        publish_settings(cmnd);\r\n\r\n        };\r\n\r\n    function doupdate() {\r\n\r\n        var input_payload = \"<font size=5 color='hotpink'>Installiere Systemupdates</font><p><br>Bitte warten... (Das kann dauern)\";\r\n        $('#full_output').html(input_payload);\r\n\r\n        var cmnd = \"apt-get -y upgrade\";\r\n\r\n        publish_settings(cmnd);\r\n\r\n        };\r\n\r\n\r\n    function reboot() {\r\n\r\n        var input_payload = \"<font size=5 color='hotpink'>Reboot</font><p><br>Die Seite wird in 3 Minuten neu geladen\";\r\n        $('#full_output').html(input_payload);\r\n        \r\n        var cmnd = \"reboot now\";\r\n\r\n        publish_settings(cmnd);\r\n        \r\n        setTimeout(() => { window.location.reload(true) }, 30000);\r\n\r\n        };\r\n\r\n    function recovery() {\r\n\r\n        var input_payload = \"<font size=5 color='hotpink'>Reboot ins Recovery</font><p><br>Recovery-SD einlegen...<br>Die Seite wird in 3 Minuten neu geladen\";\r\n        $('#full_output').html(input_payload);\r\n\r\n        var cmnd = \"reboot now\";\r\n\r\n        publish_settings(cmnd);\r\n        \r\n        setTimeout(() => { window.open('http://nanohome.nano.lan') }, 30000);\r\n\r\n        };\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 6,
+        "w": 9,
+        "x": 0,
+        "y": 40
+      },
+      "id": 19,
+      "links": [],
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    }
+  ],
+  "schemaVersion": 22,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "",
+  "title": "Settings",
+  "uid": "sYOGRUiRz",
+  "variables": {
+    "list": []
+  },
+  "version": 306
+}

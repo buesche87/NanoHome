@@ -1,0 +1,201 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 9,
+  "links": [],
+  "panels": [
+    {
+      "content": "<div><center><hr /><h3>Schaltuhr</h3></center><hr /></div>\r\n\r\n<div>\r\n<center>\r\n<select class=\"nanohome\" id=\"device\" style=\"width: 166px\" onchange=\"show_zsp()\" name=\"nanolist\">\r\n<option value=\"shelly1pm-8CAAB505F81D\">Schlafzimmer</option>\r\n<option value=\"shelly1pm-76DAD6\">TV</option>\r\n<option value=\"sonoff_3\">Büro</option>\r\n<option value=\"sonoff_1\">Wohnzimmer</option>\r\n<option value=\"shelly1pm-E641C5\">Sideboard</option>\r\n<option value=\"shelly1pm-766A83\">Sofa</option>\r\n<option value=\"shelly1pm-8CAAB5056FE7\">Joris</option>\r\n</select>\r\n<br><p>\r\n<table>\r\n<tr>\r\n<td><font size=4>Ein</font></td>\r\n<td><input class=\"nanohome\" id=\"ein\" pattern=\".{5,5}\" style=\"width: 80px\" value=\"08:00\"</input></td>\r\n</tr>\r\n<td><font size=4>Aus</font></td>\r\n<td><input class=\"nanohome\" id=\"aus\" pattern=\".{5,5}\" style=\"width: 80px\" value=\"22:00\"</input></td>\r\n</tr>\r\n</table>\r\n<br>\r\n\r\n<select class=\"nanohome\" id=\"day\" style=\"width: 166px; background-color: #c7e9ff\">\r\n  <option value=\"*\">Täglich</option>\r\n  <option value=\"1\">Montag</option>\r\n  <option value=\"2\">Dienstag</option>\r\n  <option value=\"3\">Mittwoch</option>\r\n  <option value=\"4\">Donnerstag</option>\r\n  <option value=\"5\">Freitag</option>\r\n  <option value=\"6\">Samstag</option>\r\n  <option value=\"0\">Sonntag</option>\r\n  <option value=\"6-7\">Wochenende</option>\r\n  <option value=\"1-5\">Werktags</option>\r\n</select>\r\n<br><br>\r\n  <button class=\"nanohome\" style=\"background-color: #c0fcb1\" onclick=\"add_zsp()\">Aktivieren</button>\r\n  <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"show_allzsp()\">Auslesen</button>\r\n  <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"delete_zsp()\">Deaktivieren</button>\r\n</center>\r\n</div>\r\n\r\n<script>\r\n    \r\n    function ShowDivZSP() {\r\n        document.getElementById(\"div_zsp\").style.display = \"\";\r\n    }\r\n    \r\n    mqtt.onMessageArrived = message_inbound;\r\n\r\n    function message_inbound(zsp_message) {\r\n        var zsp_output = zsp_message.payloadString;\r\n        $('#req_zsp_output').html(zsp_output);\r\n    };\r\n    \r\n    var add_zsp = function () {\r\n\t\t\r\n\t\t    var zsp_dev = document.getElementById(\"device\").value;\r\n        var zsp_tag = document.getElementById(\"day\").value;\r\n        var zsp_ein = document.getElementById(\"ein\").value;\r\n        if (zsp_ein.length < 5) zsp_ein = \"-\";\r\n        var zsp_aus = document.getElementById(\"aus\").value;\r\n        if (zsp_aus.length < 5) zsp_aus = \"-\";\r\n        \r\n        var addcron = \"cronman add '\" + zsp_dev + \"' '\" + zsp_tag + \"' \" + zsp_ein + \" \" + zsp_aus;\r\n        \r\n        publish_zsp(addcron); \r\n    }\r\n\r\n    var show_zsp = function () {\r\n\t\t\r\n\t\t    var zsp_dev = document.getElementById(\"device\").value;\r\n\t\t    var showcron = \"cronman show \" + zsp_dev;\r\n\t\t\r\n        publish_zsp(showcron); \r\n    }\r\n\r\n    var show_allzsp = function () {\r\n\t\t\r\n\t\t    var showcron = \"cronman show all\";\r\n\t\t\r\n        publish_zsp(showcron); \r\n    }\r\n\r\n\r\n    var delete_zsp = function () {\r\n\r\n\t\t    var zsp_dev = document.getElementById(\"device\").value;\r\n        var delcron = \"cronman remove \" + zsp_dev;\r\n\t\t\r\n        publish_zsp(delcron); \r\n    }\r\n\r\n    var publish_zsp = function (zsp_payload) {\r\n        mqtt.subscribe(\"output\", {\r\n\t\t    qos: 2\r\n\t      });\r\n\t\r\n\t      console.log('Sending: ' + JSON.stringify(zsp_payload));\r\n    \r\n\t      var zsp_message = new Paho.MQTT.Message(zsp_payload);\r\n\t\t        zsp_message.destinationName = \"input\";\r\n\t\t        zsp_message.qos = 2;\r\n\r\n\t      mqtt.send(zsp_message);\r\n\t    \r\n\t      setTimeout(() => { mqtt.unsubscribe(\"output\"); }, 5000);\r\n\t\r\n\t  };\r\n\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 10,
+        "w": 7,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<head><link rel='stylesheet' type='text/css' href='../public/style.css'></head>\r\n<div ><center><hr /><h4>Output</h4></center><hr /></div>\r\n\r\n<div style=\"position: fixed;\" ><br><span id=\"req_zsp_output\" style=\"white-space: pre; font-family: monospace; display: block; unicode-bidi: embed; font-size:18px\"></span></div>",
+      "datasource": null,
+      "gridPos": {
+        "h": 16,
+        "w": 17,
+        "x": 7,
+        "y": 0
+      },
+      "id": 8,
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "content": "<div><center><hr /><h3>Standbykiller</h3></center><hr /></div>\r\n\r\n<div>\r\n<center>\r\n<select class=\"nanohome\" id=\"stby_device\" style=\"width: 166px\" onchange=\"show_stby()\" name=\"nanolist\">\r\n<option value=\"shelly1pm-8CAAB505F81D\">Schlafzimmer</option>\r\n<option value=\"shelly1pm-76DAD6\">TV</option>\r\n<option value=\"sonoff_3\">Büro</option>\r\n<option value=\"sonoff_1\">Wohnzimmer</option>\r\n<option value=\"shelly1pm-E641C5\">Sideboard</option>\r\n<option value=\"shelly1pm-766A83\">Sofa</option>\r\n<option value=\"shelly1pm-8CAAB5056FE7\">Joris</option>\r\n</select>\r\n<br><p>\r\n<table>\r\n<tr>\r\n<td><font size=4>Max Standby [W]</font></td>\r\n<td><input class=\"nanohome\" id=\"stbypwr\" maxlength=\"5\" style=\"width: 60px\" value=\"20\"</input></td>\r\n</table>\r\n<br><p>\r\n  <button class=\"nanohome\" style=\"background-color: #c0fcb1\" onclick=\"add_stby()\">Aktivieren</button>\r\n  <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"show_allstby()\">Auslesen</button>\r\n  <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"delete_stby()\">Deaktivieren</button>\r\n</center>\r\n</div>\r\n\r\n<script>\r\n\r\n    var show_stby = function () {\r\n\r\n    \t\tvar stby_dev = document.getElementById(\"stby_device\").value;\r\n        var stdby_kill = \"standbykiller show \" + stby_dev;\r\n\t\t\r\n        publish_stby(stdby_kill); \r\n    }\r\n\r\n    var show_allstby = function () {\r\n\r\n        var stdby_kill = \"standbykiller show all\";\r\n\t\t\r\n        publish_stby(stdby_kill); \r\n    }\r\n\r\n    var add_stby = function () {\r\n\r\n\t\t    var stby_dev = document.getElementById(\"stby_device\").value;\r\n        var stby_pwr = document.getElementById(\"stbypwr\").value;\r\n        var stdby_kill = \"standbykiller add '\" + stby_dev + \"' '\" + stby_pwr + \"'\";\r\n        \r\n        publish_stby(stdby_kill); \r\n    }\r\n\r\n    var delete_stby = function () {\r\n\r\n    \t\tvar stby_dev = document.getElementById(\"stby_device\").value;\r\n        var stdby_kill = \"standbykiller remove '\" + stby_dev + \"'\";\r\n\t\t\r\n        publish_stby(stdby_kill); \r\n    }\r\n\r\n\r\n      var publish_stby = function (stby_payload) {\r\n      mqtt.subscribe(\"output\", {\r\n\t\t  qos: 2\r\n\t    });\r\n\t\r\n\t    console.log('Sending: ' + JSON.stringify(stby_payload));\r\n    \r\n\t    var stby_message = new Paho.MQTT.Message(stby_payload);\r\n\t\t      stby_message.destinationName = \"input\";\r\n\t\t      stby_message.qos = 2;\r\n\r\n\t    mqtt.send(stby_message);\r\n\t    \r\n\t    setTimeout(() => { mqtt.unsubscribe(\"output\"); }, 5000);\r\n\t\r\n\t  };\r\n\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 10
+      },
+      "id": 9,
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "activeThemeId": 0,
+      "datasource": null,
+      "gridPos": {
+        "h": 2,
+        "w": 17,
+        "x": 7,
+        "y": 16
+      },
+      "id": 12,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "themes": [
+        {
+          "name": "Nano Theme",
+          "styles": [
+            {
+              "props": {
+                "theme": "default"
+              },
+              "type": "basetheme"
+            },
+            {
+              "props": {
+                "url": "../public/img/nanohome.png"
+              },
+              "type": "bgimage"
+            },
+            {
+              "props": {
+                "text": ".panel-container {\n    background-color: rgba(0,0,0,0);\n}"
+              },
+              "type": "style"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "yesoreyeram-boomtheme-panel"
+    },
+    {
+      "content": "<div><center><hr /><h3>Multiswitch</h3></center><hr /></div>\r\n\r\n<div>\r\n<center>\r\n<table>\r\n<tr>\r\n<td><font size=4>Wenn</font></td>\r\n<td>\r\n<select class=\"nanohome\" id=\"multi_dev1\" onchange=\"show_multi()\" style=\"background-color: #fff4bd; width:166px\" name=\"nanolist\">\r\n<option value=\"shelly1pm-8CAAB505F81D\">Schlafzimmer</option>\r\n<option value=\"shelly1pm-76DAD6\">TV</option>\r\n<option value=\"sonoff_3\">Büro</option>\r\n<option value=\"sonoff_1\">Wohnzimmer</option>\r\n<option value=\"shelly1pm-E641C5\">Sideboard</option>\r\n<option value=\"shelly1pm-766A83\">Sofa</option>\r\n<option value=\"shelly1pm-8CAAB5056FE7\">Joris</option>\r\n</select>\r\n</td>\r\n  <td>\r\n    <select class=\"nanohome\" id=\"multi_value1\" onchange=\"show_multi()\" style=\"width: 90px; background-color: #c7e9ff\">\r\n      <option value=\"on\">Ein</option>\r\n      <option value=\"off\">Aus</option>\r\n    </select>\r\n  </td>\r\n</tr>\r\n<tr>\r\n<td><font size=4>Dann</font></td>\r\n<td>\r\n<select class=\"nanohome\" id=\"multi_dev2\" onchange=\"show_multi()\" style=\"background-color: #fff4bd; width:166px\" name=\"nanolist\">\r\n<option value=\"shelly1pm-8CAAB505F81D\">Schlafzimmer</option>\r\n<option value=\"shelly1pm-76DAD6\">TV</option>\r\n<option value=\"sonoff_3\">Büro</option>\r\n<option value=\"sonoff_1\">Wohnzimmer</option>\r\n<option value=\"shelly1pm-E641C5\">Sideboard</option>\r\n<option value=\"shelly1pm-766A83\">Sofa</option>\r\n<option value=\"shelly1pm-8CAAB5056FE7\">Joris</option>\r\n</select>\r\n</td>\r\n  <td>\r\n    <select class=\"nanohome\" id=\"multi_value2\" onchange=\"show_multi()\" style=\"width: 90px; background-color: #c7e9ff\">\r\n      <option value=\"on\">Ein</option>\r\n      <option value=\"off\">Aus</option>\r\n    </select>\r\n  </td>\r\n</tr>\r\n</table>\r\n\r\n<br><p>\r\n  <button class=\"nanohome\" style=\"background-color: #c0fcb1\" onclick=\"add_multi()\">Aktivieren</button>\r\n  <button class=\"nanohome\" style=\"background-color: #fff4bd\" onclick=\"show_allmulti()\">Auslesen</button>\r\n  <button class=\"nanohome\" style=\"background-color: #ffbdbd\" onclick=\"delete_multi()\">Deaktivieren</button>\r\n</center>\r\n</div>\r\n\r\n<script>\r\n\r\n    var show_allmulti = function () {\r\n\r\n      var multi_dev1 = document.getElementById(\"multi_dev1\").value;\r\n      var multi_value1 = document.getElementById(\"multi_value1\").value;\t\t\r\n      var multi_value2 = document.getElementById(\"multi_value2\").value;\t\r\n\r\n      var showmulti = \"multiswitch show '\" + multi_dev1 + \"' '\" + multi_dev1 + \"' '\" + multi_value1 + \"' '\" + multi_value2 + \"'\";\r\n\r\n\t\t\r\n      publish_multi(showmulti); \r\n\r\n    }\r\n\r\n    var show_multi = function () {\r\n\r\n      var multi_dev1 = document.getElementById(\"multi_dev1\").value;\r\n      var multi_dev2 = document.getElementById(\"multi_dev2\").value;\r\n      var multi_value1 = document.getElementById(\"multi_value1\").value;\t\t\r\n      var multi_value2 = document.getElementById(\"multi_value2\").value;\t\r\n\r\n      var showmulti = \"multiswitch show '\" + multi_dev1 + \"' '\" + multi_dev2 + \"' '\" + multi_value1 + \"' '\" + multi_value2 + \"'\";\r\n\t\t\r\n\t\t  // var showmulti = \"multiswitch show all\"\r\n\t\t\r\n      publish_multi(showmulti); \r\n\r\n    }\r\n\r\n    var add_multi = function () {\r\n\r\n      var multi_dev1 = document.getElementById(\"multi_dev1\").value;\r\n      var multi_dev2 = document.getElementById(\"multi_dev2\").value;\r\n      var multi_value1 = document.getElementById(\"multi_value1\").value;\t\t\r\n      var multi_value2 = document.getElementById(\"multi_value2\").value;\t\r\n      \r\n      var addmulti = \"multiswitch add '\" + multi_dev1 + \"' '\" + multi_dev2 + \"' '\" + multi_value1 + \"' '\" + multi_value2 + \"'\";\r\n        \r\n      publish_multi(addmulti); \r\n    }\r\n\r\n    var delete_multi = function () {\r\n\r\n      var multi_dev1 = document.getElementById(\"multi_dev1\").value;\r\n      var multi_dev2 = document.getElementById(\"multi_dev2\").value;\r\n      var multi_value1 = document.getElementById(\"multi_value1\").value;\t\t\r\n      var multi_value2 = document.getElementById(\"multi_value2\").value;\t\r\n\r\n      var delmulti = \"multiswitch remove '\" + multi_dev1 + \"' '\" + multi_dev2 + \"' '\" + multi_value1 + \"' '\" + multi_value2 + \"'\";\r\n\t\t\r\n      publish_multi(delmulti); \r\n      \r\n    }\r\n\r\n    var publish_multi = function (multi_payload) {\r\n\r\n      mqtt.subscribe(\"output\", {\r\n\t\t  qos: 2\r\n\t    });\r\n\t\r\n\t    console.log('Sending: ' + JSON.stringify(multi_payload));\r\n    \r\n\t    var multi_message = new Paho.MQTT.Message(multi_payload);\r\n\t\t      multi_message.destinationName = \"input\";\r\n\t\t      multi_message.qos = 2;\r\n\r\n\t    mqtt.send(multi_message);\r\n\t    \r\n\t    setTimeout(() => { mqtt.unsubscribe(\"output\"); }, 5000);\r\n\t\r\n\t  };\r\n\r\n</script>",
+      "datasource": null,
+      "gridPos": {
+        "h": 8,
+        "w": 7,
+        "x": 0,
+        "y": 17
+      },
+      "id": 10,
+      "mode": "html",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 22,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "",
+  "title": "Schaltuhr",
+  "uid": "_H3fwdmRz",
+  "variables": {
+    "list": []
+  },
+  "version": 264
+}

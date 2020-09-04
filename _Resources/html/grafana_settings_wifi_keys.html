@@ -1,0 +1,51 @@
+<div>
+    <h4>WLAN Key Manager</h4>
+    <hr />
+</div>
+
+<div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" type="text" id="psk_input" requiredminlength="8" value="NanoHome WLAN Key" onfocus="psk_focus()" onfocusout="psk_focus()" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button title="WLAN Key setzen" class="nanohome" style="background-color: #ffbdbd;" onclick="send_psk()">💾</button>
+                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_psk()">🔑</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+    var send_psk = function () {
+
+            var psk = document.getElementById("psk_input").value;
+            var psk_change = "pskc " + "'" + psk + "'";
+
+            publish_settings(psk_change);
+    };
+
+    function psk_focus() {
+        var x = document.getElementById("psk_input");
+        if (x.value === "NanoHome WLAN Key") {
+            x.value = "";
+            x.type = "password";
+        } else if (x.value === "") {
+            x.value = "NanoHome WLAN Key";
+            x.type = "text";
+        }
+    }
+
+    function show_psk() {
+        var x = document.getElementById("psk_input");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+</script>
