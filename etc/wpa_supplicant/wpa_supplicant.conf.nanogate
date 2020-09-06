@@ -5,6 +5,6 @@ network={
 ssid="NanoHome"
 scan_ssid=1
 key_mgmt=WPA-PSK
-psk="NanoHome_Log1n"
+psk="Nano_GW_Log1n"
 id_str="home"
 }
