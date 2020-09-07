@@ -1,5 +1,5 @@
 #!/bin/bash
-# usermgmt - Manages MQTT devices on Grafana Dashboards
+# usermgmt - Manages MQTT users from Grafana Dashboards
 
 # Catch Parameters
 user="$2"
