@@ -8,13 +8,6 @@
         <tr>
             <td colspan="2">
                 <select class="nanohome" id="stby_device"onchange="standbykill('show')" name="nanolist_stbykill">
-                    <option value="shelly1pm-8CAAB505F81D">Schlafzimmer</option>
-                    <option value="shelly1pm-76DAD6">TV</option>
-                    <option value="sonoff_3">Büro</option>
-                    <option value="sonoff_1">Wohnzimmer</option>
-                    <option value="shelly1pm-E641C5">Sideboard</option>
-                    <option value="shelly1pm-766A83">Sofa</option>
-                    <option value="shelly1pm-8CAAB5056FE7">Joris</option>
                 </select>
             </td>
         </tr>
@@ -24,9 +17,9 @@
         </tr>
         <tr>
             <td colspan="2" align="center">
-                <button class="nanohome" style="width: 30%; background-color: #c0fcb1;" onclick="standbykill('add')">💾</button>
-                <button class="nanohome" style="width: 30%; background-color: #fff4bd;" onclick="standbykill('show all')">🔎</button>
-                <button class="nanohome" style="width: 30%; background-color: #ffbdbd;" onclick="standbykill('remove')">❌</button>
+                <button title="Deaktivieren" class="nanohome" style="background-color: #c0fcb1;" onclick="standbykill('add')">💾</button>
+                <button title="Alle Anyeigen" class="nanohome" style="background-color: #fff4bd;" onclick="standbykill('show all')">🔎</button>
+                <button title="Deaktivieren" class="nanohome" style="background-color: #ffbdbd;" onclick="standbykill('remove')">❌</button>
             </td>
         </tr>
     </table>

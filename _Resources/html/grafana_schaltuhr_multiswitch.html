@@ -9,15 +9,6 @@
             <td colspan="3">
                 <select class="nanohome" id="multi_dev1" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist_multiswitch">
                     <option selected disabled>Wenn...</option>
-                    <option value="shelly1pm-8CAAB505F81D">Schlafzimmer</option>
-                    <option value="shelly1pm-76DAD6">TV</option>
-                    <option value="sonoff_3">Büro</option>
-                    <option value="sonoff_1">Wohnzimmer</option>
-                    <option value="shelly1pm-E641C5">Sideboard</option>
-                    <option value="shelly1pm-766A83">Sofa</option>
-                    <option value="shelly1pm-8CAAB5056FE7">Joris</option>
-                    <option value="shellyswitch25-BCDDC277633D">Rollo Links</option>
-                    <option value="shellyswitch25-BCDDC2776459">Rollo Rechts</option>
                 </select>
             </td>
             <tr>
@@ -35,15 +26,6 @@
             <td colspan="3">
                 <select class="nanohome" id="multi_dev2" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist">
                     <option selected disabled>Dann...</option>
-                    <option value="shelly1pm-8CAAB505F81D">Schlafzimmer</option>
-                    <option value="shelly1pm-76DAD6">TV</option>
-                    <option value="sonoff_3">Büro</option>
-                    <option value="sonoff_1">Wohnzimmer</option>
-                    <option value="shelly1pm-E641C5">Sideboard</option>
-                    <option value="shelly1pm-766A83">Sofa</option>
-                    <option value="shelly1pm-8CAAB5056FE7">Joris</option>
-                    <option value="shellyswitch25-BCDDC277633D">Rollo Links</option>
-                    <option value="shellyswitch25-BCDDC2776459">Rollo Rechts</option>
                 </select>
             </td>
             </tr>
@@ -88,9 +70,9 @@
         </tr>
         <tr>
             <td colspan="3" align="center">
-                <button class="nanohome" style="width: 30%; background-color: #c0fcb1;" onclick="multiswitch('add')">💾</button>
-                <button class="nanohome" style="width: 30%; background-color: #fff4bd;" onclick="multiswitch('show all')">🔎</button>
-                <button class="nanohome" style="width: 30%; background-color: #ffbdbd;" onclick="multiswitch('remove')">❌</button>
+                <button title="Aktivieren" class="nanohome" style="background-color: #c0fcb1;" onclick="multiswitch('add')">💾</button>
+                <button title="Alle Anyeigen" class="nanohome" style="background-color: #fff4bd;" onclick="multiswitch('show all')">🔎</button>
+                <button title="Deaktivieren" class="nanohome" style="background-color: #ffbdbd;" onclick="multiswitch('remove')">❌</button>
             </td>
         </tr>
     </table>
