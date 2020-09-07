@@ -1,6 +1,10 @@
 #!/bin/bash
 # rollersecurity for NanoHome - sends OFF to topic if current value exceeds a certain value
 
+
+##### TBD #####
+
+
 # settings
 server="localhost"
 user="cron_mqtt"
