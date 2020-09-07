@@ -1,18 +1,21 @@
 #!/bin/bash
-# nanobackup - NanoHome backup tool
+#/////////////////////////////////////////////////////////////////////////////////////
+# Nanobackup for NanoHome - NanoHome Backup tool
+#/////////////////////////////////////////////////////////////////////////////////////
 
-# dgt backup parameters  
+# Catch Parameters
 rectype="$1" #[backup|restore]
 grafana="$2" #[true|false]
 influxdb="$3" #[true|false]
 wifi="$4" #[true|false]
 
-# settings
+# Settings
 backupdir="/mnt/recovery_sd/root/Backup"
 bkdr_grafana="$backupdir/Grafana"
 bkdr_influxdb="$backupdir/InfluxDB"
 bkdr_wifi="$backupdir/wpa_supplicant/"
-install_dir="/usr/local/nanohome/"
+install_dir="/usr/local/nanohome"
+
 
 # mount recovery-sd
 umount /mnt/recovery_sd >> /dev/null 2>&1
@@ -20,38 +23,35 @@ mount -t auto -v /dev/mmcblk1p2 /mnt/recovery_sd >> /dev/null 2>&1
 
 if [ ! $? -eq 0 ]; then
 
-  echo "recovery-sd not found"
-  echo "trying to different sd card"
   mount -t auto -v /dev/mmcblk1p1 /mnt/recovery_sd >> /dev/null 2>&1
   
   if [ $? -eq 0 ]; then
 
-    echo "sd mounted"
-	echo ""
+	statusmsg "Normale SD-Karte gemountet" "white"
 
   else
  
-     echo "no sd card found" 
+     errmsg "Error" "Keine SD-Karte gefunden" 
      exit 1
   fi
   
+else
+	
+	statusmsg "Recovery-SD gemountet" "white"
+  
 fi
 
-# create directories
-if [ ! -d "$backupdir" ]; then
+mkdir -p "$bkdr_grafana"
+mkdir -p "$bkdr_influxdb"
+mkdir -p "$bkdr_wifi"
 
-    mkdir -p "$bkdr_grafana"
-    mkdir -p "$bkdr_influxdb"
-    mkdir -p "bkdr_wifi"
-
-fi
 
 # get backup selections from interface
 if [ "$rectype" == "backup" ]; then
 
     if [ "$grafana" == "true" ]; then
         cd $install_dir/grafana-backup-tool/
-        ./backup_grafana.sh "$bkdr_grafana" >> /dev/null 2>&1
+        ./backup_grafana.sh >> /dev/null 2>&1
         touch "$bkdr_grafana"
         echo "Grafana Backup..."
     fi
@@ -61,12 +61,12 @@ if [ "$rectype" == "backup" ]; then
         echo "InfluxDB Backup..."
     fi
     if [ "$wifi" == "true" ]; then
-        cp -R /etc/wpa_supplicant/wpa-supplicant* "$bkdr_wifi" >> /dev/null 2>&1
+        cp /etc/wpa_supplicant/wpa_supplicant* "$bkdr_wifi" >> /dev/null 2>&1
         echo "Wifi Backup..."
         touch "$bkdr_wifi"
     fi
-
-	echo "<br><font size=5 color='hotpink'>Backup complete</font>"
+	
+	statusmsg "Backup complete" "hotpink"
 
 fi
 
@@ -75,20 +75,20 @@ if [ "$rectype" == "restore" ]; then
 
     if [ "$grafana" == "true" ]; then
         echo "Restoring Grafana..."
-        #cd /root/grafana-backup-tool/
+        #cd $install_dir/grafana-backup-tool/
         #./restore_grafana.sh
     fi
     if [ "$influxdb" == "true" ]; then
         echo "Restoring InfluxDB..."
-        #influxd restore -portable /mnt/recovery_sd/root/Backup/InfluxDB
+        #influxd restore -portable $bkdr_influxdb
     fi
 
     if [ "$wifi" == "true" ]; then
         echo "Restoring Wifi Settings..."
-        #cp /mnt/recovery_sd/root/Backup/wpa_supplicant/* /etc/wpa_supplicant/
+        #cp $bkdr_wifi/* /etc/wpa_supplicant/
     fi
 	
-	echo "<br><font size=5 color='hotpink'>Restore complete (deaktiviert)</font>"
+	statusmsg "Restore complete" "hotpink" "" "" "Inaktiv - zu gefährlich" "white"
 	
 fi
 
@@ -96,7 +96,7 @@ fi
 if [ "$rectype" == "show" ]; then
 
 	echo "<font size=5 color='hotpink'>Stored Backups</font><br>"
-	echo "$(tree -d -D --timefmt "%d.%m.%y %T" /mnt/recovery_sd/root/Backup)"
+	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $backupdir)"
 
 fi
 

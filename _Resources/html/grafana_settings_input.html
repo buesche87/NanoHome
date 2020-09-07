@@ -1,166 +1,24 @@
-<div><h5>Input</h5></div>
-
 <div>
-	<hr>
-	<table style="width:100%;">
-  <tbody>
-  <tr>
-    <td><input type="text" id="input" name="input" style="width:100%" value="Input"</input></td>
-    <td><button type="button" style="background-color: #ffbdbd" onclick="input_message()"><font size="4">Senden</font></button></td>
-  </tr>
-  </tbody>
-  </table>
+    <h4>System Input</h4>
+    <hr />
 </div>
 
 <div>
-  <hr>
-	<div><span id="full_output" style="text-align: left; white-space: pre; font-family: monospace; display: inline-block; unicode-bidi: embed">#</span></div>
+<input title="Linux Befehle ausführen" class="nanohome" type="text" id="input" value="Input" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off"/>
 </div>
 
 <script>
-
-    var input_message = function () {
+$("input").on("keydown",function search(e) {
+    if(e.keyCode == 13) {
+      
         var inp = document.getElementById("input").value;
         
-        publish_settings(inp);
-        
-    };
-        
-    var publish_settings = function (settings_payload) {
-      mqtt.subscribe("output", {
-		  qos: 2
-	    });
-	
-	    console.log('Sending: ' + JSON.stringify(settings_payload));
-    
-	    var settings_message = new Paho.MQTT.Message(settings_payload);
-		      settings_message.destinationName = "input";
-		      settings_message.qos = 2;
-
-	    mqtt.send(settings_message);
-	    
-	    setTimeout(() => { mqtt.unsubscribe("output"); }, 300000);
-	
-	  };
-
-    mqtt.onMessageArrived = message_inbound;
-
-    function message_inbound(message) {
-        var input_payload = message.payloadString;
-        $('#full_output').html(input_payload);
-    };
-
+        if (inp != "") {
+            publish_settings(inp);
+          } else {
+            var input_payload = "errmsg 'Achtung!' 'Führt Linux-Befehle als root aus <br><br>keine Interaktiven Befehle nutzen!' ";
+            publish_settings(input_payload);
+          }
+    }
+});
 </script>
-
-<style type="text/css">
-
-body {
-  background-image: url('../public/img/bg_image.jpg');
-font-size: 16px;
-}
-
-table, tr, td {
-  border-style : hidden!important;
-}
-
-input, input[type=password] {
-  background-color: #fff4bd;
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding: 8px;
-  height: 35px;
-  
-}
-
-button {
-
-  background-color: #c7e9ff;
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  width: 100px;
-  height: 35px;
-  
-}
-
-select {
-
-  background-color: #c7e9ff;
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  
-}
-
-/* Customize the label (the container) */
-.container {
-  display: block;
-  position: relative;
-  padding-left: 35px;
-  margin-bottom: 12px;
-  cursor: pointer;
-  font-size: 16px;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* Hide the browser's default checkbox */
-.container input {
-  position: absolute;
-  opacity: 0;
-  cursor: pointer;
-  height: 0;
-  width: 0;
-}
-
-/* Create a custom checkbox */
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 25px;
-  width: 25px;
-  background-color: #eee;
-}
-
-/* On mouse-over, add a grey background color */
-.container:hover input ~ .checkmark {
-  background-color: #ccc;
-}
-
-/* When the checkbox is checked, add a blue background */
-.container input:checked ~ .checkmark {
-  background-color: #2196F3;
-}
-
-/* Create the checkmark/indicator (hidden when not checked) */
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-/* Show the checkmark when checked */
-.container input:checked ~ .checkmark:after {
-  display: block;
-}
-
-/* Style the checkmark/indicator */
-.container .checkmark:after {
-  left: 9px;
-  top: 5px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 3px 3px 0;
-  -webkit-transform: rotate(45deg);
-  -ms-transform: rotate(45deg);
-  transform: rotate(45deg);
-}
-
-</style>

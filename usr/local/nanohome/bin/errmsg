@@ -1,0 +1,5 @@
+#!/bin/bash
+# errmsg - send html formated error messages to dashboard
+
+echo -e "<font size='5' color='red'>$1</font><br>"
+echo -e "<font size='4' color='white'>$2</font>"

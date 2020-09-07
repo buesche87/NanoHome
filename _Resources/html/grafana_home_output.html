@@ -1,12 +1,10 @@
 <head><link rel='stylesheet' type='text/css' href='../public/style.css'></head>
 
-<div id="mqtt_output_panel">
-
+<center>
     <div><span id="status_output">#</span></div>
-    <div>Last Message: <span id="name_output"/> # <span id="request_output" /></div>
+    <div>Last Message: <font color='hotpink'><span id="name_output"></span> # <span id="request_output"></span></font></div>
     <!--- DEBUG <div>Topic: <span id="topic_output">#</span></div> --->
-    <!--- DEBUG <div>Status: <span id="request_output">#</span></div> ---> 
-</div>
+</center>
 
 <script>
     
@@ -51,7 +49,7 @@
             options.userName = user;
             options.password = pwd;
         }
-        // console.log("Host=" + host + ", port=" + port + ", path=" + path + " TLS = " + useTLS + " username=" + username + " password=" + password);
+        console.log("Host=" + host + ", port=" + port + ", path=" + path + " TLS = " + useTLS + " username=" + user + " password=" + pwd);
         mqtt.connect(options);
     }
     
@@ -82,12 +80,13 @@
         $('#status_output').html('Connected to ' + host + ':' + port + path);
         $('#topic_output').html(input_topic);
         $('#name_output').html(device_name);
+        
         var message = new Paho.MQTT.Message(payload);
         message.destinationName = input_topic;
         message.qos = qos;
         mqtt.send(message);
         
-		    setTimeout(() => { mqtt.unsubscribe(output_topic); }, 2000);
+		    setTimeout(() => { mqtt.unsubscribe(output_topic); }, 5000);
 		
     }
 

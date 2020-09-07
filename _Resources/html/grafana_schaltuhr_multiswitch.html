@@ -1,119 +1,113 @@
-<div><center><font size=5 color='hotpink'>Multiswitch</font></center><hr></div>
+<div>
+    <h3>Multiswitch</h3>
+    <hr />
+</div>
 
 <div>
-<center>
-<table>
-<tr>
-<td><font size=4>Wenn</font></td>
-<td>
-<select id="multi_dev1" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
-<option value="shelly1pm-76DAD6">TV</option>
-<option value="sonoff_3">Büro</option>
-<option value="sonoff_1">TV Deko</option>
-<option value="shelly1pm-E641C5">Sideboard</option>
-<option value="shelly1pm-766A83">Soundbar</option>
-<option value="shelly1pm-8CAAB5056FE7">Joris</option>
-</select>
-</td>
-</tr>
-<tr>
-  <td><font size=4></font></td>
-  <td>
-    <select name="multi_value1" id="multi_value1" style="width: 166px; font-size:18px; text-align-last: center; background-color: #c7e9ff">
-      <option value="on">on</option>
-      <option value="off">off</option>
-      <option value="toggle">toggle</option>
-    </select>
-  </td>
-</tr>
-<tr>
-<td><font size=4>Dann</font></td>
-<td>
-<select id="multi_dev2" style="width: 166px; font-size:18px; text-align-last: center; background-color: #fff4bd" name="nanolist">
-<option value="shelly1pm-76DAD6">TV</option>
-<option value="sonoff_3">Büro</option>
-<option value="sonoff_1">TV Deko</option>
-<option value="shelly1pm-E641C5">Sideboard</option>
-<option value="shelly1pm-766A83">Soundbar</option>
-<option value="shelly1pm-8CAAB5056FE7">Joris</option>
-</select>
-</td>
-</tr>
-<tr>
-  <td><font size=4></font></td>
-  <td>
-    <select name="multi_value2" id="multi_value2" style="width: 166px; font-size:18px; text-align-last: center; background-color: #c7e9ff">
-      <option value="on">on</option>
-      <option value="off">off</option>
-      <option value="toggle">toggle</option>
-    </select>
-  </td>
-</tr>
-</table>
-
-<br><p>
-  <button style="width: 100px; height: 35px; background-color: #c7e9ff" type="button" onclick="add_multi()"><font size="3">Senden</font></button>
-  <button style="width: 100px; height: 35px; background-color: #fff4bd" type="button" onclick="show_multi()"><font size="3">Auslesen</font></button>
-  <button style="width: 100px; height: 35px; background-color: #ffbdbd" type="button" onclick="delete_multi()"><font size="3">Löschen</font></button>
-</center>
+    <table>
+        <tr>
+            <td colspan="3">
+                <select class="nanohome" id="multi_dev1" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist_multiswitch">
+                    <option selected disabled>Wenn...</option>
+                </select>
+            </td>
+            <tr>
+            </tr>
+            <td colspan="3">
+                <select class="nanohome" id="multi_value1" onchange="multiswitch('show')" style="background-color: #c7e9ff;">
+                    <option value="on">Ein</option>
+                    <option value="off">Aus</option>
+                    <option value="on">Auf</option>
+                    <option value="off">Zu</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <select class="nanohome" id="multi_dev2" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist">
+                    <option selected disabled>Dann...</option>
+                </select>
+            </td>
+            </tr>
+            <tr>
+            <td colspan="3">
+                <select class="nanohome" id="multi_value2" onchange="multiswitch('show')" style="background-color: #c7e9ff;">
+                    <option value="on">Ein</option>
+                    <option value="off">Aus</option>
+                    <option value="on">Auf</option>
+                    <option value="off">Zu</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <select class="nanohome" id="multi_day" onchange="show_time()" style="background-color: #c7e9ff;">
+                    <option selected disabled>Aktiv...</option>
+                    <option value="always">Immer</option>
+                    <option value="*">Täglich</option>
+                    <option value="1">Montag</option>
+                    <option value="2">Dienstag</option>
+                    <option value="3">Mittwoch</option>
+                    <option value="4">Donnerstag</option>
+                    <option value="5">Freitag</option>
+                    <option value="6">Samstag</option>
+                    <option value="0">Sonntag</option>
+                    <option value="6-7">Wochenende</option>
+                    <option value="1-5">Werktags</option>
+                </select>
+            </td>
+        </tr>
+        <tr align="center">
+            <td style="width:48%">
+                <input class="nanohome" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+            <td>
+                <font size="4">-</font>
+            </td>
+            <td style="width:48%">
+                <input class="nanohome" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" align="center">
+                <button title="Aktivieren" class="nanohome" style="background-color: #c0fcb1;" onclick="multiswitch('add')">💾</button>
+                <button title="Alle Anyeigen" class="nanohome" style="background-color: #fff4bd;" onclick="multiswitch('show all')">🔎</button>
+                <button title="Deaktivieren" class="nanohome" style="background-color: #ffbdbd;" onclick="multiswitch('remove')">❌</button>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <script>
+    function multiswitch(param) {
+        var multi_dev1 = document.getElementById("multi_dev1").value;
+        var multi_dev2 = document.getElementById("multi_dev2").value;
+        var multi_value1 = document.getElementById("multi_value1").value;
+        var multi_value2 = document.getElementById("multi_value2").value;
+        var multi_day = document.getElementById("multi_day").value;
+        var multi_on = document.getElementById("multi_on").value;
+        var multi_off = document.getElementById("multi_off").value;
 
-    var show_multi = function () {
+        var multiswitch_message = "multiswitch " + param + " '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "' '" + multi_day + "' '" + multi_on + "' '" + multi_off + "'";
 
-      var multi_dev1 = document.getElementById("multi_dev1").value;
-      var multi_dev2 = document.getElementById("multi_dev2").value;
-      var multi_value1 = document.getElementById("multi_value1").value;		
-      var multi_value2 = document.getElementById("multi_value2").value;	
-
-      var showmulti = "multiswitch show '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
-		
-      publish_multi(showmulti); 
+        publish_timer(multiswitch_message);
 
     }
 
-    var add_multi = function () {
-
-      var multi_dev1 = document.getElementById("multi_dev1").value;
-      var multi_dev2 = document.getElementById("multi_dev2").value;
-      var multi_value1 = document.getElementById("multi_value1").value;		
-      var multi_value2 = document.getElementById("multi_value2").value;	
+    function show_time() {
       
-      var addmulti = "multiswitch add '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
-        
-      publish_multi(addmulti); 
+        var multi_day = document.getElementById("multi_day");
+
+        if (multi_day.value !== "always") {
+          
+            document.getElementById("multi_on").value = "08:00";
+            document.getElementById("multi_off").value = "22:00";
+            
+        } else {
+          
+            document.getElementById("multi_on").value = "-";
+            document.getElementById("multi_off").value = "-";
+            
+        }
     }
-
-    var delete_multi = function () {
-
-      var multi_dev1 = document.getElementById("multi_dev1").value;
-      var multi_dev2 = document.getElementById("multi_dev2").value;
-      var multi_value1 = document.getElementById("multi_value1").value;		
-      var multi_value2 = document.getElementById("multi_value2").value;	
-
-      var delmulti = "multiswitch remove '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "'";
-		
-      publish_multi(delmulti); 
-      
-    }
-
-    var publish_multi = function (multi_payload) {
-
-      mqtt.subscribe("output", {
-		  qos: 2
-	    });
-	
-	    console.log('Sending: ' + JSON.stringify(multi_payload));
-    
-	    var multi_message = new Paho.MQTT.Message(multi_payload);
-		      multi_message.destinationName = "input";
-		      multi_message.qos = 2;
-
-	    mqtt.send(multi_message);
-	    
-	    setTimeout(() => { mqtt.unsubscribe("output"); }, 5000);
-	
-	  };
-
 </script>

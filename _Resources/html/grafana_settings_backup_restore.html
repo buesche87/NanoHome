@@ -1,0 +1,62 @@
+<div>
+    <h4>Backup & Restore</h4>
+    <hr />
+</div>
+
+<div>
+    <table style="margin-left: auto; margin-right: auto;">
+        <tr>
+            <td>
+                <label class="container">
+                    <font size="3">Dashboards</font>
+                    <input type="checkbox" id="grafana" checked="checked" />
+                    <span class="checkmark"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="container">
+                    <font size="3">Messwerte</font>
+                    <input type="checkbox" id="influxdb" checked="checked" />
+                    <span class="checkmark"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="container">
+                    <font size="3">Wifi</font>
+                    <input type="checkbox" id="wifi" checked="checked" />
+                    <span class="checkmark"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button title="Backups zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="backuprestore('show')">🔎</button>
+                <button class="nanohome" style="background-color: #adfc95;" onclick="backuprestore('backup')">Backup</button>
+                <button class="nanohome" style="background-color: #ffbdbd;" onclick="backuprestore('resotre')">Restore</button>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<script>
+
+	function backuprestore(param) {
+
+        var input_payload = "<font size='5' color='hotpink'>Wird ausgeführt</font><br><br><font size='4'>Bitte warten...</font>";
+        $("#settings_output").html(input_payload);
+	
+        var grafana = document.getElementById("grafana").checked;
+        var influxdb = document.getElementById("influxdb").checked;
+        var wifi = document.getElementById("wifi").checked;
+
+		var cmnd = "nanobackup " + param + " " + grafana + " " + influxdb + " " + wifi ;
+		
+		publish_settings(cmnd);
+	
+	}
+
+</script>

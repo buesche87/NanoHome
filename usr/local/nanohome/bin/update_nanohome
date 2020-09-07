@@ -1,0 +1,49 @@
+#!/bin/bash
+# update_nanohome - nanohome online update
+
+update_path="/mnt/sd/update"
+update_file="/mnt/sd/update/nanohome_update_package*"
+update_script="/tmp/nhupd/nanohome_update_script.sh"
+temp_path="/tmp/nhupd"
+
+# mount sd
+umount /mnt/sd >> /dev/null 2>&1
+mount -t auto -v /dev/mmcblk1p1 /mnt/sd >> /dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+
+	if ls $update_file 1> /dev/null 2>&1; then
+
+		echo "update file found"
+		mkdir $temp_path
+
+		echo "extracting update file..."	
+		unzip $update_file -d $temp_path/
+
+	else 
+
+		echo "Error: update file missing"
+		exit 1
+
+	fi
+	
+	echo "starting update script"
+	chmod +x $update_script
+	$update_script
+	
+	echo "update done"
+	mkdir $update_path/DONE
+	mv $update_file $update_path/DONE
+	
+	echo "starting grafana dashboard updater"
+	update_dashboards
+	
+	echo "script run, unmounting"
+	umount /mnt/sd >> /dev/null 2>&1
+
+else
+
+	echo "Error: sd mount failed"
+	exit 1
+
+fi

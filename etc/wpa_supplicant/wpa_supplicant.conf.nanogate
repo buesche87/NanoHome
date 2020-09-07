@@ -2,7 +2,7 @@ country=DE
 ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
 update_config=1
 network={
-ssid="NanoGateway"
+ssid="NanoHome"
 scan_ssid=1
 key_mgmt=WPA-PSK
 psk="Nano_GW_Log1n"

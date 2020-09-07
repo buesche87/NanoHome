@@ -1,61 +1,71 @@
-<div><h5>Wifi hinzufügen / ändern</h5></div>
+<div>
+    <h4>WLAN & IP Manager</h4>
+    <hr />
+</div>
 
-<div id="mqtt_wcon_panel">
-
-<hr>
-
-<table style="width:100%">
-  <tbody>
-  <tr>
-  <td style="width:120px">SSID</td>
-  <td><input type="text" id="ssid" name="ssid" style="width:100%" requiredminlength="4" /></td>
-  </tr>
-  <tr>
-  <td>PSK</td>
-  <td><input type="text" id="psk" name="psk" style="width:100%" requiredminlength="8" /></td>
-  </tr>
-  <tr>
-  <td>IP</td>
-  <td><input type="text" list="iplist" id="ipaddress" name="ipaddress" style="width:100%" requiredminlength="4" />
-  <datalist id="iplist">
-  <option>DHCP</option>
-  <option>Custom...</option>
-  </datalist>
-  </td>
-  </tr>
-  <tr>
-  <td>Subnetz</td>
-  <td><input type="text" list="subnetlist" id="subnetinp" name="subnetinp" style="width:100%" maxlength="2" />
-  <datalist id="subnetlist">
-  <option>24</option>
-  <option>8</option>
-  <option>16</option>
-  <option>32</option>
-  <option>Custom...</option>
-  </datalist>
-  </td>
-  </tr>
-  <tr>
-  <td /><td><center>
-  <button style="background-color: #adfc95" type="button" onclick="message_wcon();">
-    <font size="4">Senden</font>
-  </button></center></td>
-  </tr>
-  </tbody>
-  </table>
+<div>
+    <table style="width: 100%;">
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" id="ssid" requiredminlength="4" value="WLAN SSID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" type="password" id="psk" requiredminlength="8" value="WLAN Key" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <center><font size="3" style="text-align: center;">Optional fixe IP-Adresse</font></center>
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" id="ip" requiredminlength="8" value="IP Adresse" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" id="gateway" requiredminlength="8" value="Gateway" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td style="width: 100%;">
+                <input class="nanohome" id="dnsserver" requiredminlength="8" value="DNS Server" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <button title="Zeige Einstellungen" class="nanohome" style="background-color: #fff4bd;" onclick="wifimgmt('show');">🔎</button>
+                <button title="WLAN speichern & IP setzen" class="nanohome" style="background-color: #adfc95;" onclick="wifimgmt('add');">💾</button>
+                <button title="Alle bekannten WLAN löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="wifimgmt('delete');">❌</button>
+                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_key()">🔑</button>
+            </td>
+        </tr>
+    </table>
 </div>
 
 <script>
-
-    var message_wcon = function () {
+    function wifimgmt(param) {
+	
         var ssid_input = document.getElementById("ssid").value;
         var psk_input = document.getElementById("psk").value;
-        var ip_adresse = document.getElementById("ipaddress").value;
-        var subnetmask = document.getElementById("subnetinp").value;
-        var wcon = "wcon '" + ssid_input + "' '" + psk_input + "' '" + ip_adresse + "' '" + subnetmask + "'";
+        var ip_input = document.getElementById("ip").value;
+        var gateway_input = document.getElementById("gateway").value;
+        var dns_input = document.getElementById("dnsserver").value;
+		
+        var wcon = "wcon '" + param + "' '" + ssid_input + "' '" + psk_input + "' '" + ip_input + "' '" + gateway_input + "' '" + dns_input + "'";
 
         publish_settings(wcon);
+    };
 
+    function show_key() {
+        var x = document.getElementById("psk");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
     }
-
 </script>
