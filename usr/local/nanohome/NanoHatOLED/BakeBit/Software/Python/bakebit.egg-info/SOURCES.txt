@@ -1,0 +1,6 @@
+bakebit.py
+setup.py
+bakebit.egg-info/PKG-INFO
+bakebit.egg-info/SOURCES.txt
+bakebit.egg-info/dependency_links.txt
+bakebit.egg-info/top_level.txt
