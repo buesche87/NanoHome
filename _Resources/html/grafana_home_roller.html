@@ -1,0 +1,25 @@
+<center><font size="5" color="white">_DESCRIPTION_</font></center>
+
+<table style="width:100%;height:50%"> 
+	<tr style="height:30%"> 
+	  	<td style="width:20%; text-align:left; vertical-align:bottom"><font size="4" color="white">▼</font></td>
+		<td style="width:60%; text-align:center; vertical-align:bottom"><font size="2" color="white">🔘</font></td>
+		<td style="width:20%; text-align:right; vertical-align:bottom"><font size="4" color="white">▲</font></td>
+	</tr>
+	<tr style="height:70%">
+		<td colspan="3" style="width:100%">
+			<input id="_DEVID_" type="range" class="slider" min="50" max="100" onchange="update_value__DEVID_()" />
+		</td>
+	</tr>
+</table>
+
+<script>
+
+var update_value_shellyswitch25_BCDDC277633D = function() { 
+
+	var _DEVID__value = document.getElementById("_DEVID_").value; 
+	publish(_DEVID__value, 'shellies/_DEVID_/roller/0/command/pos', 'shellies/_DEVID_/roller/0/command/pos', '_DESCRIPTION_', 2); 
+
+}
+
+</script>
