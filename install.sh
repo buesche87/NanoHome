@@ -29,6 +29,9 @@ cp -R ./usr/* /usr/
 # Make NnaoHome Scripts executable
 chmod +x /usr/local/nanohome/bin/*
 
+# Create Symlinks
+ln -s /usr/local/nanohome/bin/* /usr/local/bin/
+
 # Start services
 systemctl start autohotspot.service || (echo "Failed to start autohotspot service" && set -e)
 systemctl enable autohotspot.service
@@ -62,6 +65,3 @@ crontab -l | { cat; echo "*/1 * * * * /usr/local/nanohome/bin/cputemp"; } | cron
 
 # Create Free Disk Monitoring
 crontab -l | { cat; echo "*/15 * * * * /usr/local/nanohome/bin/diskspace"; } | crontab - || (echo "Failed to add diskspace crontab" && set -e)
-
-# Create IP Monitoring
-crontab -l | { cat; echo "* */1 * * * /usr/local/nanohome/bin/ip_to_mqtt"; } | crontab - || (echo "Failed to add ip_mqtt crontab" && set -e)

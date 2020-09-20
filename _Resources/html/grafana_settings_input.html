@@ -16,8 +16,7 @@ $("input").on("keydown",function search(e) {
         if (inp != "") {
             publish_settings(inp);
           } else {
-            var input_payload = "errmsg 'Achtung!' 'Führt Linux-Befehle als root aus <br><br>keine Interaktiven Befehle nutzen!' ";
-            publish_settings(input_payload);
+            publish_settings("nanohelp");
           }
     }
 });

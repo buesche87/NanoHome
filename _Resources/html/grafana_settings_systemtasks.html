@@ -1,0 +1,35 @@
+<div>
+    <h4>System Tasks</h4>
+    <hr />
+</div>
+
+<div>
+    <table style="text-align: center; margin-left: auto; margin-right: auto;">
+        <tr>
+            <td>
+                <button title="Nach Systemupdates suchen" class="nanohome" style="width: 100px; background-color: #fff4bd;" onclick="systemtools('checkupdate')">🔎</button>
+                <button class="nanohome" style="width: 100px;  background-color: #adfc95;" onclick="systemtools('update')">Update</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="nanohome" style="width: 100px; background-color: #ffbdbd;" onclick="systemtools('reboot')">Reboot</button>
+                <button class="nanohome" style="width: 100px; background-color: #ffbdbd;" onclick="systemtools('recovery')">Recovery</button>
+            </td>       
+        </tr>
+    </table>
+</div>
+
+<script>
+
+    function systemtools(param) {
+
+        var input_payload = "<font size=5 color='hotpink'>Task wird ausgeführt</font><p><br>Bitte warten...";
+        $("#settings_output").html(input_payload);
+
+        var cmnd = "systemtools '" + param + "'";
+        publish_settings(cmnd);
+        
+    }
+
+</script>
