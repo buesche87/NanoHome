@@ -1,57 +1,45 @@
-<div>
-    <h4>MQTT Device Manager</h4>
-    <hr />
-</div>
+<h4>MQTT Device Manager</h4>
+<hr />
 
-<div>
-    <table style="width: 100%;">
-        <tr>
-            <td>
-                <select class="nanohome" id="device">
-                    <option value="shelly">Shelly</option>
-                    <option value="sonoff">Sonoff</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <select class="nanohome" id="devicetype">
-                    <option value="switch">Switch</option>
-                    <option value="sensor">Sensor</option>
-                    <option value="roller">Roller</option>
-                    <option value="shutter">Shutter</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="nanohome" id="devid" value="Device ID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <input class="nanohome" id="desc" value="Bezeichnung" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Geräteliste anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="showdev()">🔎</button>
-                <button title="Gerät hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="adddev()">💾</button>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <select class="nanohome" id="del_dev" name="nanolist">
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Gerät löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="remdev()">❌</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<select class="nanohome" id="device">
+    <option value="shelly">Shelly</option>
+    <option value="sonoff">Sonoff</option>
+</select>
+
+</p>
+
+<select class="nanohome" id="devicetype">
+    <option value="switch">Switch</option>
+    <option value="sensor">Sensor</option>
+    <option value="roller">Roller</option>
+    <option value="shutter">Shutter</option>
+</select>
+
+</p>
+
+<input class="nanohome" id="devid" value="Device ID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" id="desc" value="Bezeichnung" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="Geräteliste anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="showdev()">🔎</button>
+<button title="Gerät hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="adddev()">💾</button>
+
+</p>
+
+<select class="nanohome" id="del_dev" name="nanolist">
+</select>
+
+</p>
+
+<button title="Gerät entfernen" class="nanohome" style="background-color: #ffbdbd;" onclick="remdev()">❌</button>  
+
+</center>
 
 <script>
     var showdev = function () {

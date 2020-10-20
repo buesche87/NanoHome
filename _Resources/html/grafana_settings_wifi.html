@@ -1,50 +1,40 @@
-<div>
-    <h4>WLAN & IP Manager</h4>
-    <hr />
-</div>
+<h4>WLAN & IP Manager</h4>
+<hr />
 
-<div>
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="ssid" requiredminlength="4" value="WLAN SSID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" type="password" id="psk" requiredminlength="8" value="WLAN Key" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <center><font size="3" style="text-align: center;">Optional fixe IP-Adresse</font></center>
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="ip" requiredminlength="8" value="IP Adresse" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="gateway" requiredminlength="8" value="Gateway" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="dnsserver" requiredminlength="8" value="DNS Server" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Zeige Einstellungen" class="nanohome" style="background-color: #fff4bd;" onclick="wifimgmt('show');">🔎</button>
-                <button title="WLAN speichern & IP setzen" class="nanohome" style="background-color: #adfc95;" onclick="wifimgmt('add');">💾</button>
-                <button title="Alle bekannten WLAN löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="wifimgmt('delete');">❌</button>
-                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_key()">🔑</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<input class="nanohome" id="ssid" requiredminlength="4" value="WLAN SSID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" type="password" id="psk" requiredminlength="8" value="WLAN Key" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<font size="3" style="text-align: center;">Optional fixe IP-Adresse</font>
+
+</p>
+
+<input class="nanohome" id="ip" requiredminlength="8" value="IP Adresse" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" id="gateway" requiredminlength="8" value="Gateway" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" id="dnsserver" requiredminlength="8" value="DNS Server" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="Zeige Einstellungen" class="nanohome" style="background-color: #fff4bd;" onclick="wifimgmt('show');">🔎</button>
+<button title="WLAN speichern & IP setzen" class="nanohome" style="background-color: #adfc95;" onclick="wifimgmt('add');">💾</button>
+<button title="Alle bekannten WLAN löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="wifimgmt('delete');">❌</button>
+<button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_key()">🔑</button>
+
+</p>
+
+</center>
 
 <script>
     function wifimgmt(param) {

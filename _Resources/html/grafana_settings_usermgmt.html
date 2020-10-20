@@ -1,29 +1,22 @@
-<div>
-    <h4>MQTT User Manager</h4>
-    <hr />
-</div>
+<h4>MQTT User Manager</h4>
+<hr />
 
-<div>
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" id="mqtt_user" requiredminlength="4" value="Benutzername" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" type="password" id="mqtt_pwd" requiredminlength="8" value="Passwort" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" />
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="Alle anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="usermgmt('show');">🔎</button>
-                <button title="Hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="usermgmt('add');">💾</button>
-                <button title="Löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="usermgmt('remove');">❌</button>
-                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_mqtt_pw()">🔑</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<input class="nanohome" id="mqtt_user" requiredminlength="4" value="Benutzername" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" type="password" id="mqtt_pwd" requiredminlength="8" value="Passwort" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" />
+
+</p>
+
+<button title="Alle anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="usermgmt('show');">🔎</button>
+<button title="Hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="usermgmt('add');">💾</button>
+<button title="Löschen" class="nanohome" style="background-color: #ffbdbd;" onclick="usermgmt('remove');">❌</button>
+<button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_mqtt_pw()">🔑</button>
+
+</center>
 
 <script>
 

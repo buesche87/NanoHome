@@ -1,53 +1,46 @@
 #!/bin/bash
-#/////////////////////////////////////////////////////////////////////////////////////
-# Standbykiller for NanoHome - sends OFF to topic if device falls below [W]
-#/////////////////////////////////////////////////////////////////////////////////////
+# standbykiller for NanoHome - sends OFF to topic if device falls below [W]
 
-# Catch Parameters
-device="$2"
-maxpower="$3"
-
-# Settings
+# settings
 server="localhost"
 user="cron_mqtt"
 pass="Cron2MQTT"
 
-# Device Support
+# Parameters
+device="$2"
+maxpower="$3"
+
+# device support
 if [ ! "$device" = "all" ]; then
 	. /usr/local/nanohome/dev_compatibility $device
 fi
 
-# Environment
+# environment
 service_description="standbykiller"
 service_name="$service_description.$device.service"
 service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/$service_description.service.template"
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Print Standbykiller and their Cronjobs On Dashboard
-#/////////////////////////////////////////////////////////////////////////////////////
+# functions
 print_killer () {
 
-	# Settings
 	dev="$1"
 	status="$2"
 	service_name="$3"
-	
-	# Color of Status on Dashboard
+
 	if [[ "$status" =~ "Aktiv" ]]; then
 		color="#c0fcb1"
 	else
 		color="grey"
 	fi
 
-	# Print Message on Dashboard
 	desc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
-	echo "<font size='4'><font color='hotpink'>$desc</font>: <font color='$color'>$status</font></font>"
 	
-	# If Standbykiller exists print message on dashboard
+	echo "<font size='4'><font color='hotpink'>$desc</font>: <font color='$color'>$status</font></font>"
+
 	if [ ! -z "$service_name" ]; then
 
-		status="$(systemctl status $service_name | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }')"
+		status="$(systemctl status standbykiller.shelly1pm-76DAD6.service | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }')"
 		lastmsg="$(systemctl status $service_name | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
 
 		if [[ "$status" =~ "running" ]]; then
@@ -70,9 +63,7 @@ print_killer () {
 
 }
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Show Stanbykiller
-#/////////////////////////////////////////////////////////////////////////////////////
+# show devices
 if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 
 	# show all devices
@@ -105,76 +96,70 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 	# show active state of specific device
 	elif test -f "$service_file"; then
 
-		# Print Message on Dashboard
 		maxpower="$(cat $service_file | grep "standbykiller service $device" | awk '{ printf $5"\n" }')"
 		msg="Aktiv wenn unter ${maxpower}W"
+		
 		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		
 		print_killer "$dev_desc" "$msg" "$service_name"
 
 	# show insctive state of specific device
 	else
 		
-		# Print Message on Dashboard
 		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		
 		print_killer "$dev_desc" "Inaktiv"
 
 	fi
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Create Standbykiller
-#/////////////////////////////////////////////////////////////////////////////////////
+# add device
 elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 
 	# check if service exists
 	if test -f "$service_file"; then
 
-		# Print Message on Dashboard
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
 		msg="Aktiv wenn unter ${maxpower}W" 
+		
+		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		
 		print_killer "$dev_desc" "$msg" "$service_name"
 
 	# create new service
 	else
-		
-		# Copy Service from template and modify it
+
 		cp $service_template $service_file
 
 		sed -i "s/-dev/$device/" $service_file
 		sed -i "s/-sbpwr/$maxpower/" $service_file
-		
-		# Start SErvice
+
 		systemctl start $service_name
 		systemctl enable $service_name
 
-		# Print Message on Dashboard
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
 		msg="Aktiviert wenn unter ${maxpower}W"
+		
+		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		
 		print_killer "$dev_desc" "$msg" "$service_name"
 
 	fi
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Remove Standbykiller
-#/////////////////////////////////////////////////////////////////////////////////////
+# remove device
 elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
 
-	# Stop Services
 	systemctl stop $service_name
 	systemctl disable $service_name
 
-	# Remove Service
 	rm -r $service_file
 	
-	# Print Message on Dashboard
 	echo "<font size='5' color='white'>Standbykiller</font><br>"
+	
 	print_killer "$dev_desc" "Deaktiviert"
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Service Mode
-#/////////////////////////////////////////////////////////////////////////////////////
+# service mode
 elif [ "$1" == "service" ]; then
 
 	lastmsg="off"
+	try="1"
 
 	while read curpower;
 	do
@@ -192,23 +177,26 @@ elif [ "$1" == "service" ]; then
 
 				echo "|[$now] $device just started -> I won't kill it yet"
 
+			elif [ try > 2 ]; then #give time to manually wake unwanted standby
+			
+				echo "|[$now] $device: ${curpower}W - standby killed"
+
+				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $off_command >/dev/null 2>&1			
+
 			else
+				
+				echo "|[$now] $device: ${curpower}W - less than ${maxpower}W -> wait 60s and then kill standby"
+				((try=try+1))
 
-				echo "|[$now] $device: ${curpower}W, less than ${maxpower}W -> killing standby"
-
-				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $off_command >/dev/null 2>&1
 			fi
 
 		else
-			echo "|[$now] $device: ${curpower}W, more than ${maxpower}W -> keeping alive"
+			echo "|[$now] $device: ${curpower}W - more than ${maxpower}W -> keeping alive"
 			lastmsg="running"
 		fi
 
 	done < <(mosquitto_sub -h $server -u $user -P $pass -t $power_topic -q 2)
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Err Exit
-#/////////////////////////////////////////////////////////////////////////////////////
 else
 
 	echo "----------------------------------------------------------"

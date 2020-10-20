@@ -1,23 +1,16 @@
-<div>
-    <h4>WLAN Key Manager</h4>
-    <hr />
-</div>
+<h4>WLAN Key Manager</h4>
+<hr />
 
-<div>
-    <table style="width: 100%;">
-        <tr>
-            <td style="width: 100%;">
-                <input class="nanohome" type="text" id="psk_input" requiredminlength="8" value="NanoHome WLAN Key" onfocus="psk_focus()" onfocusout="psk_focus()" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td align="center">
-                <button title="WLAN Key setzen" class="nanohome" style="background-color: #ffbdbd;" onclick="send_psk()">💾</button>
-                <button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_psk()">🔑</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<input class="nanohome" type="text" id="psk_input" requiredminlength="8" value="NanoHome WLAN Key" onfocus="psk_focus()" onfocusout="psk_focus()" autocomplete="off" />
+
+</p>
+
+<button title="WLAN Key setzen" class="nanohome" style="background-color: #ffbdbd;" onclick="send_psk()">💾</button>
+<button title="Passwort zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="show_psk()">🔑</button>
+
+</center>
 
 <script>
 

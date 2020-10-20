@@ -1,29 +1,27 @@
-<div>
-    <h3>Standbykiller</h3>
-    <hr />
-</div>
+<h3>Standbykiller</h3>
+<hr />
 
-<div>
-    <table align="center" style="width:100%">
-        <tr>
-            <td colspan="2">
-                <select class="nanohome" id="stby_device"onchange="standbykill('show')" name="nanolist_stbykill">
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td align="right"><font size="4">Standby [W]</font></td>
-            <td align="left" style="width:40%"><input class="nanohome" id="stbypwr" maxlength="5" value="20" /></td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <button title="Deaktivieren" class="nanohome" style="background-color: #c0fcb1;" onclick="standbykill('add')">💾</button>
-                <button title="Alle Anyeigen" class="nanohome" style="background-color: #fff4bd;" onclick="standbykill('show all')">🔎</button>
-                <button title="Deaktivieren" class="nanohome" style="background-color: #ffbdbd;" onclick="standbykill('remove')">❌</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<select class="nanohome" id="stby_device"onchange="standbykill('show')" name="nanolist_stbykill">
+</select>
+
+</p>
+
+<table align="center" style="width:100%">
+    <tr>
+        <td align="right" style="width:50%"><font size="4">Standby [W]</font></td>
+        <td align="left" style="width:50%"><input class="nanohome_blue" style="width:50%" id="stbypwr" maxlength="5" value="20" /></td>
+    </tr>
+</table>
+
+</p>
+
+<button title="Aktivieren" class="nanohome_add" onclick="standbykill('add')">💾</button>
+<button title="Alle Anzeigen" class="nanohome_show" onclick="standbykill('show all')">🔎</button>
+<button title="Deaktivieren" class="nanohome_remove" onclick="standbykill('remove')">❌</button>
+
+</center>
 
 <script>
 

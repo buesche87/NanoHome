@@ -1,46 +1,45 @@
-<div>
-    <h4>Backup & Restore</h4>
-    <hr />
-</div>
+<h4>Backup & Restore</h4>
+<hr />
 
-<div>
-    <table style="margin-left: auto; margin-right: auto;">
-        <tr>
-            <td>
-                <label class="container">
-                    <font size="3">Dashboards</font>
-                    <input type="checkbox" id="grafana" checked="checked" />
-                    <span class="checkmark"></span>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="container">
-                    <font size="3">Messwerte</font>
-                    <input type="checkbox" id="influxdb" checked="checked" />
-                    <span class="checkmark"></span>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <label class="container">
-                    <font size="3">Wifi</font>
-                    <input type="checkbox" id="wifi" checked="checked" />
-                    <span class="checkmark"></span>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <button title="Backups zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="backuprestore('show')">🔎</button>
-                <button class="nanohome" style="background-color: #adfc95;" onclick="backuprestore('backup')">Backup</button>
-                <button class="nanohome" style="background-color: #ffbdbd;" onclick="backuprestore('resotre')">Restore</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<table style="margin-left: auto; margin-right: auto;">
+    <tr>
+        <td>
+            <label class="container">
+                <font size="3">Dashboards</font>
+                <input type="checkbox" id="grafana" checked="checked" />
+                <span class="checkmark"></span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="container">
+                <font size="3">Messwerte</font>
+                <input type="checkbox" id="influxdb" checked="checked" />
+                <span class="checkmark"></span>
+            </label>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <label class="container">
+                <font size="3">Wifi</font>
+                <input type="checkbox" id="wifi" checked="checked" />
+                <span class="checkmark"></span>
+            </label>
+        </td>
+    </tr>
+</table>
+
+</p>
+
+<button title="Backups zeigen" class="nanohome" style="background-color: #fff4bd;" onclick="backuprestore('show')">🔎</button>
+<button title="Backup erstellen" class="nanohome" style="background-color: #adfc95;" onclick="backuprestore('backup')">Backup</button>
+<button title="Backup zurückspielen" class="nanohome" style="background-color: #ffbdbd;" onclick="backuprestore('resotre')">Restore</button>
+
+<center>
 
 <script>
 

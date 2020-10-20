@@ -1,84 +1,71 @@
-<div>
-    <h3>Multiswitch</h3>
-    <hr />
-</div>
+<h3>Multiswitch</h3>
+<hr />
 
-<div>
-    <table>
-        <tr>
-            <td colspan="3">
-                <select class="nanohome" id="multi_dev1" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist_multiswitch">
-                    <option selected disabled>Wenn...</option>
-                </select>
-            </td>
-            <tr>
-            </tr>
-            <td colspan="3">
-                <select class="nanohome" id="multi_value1" onchange="multiswitch('show')" style="background-color: #c7e9ff;">
-                    <option value="on">Ein</option>
-                    <option value="off">Aus</option>
-                    <option value="on">Auf</option>
-                    <option value="off">Zu</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <select class="nanohome" id="multi_dev2" onchange="multiswitch('show')" style="background-color: #fff4bd;" name="nanolist">
-                    <option selected disabled>Dann...</option>
-                </select>
-            </td>
-            </tr>
-            <tr>
-            <td colspan="3">
-                <select class="nanohome" id="multi_value2" onchange="multiswitch('show')" style="background-color: #c7e9ff;">
-                    <option value="on">Ein</option>
-                    <option value="off">Aus</option>
-                    <option value="on">Auf</option>
-                    <option value="off">Zu</option>
-                </select>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <select class="nanohome" id="multi_day" onchange="show_time()" style="background-color: #c7e9ff;">
-                    <option selected disabled>Aktiv...</option>
-                    <option value="always">Immer</option>
-                    <option value="*">Täglich</option>
-                    <option value="1">Montag</option>
-                    <option value="2">Dienstag</option>
-                    <option value="3">Mittwoch</option>
-                    <option value="4">Donnerstag</option>
-                    <option value="5">Freitag</option>
-                    <option value="6">Samstag</option>
-                    <option value="0">Sonntag</option>
-                    <option value="6-7">Wochenende</option>
-                    <option value="1-5">Werktags</option>
-                </select>
-            </td>
-        </tr>
-        <tr align="center">
-            <td style="width:48%">
-                <input class="nanohome" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-            <td>
-                <font size="4">-</font>
-            </td>
-            <td style="width:48%">
-                <input class="nanohome" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3" align="center">
-                <button title="Aktivieren" class="nanohome" style="background-color: #c0fcb1;" onclick="multiswitch('add')">💾</button>
-                <button title="Alle Anyeigen" class="nanohome" style="background-color: #fff4bd;" onclick="multiswitch('show all')">🔎</button>
-                <button title="Deaktivieren" class="nanohome" style="background-color: #ffbdbd;" onclick="multiswitch('remove')">❌</button>
-            </td>
-        </tr>
-    </table>
-</div>
+<center>
+
+<select class="nanohome" id="multi_dev1" onchange="multiswitch('show')" name="nanolist_multiswitch">
+	<option selected disabled>Wenn...</option>
+</select>
+
+</p>
+
+<select class="nanohome_blue" id="multi_value1" onchange="multiswitch('show')">
+    <option value="on">Ein</option>
+    <option value="off">Aus</option>
+    <option value="on">Auf</option>
+    <option value="off">Zu</option>
+</select>
+
+</p>
+
+<select class="nanohome" id="multi_dev2" onchange="multiswitch('show')" name="nanolist">
+	<option selected disabled>Dann...</option>
+</select>
+
+</p>
+
+<select class="nanohome_blue" id="multi_value2" onchange="multiswitch('show')">
+    <option value="on">Ein</option>
+    <option value="off">Aus</option>
+    <option value="on">Auf</option>
+    <option value="off">Zu</option>
+</select>
+
+</p>
+
+<select class="nanohome_blue" id="multi_day" onchange="show_time()">
+    <option selected disabled>Aktiv...</option>
+    <option value="always">Immer</option>
+    <option value="*">Täglich</option>
+    <option value="1">Montag</option>
+    <option value="2">Dienstag</option>
+    <option value="3">Mittwoch</option>
+    <option value="4">Donnerstag</option>
+    <option value="5">Freitag</option>
+    <option value="6">Samstag</option>
+    <option value="0">Sonntag</option>
+    <option value="6-7">Wochenende</option>
+    <option value="1-5">Werktags</option>
+</select>
+
+</p>
+
+<input class="nanohome_blue" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<font size="4">-</font>
+<input class="nanohome_blue" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="Aktivieren" class="nanohome_add" onclick="multiswitch('add')">💾</button>
+<button title="Alle Anzeigen" class="nanohome_show" onclick="multiswitch('show all')">🔎</button>
+<button title="Deaktivieren" class="nanohome_remove" onclick="multiswitch('remove')">❌</button>
+
+</p>
+
+</center>
 
 <script>
+
     function multiswitch(param) {
         var multi_dev1 = document.getElementById("multi_dev1").value;
         var multi_dev2 = document.getElementById("multi_dev2").value;
@@ -110,4 +97,5 @@
             
         }
     }
+
 </script>
