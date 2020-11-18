@@ -60,7 +60,7 @@ add_device () {
 	# Fill Dropdown in Devicemanager Dashboard //////////////////////////////////////////////////
 	get_dashboard "$devmgr_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n\\t\\t\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
 
 	add_json_options
 	update_dashboard
@@ -71,8 +71,7 @@ add_device () {
 	# Fill Dropdown in Settings Dashboard //////////////////////////////////////////////////
 	get_dashboard "$settings_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	# sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
-	sed -i 's#...Geräteliste...</option>#...Geräteliste...</option>\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+	sed -i 's#...Geräteliste...</option>#...Geräteliste...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
 
 	
 	add_json_options
@@ -122,16 +121,16 @@ add_device () {
 		jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
 		
 		# add new option to timer dropdown
-		sed -i 's#name=\\"nanolist_timer\\">#name=\\"nanolist_timer\\">\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+		sed -i 's#name=\\"nanolist_timer\\">#name=\\"nanolist_timer\\">\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
 
 		# add new option to multiswitch dropdown
-		sed -i 's#Wenn...</option>#Wenn...</option>\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
-		sed -i 's#Dann...</option>#Dann...</option>\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+		sed -i 's#Wenn...</option>#Wenn...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+		sed -i 's#Dann...</option>#Dann...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
 		
 		# add new option to standbykiller dropdown
 		if [ "$devicetype" == "switch" ]; then
 		
-			sed -i 's#name=\\"nanolist_stbykill\\">#name=\\"nanolist_stbykill\\">\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+			sed -i 's#name=\\"nanolist_stbykill\\">#name=\\"nanolist_stbykill\\">\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
 		
 		fi
 		
@@ -144,7 +143,7 @@ add_device () {
 	fi
 	
 	# message
-	statusmsg "Device Manager: " "white" "" "" "$desc:" "hotpink" " $sn hinzugefügt" "white"
+	statusmsg "Device Manager " "white" "" "" "$desc:" "hotpink" " $sn hinzugefügt" "white"
 	
 	exit 0
 
@@ -166,7 +165,7 @@ remove_device () {
 	# Remove from Devicemanager Dashboard //////////////////////////////////////////////////
 	get_dashboard "$devmgr_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#\\r\\n\\t\\t\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+	sed -i 's#\\r\\n\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
 	
 	add_json_options
 	update_dashboard
@@ -177,7 +176,7 @@ remove_device () {
 	# Remove from Settings Dashboard //////////////////////////////////////////////////	
 	get_dashboard "$settings_uid"
 	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+	sed -i 's#\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
 	
 	add_json_options
 	update_dashboard
@@ -192,7 +191,7 @@ remove_device () {
 	# if device found
 	if cat /tmp/merge_panel_output.json | grep "$sn" > /dev/null 2>&1 ; then
 		
-		sed -i 's#\\r\\n\\t\\t\\t\\t\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+		sed -i 's#\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
 	
 		add_json_options
 		update_dashboard
@@ -203,7 +202,7 @@ remove_device () {
 	rm /tmp/merge_panel_*
 	
 	# message
-	statusmsg "Device Manager: " "white" "" "" "$desc:" "hotpink" " $sn gelöscht <br> Button auf Home-Dashboard manuell löschen" "white"
+	statusmsg "Device Manager " "white" "" "" "$desc:" "hotpink" " $sn gelöscht <br> Button auf Home-Dashboard manuell löschen" "white"
 	
 	exit 0
 
@@ -224,6 +223,9 @@ elif [ "$1" = "remove" ] && [ ! -z "$sn" ] && [ ! -z "$desc" ]; then
 
 	remove_device
 
+#/////////////////////////////////////////////////////////////////////////////////////
+# Err Exit
+#/////////////////////////////////////////////////////////////////////////////////////
 else
 
 	errmsg "Error" "Eingabe prüfen"

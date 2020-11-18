@@ -49,6 +49,18 @@ elif [ "$1" = "recovery" ]; then
 		
 	fi
 
+elif [ "$1" = "time" ]; then
+
+	curdate="$(echo $2 | cut -d/ -f1)"
+	curtime="$(echo $2 | cut -d/ -f2)"
+	
+	echo "Synchronisiere Zeit..."
+	
+	date +%Y%m%d -s "$curdate" 1>/dev/null 2>&1
+	date +%T -s "$curtime" 1>/dev/null 2>&1
+
+	ntpdate -u ch.pool.ntp.org
+	
 else
 
 	echo "Wrong parameter"

@@ -5,13 +5,11 @@
 
 new_psk="$1"
 
-if [ ! -z "$1" ] && [ ! "$new_psk" = "NanoHome WLAN Key" ]; then
+if [ ! -z "$1" ] && [ ! "$new_psk" = "NanoGate Wifi Key" ]; then
 
-	statusmsg "Aktualisiere NanoHome WLAN Key" "white" "" "" "Zum Verbinden mit dem NanoGate \nNanoHome neu starten oder WLAN Modus umstellen" "white"
+	statusmsg "Aktualisiere NanoGate Wifi Key" "hotpink" "" "" "Zum Verbinden Wifi Modus umstellen" "white"
 
-    sed -i "s/wpa_passphrase=.*/wpa_passphrase="$new_psk"/"  /etc/hostapd/hostapd.conf
 	sed -i "s/psk=.*/psk="\""$new_psk""\"/"  /etc/wpa_supplicant/wpa_supplicant.conf.nanogate
-	systemctl is-active --quiet hostapd && systemctl restart hostapd
 
 else
 

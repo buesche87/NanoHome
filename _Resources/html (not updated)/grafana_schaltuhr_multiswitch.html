@@ -9,9 +9,10 @@
 
 </p>
 
-<select class="nanohome_blue" id="multi_value1" onchange="multiswitch('show')">
+<select class="form" id="multi_value1" onchange="multiswitch('show')">
     <option value="on">Ein</option>
     <option value="off">Aus</option>
+    <option disabled>-------</option>
     <option value="on">Auf</option>
     <option value="off">Zu</option>
 </select>
@@ -24,16 +25,17 @@
 
 </p>
 
-<select class="nanohome_blue" id="multi_value2" onchange="multiswitch('show')">
+<select class="form" id="multi_value2" onchange="multiswitch('show')">
     <option value="on">Ein</option>
     <option value="off">Aus</option>
+    <option disabled>-------</option>
     <option value="on">Auf</option>
     <option value="off">Zu</option>
 </select>
 
 </p>
 
-<select class="nanohome_blue" id="multi_day" onchange="show_time()">
+<select class="form" id="multi_day" onchange="show_time()">
     <option selected disabled>Aktiv...</option>
     <option value="always">Immer</option>
     <option value="*">Täglich</option>
@@ -50,15 +52,15 @@
 
 </p>
 
-<input class="nanohome_blue" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<input class="form" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
 <font size="4">-</font>
-<input class="nanohome_blue" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<input class="form" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
 
 </p>
 
-<button title="Aktivieren" class="nanohome_add" onclick="multiswitch('add')">💾</button>
-<button title="Alle Anzeigen" class="nanohome_show" onclick="multiswitch('show all')">🔎</button>
-<button title="Deaktivieren" class="nanohome_remove" onclick="multiswitch('remove')">❌</button>
+<button title="Aktivieren" class="form" style="background-color: #adfc95" onclick="multiswitch('add')">💾</button>
+<button title="Alle Anzeigen" class="form" style="background-color: #fff4bd" onclick="multiswitch('show all')">🔎</button>
+<button title="Deaktivieren" class="form" style="background-color: #ffbdbd" onclick="multiswitch('remove')">❌</button>
 
 </p>
 

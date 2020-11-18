@@ -1,8 +1,9 @@
 [Unit]
-Description=Automatically generates an internet Hotspot when a valid ssid is not in range
+Description=wmod autohotspot service
+After=multi-user.target
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/local/nanohome/bin/autohotspot
+ExecStart=wmod -service
 [Install]
 WantedBy=multi-user.target

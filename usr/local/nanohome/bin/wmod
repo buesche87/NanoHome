@@ -28,6 +28,7 @@ function shutdown_hotspot {
 	  then # Shutting Down Hotspot
 		systemctl stop hostapd dnsmasq
 		systemctl mask dnsmasq hostapd
+		systemctl start ntp
 		echo "[$(date +'%H:%m:%S')] Hotspot down" >> /var/log/wmod.log
 	fi
 
@@ -43,6 +44,7 @@ function disconnect_wifi {
 	wpa_cli terminate >/dev/null 2>&1
 	ip addr flush "$wifidev"
 	rm -r /var/run/wpa_supplicant >/dev/null 2>&1
+	systemctl stop ntp
 	echo "[$(date +'%H:%m:%S')] Wifi disconnected" >> /var/log/wmod.log
 	
 }
@@ -54,12 +56,14 @@ function connect_wifi {
 
 	cp /etc/wpa_supplicant/wpa_supplicant.conf.$1 /etc/wpa_supplicant/wpa_supplicant.conf
 	# ip link set dev "$wifidev" up
+	# wpa_supplicant -B -i "$wifidev" -c /etc/wpa_supplicant/wpa_supplicant.conf >/dev/null 2>&1
 	ifup "$wifidev"
-	wpa_supplicant -B -i "$wifidev" -c /etc/wpa_supplicant/wpa_supplicant.conf >/dev/null 2>&1
 	
 	if grep static /etc/network/interfaces; then 
 		pkill -f "dhclient"
 	fi
+
+	systemctl start ntp
 	
 	echo "[$(date +'%H:%m:%S')] Wifi connected" >> /var/log/wmod.log
 	
@@ -70,11 +74,11 @@ function connect_wifi {
 #/////////////////////////////////////////////////////////////////////////////////////
 function check_connection {
 	
-	sleep 10 # give wifi time
+	sleep 5 # give wifi time
 	
 	checkwifi="$(iw $wifidev link | grep 'Connected to' | wc -l)"
 
-	echo $checkwifi >> /var/log/wmod.log 
+	echo "Checkwifi status: "$checkwifi >> /var/log/wmod.log 
 
 	if [ $checkwifi -eq 0 ]; then # not connected, back to hotspot
 		echo "[$(date +'%H:%m:%S')] Wifi failed to connect, falling back to Hotspot." >> /var/log/wmod.log
@@ -83,7 +87,8 @@ function check_connection {
 		create_hotspot
 	
 	else
-		echo "[$(date +'%H:%m:%S')] Wifi connected" >> /var/log/wmod.log  
+		echo "[$(date +'%H:%m:%S')] Wifi connected" >> /var/log/wmod.log
+		ntpdate -u ch.pool.ntp.org >> /var/log/wmod.log
 	fi
 	
 }
@@ -126,6 +131,11 @@ elif  [ "$1" = "-hotspot" ]; then
 		echo "[$(date +'%H:%m:%S')]Create Hotspot" >> /var/log/wmod.log
 		create_hotspot
 	fi
+
+elif [ "$1" = "-service" ]; then
+
+connect_wifi wificlient
+check_connection
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Err Exit

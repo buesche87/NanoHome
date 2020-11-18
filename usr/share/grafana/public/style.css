@@ -23,6 +23,91 @@ button.slider {
   
 }
 
+button.form {
+
+  background-color: #1a75c9;
+  color: #000000;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding-left: 5px;
+  font-size: 16px;
+  width: 70px;
+  height: 35px;
+  text-align: center;
+  
+}
+
+button.nanohome_show {
+
+  color: #030505;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  font-size: 16px;
+  width: 70px;
+  height: 35px;
+  background-color: #ebe0ae;
+  
+}
+
+input.nanohome, input[type=password] {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100%;
+  height: 35px;
+  text-align: center;
+  font-size: 18px;
+
+}
+
+input.form {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100px;
+  height: 35px;
+  text-align: center;
+  font-size: 18px;
+  
+}
+
+select.nanohome {
+
+  background-color: #fff4bd;
+  color: #000000;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100%;
+  height: 35px;
+  text-align: center;
+  text-align-last: center;
+  font-size:18px;
+
+}
+
+select.form {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 150px; 
+  height: 35px;
+  text-align: center;
+  text-align-last: center;
+  font-size:18px;
+
+}
+
 hr {
 	
 	border: 0; 
@@ -38,111 +123,6 @@ h3, h4 {
 table, th, td {
 
   border-style : hidden!important;
-  
-}
-
-input.nanohome, input[type=password] {
-
-  color: #081717;
-  border: 2px black;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 18px;
-  background-color: #b1cfe3;
-  width: 100%;
-  height: 35px;
-  
-}
-
-input.nanohome_blue {
-
-  color: #081717;
-  border: 2px black;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 18px;
-  background-color: #b1cfe3;
-  width: 75%;
-  height: 35px;
-  
-}
-
-select.nanohome {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  width: 100%; 
-  text-align: center;
-  text-align-last: center;
-  font-size:18px;
-  background-color: #ebe0ae;
-  
-}
-
-select.nanohome_blue {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  width: 50%; 
-  text-align: center;
-  text-align-last: center;
-  font-size:18px;
-  background-color: #b1cfe3;
-  
-}
-
-button.nanohome {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  font-size: 16px;
-  width: 70px;
-  height: 35px;
-  
-}
-
-button.nanohome_add {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  font-size: 16px;
-  width: 70px;
-  height: 35px;
-  background-color: #a9e09b;
-  
-}
-
-button.nanohome_remove {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  font-size: 16px;
-  width: 70px;
-  height: 35px;
-  background-color: #ffbdbd;
-  
-}
-
-button.nanohome_show {
-
-  color: #030505;
-  border: 2px black;
-  border-radius: 4px;
-  padding-left: 5px;
-  font-size: 16px;
-  width: 70px;
-  height: 35px;
-  background-color: #ebe0ae;
   
 }
 

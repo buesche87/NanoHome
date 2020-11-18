@@ -12,15 +12,15 @@
         </tr>
         <tr>
             <td align="right" style="width:50%"><font size="4">Ein / Auf</font></td>
-            <td align="left" ><input class="nanohome_blue" id="timer_ein" pattern=".{5,5}" onfocus="this.value=''" value="08:00" autocomplete="off" /></td>
+            <td align="left" ><input class="form" id="timer_ein" pattern=".{5,5}" onfocus="this.value=''" value="08:00" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" /></td>
         </tr>
         <tr>
             <td align="right"  style="width:50%"><font size="4">Aus / Zu</font></td>
-            <td align="left" ><input class="nanohome_blue" id="timer_aus" pattern=".{5,5}" onfocus="this.value=''" value="22:00" autocomplete="off" /></td>
+            <td align="left" ><input class="form" id="timer_aus" pattern=".{5,5}" onfocus="this.value=''" value="22:00" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" /></td>
         </tr>
         <tr>
             <td colspan="2" align="center">
-                <select class="nanohome_blue" id="timer_day">
+                <select class="form" id="timer_day">
                     <option value="*">Täglich</option>
                     <option value="1">Montag</option>
                     <option value="2">Dienstag</option>
@@ -36,9 +36,9 @@
         </tr>
         <tr>
             <td colspan="2" align="center">
-                <button title="Schaltuhr aktivieren" class="nanohome_add" onclick="cronman('add')">💾</button>
-                <button title="Alle Schaltuhren zeigen" class="nanohome_show" onclick="cronman('show all')">🔎</button>
-                <button title="Schaltuhr deaktivieren" class="nanohome_remove" onclick="cronman('remove')">❌</button>
+                <button title="Schaltuhr aktivieren" class="form" style="background-color: #adfc95" onclick="cronman('add')">💾</button>
+                <button title="Alle Schaltuhren zeigen" class="form" style="background-color: #fff4bd" onclick="cronman('show all')">🔎</button>
+                <button title="Schaltuhr deaktivieren" class="form" style="background-color: #ffbdbd" onclick="cronman('remove')">❌</button>
             </td>
         </tr>
     </table>
@@ -60,3 +60,4 @@
 	};
 
 </script>
+

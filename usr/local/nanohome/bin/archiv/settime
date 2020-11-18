@@ -1,0 +1,4 @@
+service ntp stop
+sudo ntpd -gq
+service ntp start
+exit 0

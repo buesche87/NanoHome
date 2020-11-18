@@ -19,25 +19,26 @@
 
 </p>
 
-<input class="nanohome" id="devid" value="Device ID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<input class="nanohome" id="devid" value="Device ID" placeholder="MQTT Device ID" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
 
 </p>
 
-<input class="nanohome" id="desc" value="Bezeichnung" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<input class="nanohome" id="desc" value="Bezeichnung" placeholder="Bezeichnung auf NnaoHome" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
 
 </p>
 
-<button title="Geräteliste anzeigen" class="nanohome" style="background-color: #fff4bd;" onclick="showdev()">🔎</button>
-<button title="Gerät hinzufügen" class="nanohome" style="background-color: #adfc95;" onclick="adddev()">💾</button>
+<button title="Geräteliste anzeigen" class="form" style="background-color: #fff4bd;" onclick="showdev()">🔎</button>
+<button title="Gerät hinzufügen" class="form" style="background-color: #adfc95;" onclick="adddev()">💾</button>
 
 </p>
 
 <select class="nanohome" id="del_dev" name="nanolist">
+    <option selected disabled>...Geräteliste...</option>
 </select>
 
 </p>
 
-<button title="Gerät entfernen" class="nanohome" style="background-color: #ffbdbd;" onclick="remdev()">❌</button>  
+<button title="Gerät entfernen" class="form" style="background-color: #ffbdbd;" onclick="remdev()">❌</button>  
 
 </center>
 

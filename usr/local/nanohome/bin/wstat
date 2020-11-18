@@ -15,7 +15,7 @@ elif { wpa_cli -i "$wifidev" status | grep 'ssid=NanoGate'; } >/dev/null 2>&1
     echo "NanoGate"
 elif { wpa_cli -i "$wifidev" status | grep 'ip_address'; } >/dev/null 2>&1
   then # Wifi up
-    echo "Wifi Client"
+    echo "$(iwgetid -r)"
 else
     echo "Please wait..."
 fi 

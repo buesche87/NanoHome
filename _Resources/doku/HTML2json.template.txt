@@ -1,8 +1,8 @@
-1. Suchen ersetzen " -> \"
-2. Suchen ersetzen [>	<] -> \t
+1. Normal space suchen ersetzen "[> <] -> \"
+2. Tablespace suchen ersetzen "[>	<] -> \t"
 
-3. _DESCRIPTION_
-4. _DEVID_
+3. _DESCRIPTION_ suchen & ersetzen
+4. _DEVID_ suchen & ersetzen
 
 5. \r\n ans Ende jeder Zeile
 

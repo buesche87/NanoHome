@@ -1,0 +1,25 @@
+<h4>NanoGate Wifi Key</h4>
+<hr />
+
+<center>
+
+<input class="nanohome" type="text" id="psk_input" requiredminlength="8" value="NanoGate Wifi Key" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="WLAN Key setzen" class="form" style="background-color: #ffbdbd;" onclick="send_psk()">💾</button>
+<button title="Passwort zeigen" class="form" style="background-color: #fff4bd;" onclick="show_psk()">🔑</button>
+
+</center>
+
+<script>
+
+    var send_psk = function () {
+
+            var psk = document.getElementById("psk_input").value;
+            var psk_change = "pskc " + "'" + psk + "'";
+
+            publish_settings(psk_change);
+    };
+
+</script>

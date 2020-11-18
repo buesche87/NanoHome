@@ -11,15 +11,15 @@
 <table align="center" style="width:100%">
     <tr>
         <td align="right" style="width:50%"><font size="4">Standby [W]</font></td>
-        <td align="left" style="width:50%"><input class="nanohome_blue" style="width:50%" id="stbypwr" maxlength="5" value="20" /></td>
+        <td align="left" style="width:50%"><input class="form" style="width:50%" id="stbypwr" maxlength="5" value="20" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off"/></td>
     </tr>
 </table>
 
 </p>
 
-<button title="Aktivieren" class="nanohome_add" onclick="standbykill('add')">💾</button>
-<button title="Alle Anzeigen" class="nanohome_show" onclick="standbykill('show all')">🔎</button>
-<button title="Deaktivieren" class="nanohome_remove" onclick="standbykill('remove')">❌</button>
+<button title="Aktivieren" class="form" style="background-color: #adfc95" onclick="standbykill('add')">💾</button>
+<button title="Alle Anzeigen" class="form" style="background-color: #fff4bd" onclick="standbykill('show all')">🔎</button>
+<button title="Deaktivieren" class="form" style="background-color: #ffbdbd" onclick="standbykill('remove')">❌</button>
 
 </center>
 
@@ -37,3 +37,4 @@
 	};
 
 </script>
+
