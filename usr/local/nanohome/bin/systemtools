@@ -54,7 +54,7 @@ elif [ "$1" = "time" ]; then
 	curdate="$(echo $2 | cut -d/ -f1)"
 	curtime="$(echo $2 | cut -d/ -f2)"
 	
-	echo "Synchronisiere Zeit..."
+	statusmsg "Zeit synchronisiert..." "hotpink"
 	
 	date +%Y%m%d -s "$curdate" 1>/dev/null 2>&1
 	date +%T -s "$curtime" 1>/dev/null 2>&1

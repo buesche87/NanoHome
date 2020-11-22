@@ -170,21 +170,21 @@ def draw_page():
         x = 0
         cmd = "ip a | grep wlan0 | grep inet | awk '{print $2}' | rev | cut -c4- | rev"
         IPAddress = subprocess.check_output(cmd, shell = True )
-        cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+        cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
         CPU = subprocess.check_output(cmd, shell = True )
-        cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%sMB %.2f%%\", $3,$2,$3*100/$2 }'"
+        cmd = "free -m | awk 'NR==2{printf \"%s/%sMB %.0f%%\", $3,$2,$3*100/$2 }'"
         MemUsage = subprocess.check_output(cmd, shell = True )
-        cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
+        cmd = "df -h | awk '$NF==\"/\"{printf \"%d/%dGB %s\", $3,$2,$5}'"
         Disk = subprocess.check_output(cmd, shell = True )
         tempI = int(open('/sys/class/thermal/thermal_zone0/temp').read());
         if tempI>1000:
             tempI = tempI/1000
-        tempStr = "CPU TEMP: %sC" % str(tempI)
+        tempStr = "Temp  %sC" % str(tempI)
 
-        draw.text((x, top+2),       "IP: " + str(IPAddress, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
-        draw.text((x, top+2+12),    str(CPU, encoding='utf-8', errors='ignore'), font=smartFont, fill=255)
-        draw.text((x, top+2+24),    str(MemUsage, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
-        draw.text((x, top+2+36),    str(Disk, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
+        draw.text((x, top+2),       "IP    " + str(IPAddress, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
+        draw.text((x, top+2+12),    "Load  " + str(CPU, encoding='utf-8', errors='ignore'), font=smartFont, fill=255)
+        draw.text((x, top+2+24),    "Mem   " + str(MemUsage, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
+        draw.text((x, top+2+36),    "Disk  " + str(Disk, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
         draw.text((x, top+2+48),    tempStr,  font=smartFont, fill=255)
 
     # Draw Shutdown -- no

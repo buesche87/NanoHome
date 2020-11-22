@@ -228,7 +228,8 @@ elif [ "$1" = "remove" ] && [ ! -z "$sn" ] && [ ! -z "$desc" ]; then
 #/////////////////////////////////////////////////////////////////////////////////////
 else
 
-	errmsg "Error" "Eingabe prüfen"
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
+
 	exit 1
 
 fi

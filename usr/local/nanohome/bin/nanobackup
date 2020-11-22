@@ -27,17 +27,19 @@ if [ ! $? -eq 0 ]; then
   
   if [ $? -eq 0 ]; then
 
-	statusmsg "Normale SD-Karte gemountet" "white"
+	echo "Normale SD-Karte gemountet"
 
   else
- 
-     errmsg "Error" "Keine SD-Karte gefunden" 
-     exit 1
+
+	statusmsg "Error" "red" "" "" "Keine SD-Karte gefunden" "white"
+
+    exit 1
+
   fi
   
 else
 	
-	statusmsg "Recovery-SD gemountet" "white"
+	echo "Recovery-SD gemountet"
   
 fi
 
@@ -95,7 +97,7 @@ fi
 # show backups
 if [ "$rectype" == "show" ]; then
 
-	echo "<font size=5 color='hotpink'>Stored Backups</font><br>"
+	echo "<p><p><font size=5 color='hotpink'>Stored Backups</font><br>"
 	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $backupdir)"
 
 fi

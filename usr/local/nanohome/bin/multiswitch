@@ -295,7 +295,7 @@ elif [ "$1" = "service" ]; then
 
 else
 
-	errmsg "Error" "Eingaben prüfen"
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
 
 	exit 1
 

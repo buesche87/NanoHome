@@ -173,7 +173,7 @@ if [ "$1" = "add" ] && [ ! -z "$2" ] && [ ! -z "$3" ]; then
 
 	if [ "$4" = "" ] && [ "$5" = "" ]; then
 
-		errmsg "Error" "Das geht nicht"
+		statusmsg "Error" "red" "" "" "Das geht nicht" "white"
 
 		exit 1
 

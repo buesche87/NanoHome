@@ -13,6 +13,6 @@ if [ ! -z "$1" ] && [ ! "$new_psk" = "NanoGate Wifi Key" ]; then
 
 else
 
-	errmsg "Error" "Eingabe prüfen" 
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
 
 fi

@@ -66,9 +66,6 @@ function static_ip()
 	# Set wlan0 to static in Network Config
 	sed -i "s/iface wlan0 inet dhcp/iface wlan0 inet static/" /etc/network/interfaces
 	
-	# Remove wmod dhcp backup file
-	rm -r /etc/network/interfaces.static
-	
 	# Clean Network Config
 	sed -i '/address/d' /etc/network/interfaces
 	sed -i '/netmask/d' /etc/network/interfaces
@@ -164,21 +161,23 @@ elif [ "$1" = "show" ]; then
 # Delete all Networks
 #/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$1" = "delete" ]; then
+
+	# Print Status Message on Dashboard
+	statusmsg "Alle konfigurierten WLAN gelöscht" "white" "" "" "IP-Adresse auf DHCP gesetzt" "white"
 	
 	# Clean wpa_supplicant.conf.wificlient
 	echo 'country=DE' > /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
 	echo 'ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
 	echo 'update_config=1' >> /etc/wpa_supplicant/wpa_supplicant.conf.wificlient
 	
-	# Print Status Message on Dashboard
-	statusmsg "Alle konfigurierten WLAN gelöscht" "white" "" "" "IP-Adresse auf DHCP gesetzt" "white"
-	dhcp_ip
+	# start hotspot
+	wmod -hotspot	
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Err Exit
 #/////////////////////////////////////////////////////////////////////////////////////
 else
-
-	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"	
+	
+	errmsg "Error" "Eingabe prüfen" 
 
 fi
