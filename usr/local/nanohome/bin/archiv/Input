@@ -1,5 +1,0 @@
-#!/bin/bash
-
-echo "<font size='5'>Benutze das Input-Feld um Linux-Befehle zu senden.</font>"
-echo ""
-echo "<font color='red'>ACHTUNG: Du bist root!</font>"
