@@ -71,7 +71,7 @@ function connect_wifi {
 		cp /etc/network/interfaces.static /etc/network/interfaces
 	fi
 
-	echo "[$(date +'%H:%m:%S')] Enable wificlient config" >> /var/log/wmod.log
+	echo "[$(date +'%H:%m:%S')] Enable wifi config" >> /var/log/wmod.log
 	cp /etc/wpa_supplicant/wpa_supplicant.conf.$1 /etc/wpa_supplicant/wpa_supplicant.conf
 	
 	echo "[$(date +'%H:%m:%S')] Starting interface" >> /var/log/wmod.log
@@ -100,7 +100,6 @@ function set_dhcp()
 	fi
 
 	# Set wlan0 to dhcp
-	echo "[$(date +'%H:%m:%S')] Set interface to dhcp" >> /var/log/wmod.log
 	sed -i "s/iface wlan0 inet static/iface wlan0 inet dhcp/" /etc/network/interfaces
 	
 	# Clean Network Config
