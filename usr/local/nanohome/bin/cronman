@@ -243,8 +243,8 @@ elif [ "$1" = "remove" ]; then
 	if echo "$device" | grep "multiswitch" 1>/dev/null 2>&1; then
 		exit 0
 	else
-		echo "<font size='5' color='white'>Schaltuhr</font><br>"
-		echo "<font size='4'><font color='hotpink'>$dev_desc</font>: <font color='grey'>Deaktiviert</font></font>"
+		echo "<font size='5' color='white'>Schaltuhr</font>"
+		echo "<font size='4'><font color='hotpink'>$dev_desc</font>: <font color='grey'>Deaktiviert</font></font><br>"
 	fi
 	
 else

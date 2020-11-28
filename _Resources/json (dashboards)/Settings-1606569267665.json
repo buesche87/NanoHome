@@ -217,7 +217,7 @@
       },
       "id": 22,
       "options": {
-        "content": "<h4>System Input</h4>\r\n<hr />\r\n\r\n<input title=\"Linux Befehle ausführen\" placeholder=\"enter non-interactive bash commands\" class=\"nanohome\" type=\"text\" id=\"input\" value=\"Input\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\"/>\r\n\r\n<script>\r\n$(\"input\").on(\"keydown\",function search(e) {\r\n    if(e.keyCode == 13) {\r\n      \r\n        var inp = document.getElementById(\"input\").value;\r\n        \r\n        if (inp != \"\") {\r\n            publish_settings(inp);\r\n          } else {\r\n            publish_settings(\"nanohelp\");\r\n          }\r\n    }\r\n});\r\n</script>\r\n",
+        "content": "<h4>System Input</h4>\r\n<hr />\r\n\r\n<input title=\"Linux Befehle ausführen\" placeholder=\"enter non-interactive bash commands\" class=\"nanohome\" type=\"text\" id=\"input\" value=\"Input\" onfocus=\"if (this.value === 'Input') { this.value=''; } \" autocomplete=\"off\"/>\r\n\r\n<script>\r\n$(\"input\").on(\"keydown\",function search(e) {\r\n    if(e.keyCode == 13) {\r\n      \r\n        var inp = document.getElementById(\"input\").value;\r\n        \r\n        if (inp != \"\") {\r\n            publish_settings(inp);\r\n          } else {\r\n            publish_settings(\"nanohelp\");\r\n          }\r\n    }\r\n});\r\n</script>\r\n",
         "mode": "html"
       },
       "pluginVersion": "7.3.3",
@@ -303,5 +303,5 @@
   "timezone": "",
   "title": "Settings",
   "uid": "sYOGRUiRz",
-  "version": 468
+  "version": 479
 }

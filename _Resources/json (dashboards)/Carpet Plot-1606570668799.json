@@ -75,7 +75,7 @@
             },
             {
               "params": [
-                "null"
+                "previous"
               ],
               "type": "fill"
             }
@@ -145,5 +145,5 @@
   "timezone": "",
   "title": "Carpet Plot",
   "uid": "ERlYRVRRk",
-  "version": 16
+  "version": 17
 }

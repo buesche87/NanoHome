@@ -1,5 +1,5 @@
 #!/bin/bash
-# dev_cmopatibility
+# dev_compatibility
 
 if [ -z "$1" ]; then
 
@@ -13,15 +13,20 @@ if [ -z "$1" ]; then
 fi
 
 # Parameters
-device="$1"
-dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
-dev_vend="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f3 )"
-dev_type="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f4 )"
-if [[ "$device" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
+sn="$1"
+dev_desc="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f2 )"
+dev_vend="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f3 )"
+dev_type="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f4 )"
+if [[ "$sn" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
+template_folder="/usr/local/nanohome/templates"
 
 if [ "$dev_type" = "" ]; then
 
-	echo "Device not supported"
+	statusmsg "Error " "red" "" "" "Gerät nicht unterstützt" "white"
+	
+	# remove device from devlist
+	sed -i '/'$sn'/d' /usr/local/nanohome/devlist
+	
 	exit 1
 	
 fi
@@ -29,27 +34,88 @@ fi
 # Geräteunterstützung
 if [ "$dev_vend" = "sonoff" ]; then
 
-	status_topic="sonoff/$device/stat/POWER"
-	control_topic="sonoff/$device/cmnd/POWER"
+	status_topic="sonoff/$sn/stat/POWER"
+	control_topic="sonoff/$sn/cmnd/POWER"
 	off_command="OFF"
 	on_command="ON"
 	toggle_command="TOGGLE"
 	
+	home_element="yes"
+	timer_element="yes"
+	standbykiller_element="no"
 	
 elif [ "$dev_vend" = "shelly" ]; then
 	
-	# switch
-	control_topic="shellies/$device/relay/0/command"
-	status_topic="shellies/$device/relay/0"
-	power_topic="shellies/$device/relay/0/power"
-	off_command="off"
-	on_command="on"
-	toggle_command="toggle"
-	# roller
-	pos_control="shellies/$device/roller/0/command/pos"
-	pos_return="shellies/$device/roller/0/pos"
-	roller_updown="shellies/$device/roller/0/command"
-	open_command="open"
-	close_command="close"
+	if [ "$dev_type" = "switch" ]; then
+
+		control_topic="shellies/$sn/relay/0/command"
+		status_topic="shellies/$sn/relay/0"
+		power_topic="shellies/$sn/relay/0/power"
+		energy_topic="shellies/$sn/relay/0/energy"
+		off_command="off"
+		on_command="on"
+		toggle_command="toggle"
+		
+		home_element="yes"
+		timer_element="yes"
+		standbykiller_element="yes"
+
+	elif [ "$dev_type" = "roller" ]; then
+	
+		control_topic="shellies/$sn/roller/0/command"
+		pos_control="shellies/$sn/roller/0/command/pos"
+		pos_return="shellies/$sn/roller/0/pos"
+		power_topic="shellies/$sn/roller/0/power"
+		energy_topic="shellies/$sn/roller/0/energy"
+		on_command="open"
+		off_command="close"
+		
+		home_element="yes"
+		timer_element="yes"
+		standbykiller_element="no"
+		
+	elif [ "$dev_type" = "shutter" ]; then
+	
+		control_topic="shellies/$sn/roller/0/command"
+		pos_control="shellies/$sn/roller/0/command/pos"
+		pos_return="shellies/$sn/roller/0/pos"
+		power_topic="shellies/$sn/roller/0/power"
+		energy_topic="shellies/$sn/roller/0/energy"
+		on_command="open"
+		off_command="close"
+		
+		home_element="yes"
+		timer_element="yes"
+		standbykiller_element="no"
+
+	elif [ "$dev_type" = "dimmer" ]; then
+	
+		control_topic="shellies/$sn/light/0/command"
+		status_topic="shellies/$sn/light/0/status"
+		dim_value="shellies/$sn/light/0/set"
+		power_topic="shellies/$sn/light/0/power"
+		energy_topic="shellies/$sn/light/0/energy"
+		on_command="on"
+		off_command="off"
+		
+		home_element="yes"
+		timer_element="yes"
+		standbykiller_element="yes"
+
+	elif [ "$dev_type" = "sensor" ]; then
+	
+		control_topic="shellies/$sn/light/0/command"
+		status_topic="shellies/$sn/light/0/status"
+		dim_value="shellies/$sn/light/0/set"
+		power_topic="shellies/$sn/light/0/power"
+		energy_topic="shellies/$sn/light/0/energy"
+		on_command="on"
+		off_command="off"
+		
+		home_element="no"
+		timer_element="no"
+		standbykiller_element="no"
+
+	fi
 	
 fi

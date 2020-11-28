@@ -49,6 +49,32 @@
       "id": 12,
       "links": [],
       "mode": "time",
+      "options": {
+        "bgColor": "rgb(0, 0, 0)",
+        "clockType": "24 hour",
+        "countdownSettings": {
+          "endCountdownTime": "2020-11-28T20:03:14+01:00",
+          "endText": "00:00:00"
+        },
+        "dateSettings": {
+          "dateFormat": "YYYY-MM-DD",
+          "fontSize": "20px",
+          "fontWeight": "normal",
+          "showDate": true
+        },
+        "mode": "time",
+        "timeSettings": {
+          "fontSize": "72px",
+          "fontWeight": "bold"
+        },
+        "timezone": "",
+        "timezoneSettings": {
+          "fontSize": "12px",
+          "fontWeight": "normal",
+          "showTimezone": false,
+          "zoneFormat": "offsetAbbv"
+        }
+      },
       "refreshSettings": {
         "syncWithDashboard": false
       },
@@ -178,7 +204,7 @@
       "id": 1575714476,
       "links": [],
       "options": {
-        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
+        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/tv.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
       "pluginVersion": "7.3.3",
@@ -205,7 +231,7 @@
       "id": 1588962426,
       "links": [],
       "options": {
-        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
+        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/lampe.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
       "pluginVersion": "7.3.3",
@@ -460,7 +486,7 @@
       "id": 1588962423,
       "links": [],
       "options": {
-        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
+        "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/computer.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
       "pluginVersion": "7.3.3",
@@ -646,5 +672,5 @@
   "timezone": "",
   "title": "Home",
   "uid": "XieEaLmRk",
-  "version": 629
+  "version": 635
 }

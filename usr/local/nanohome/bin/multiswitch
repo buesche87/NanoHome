@@ -249,21 +249,24 @@ elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 	if [ "$dev2" == "" ]; then 
 		service_name="ls /etc/systemd/system/ | grep multiswitch | grep $dev1"
 	fi
+	
+	if [ ! -z $service_name ]; then
+		# Delete Multiswitch
+		while IFS= read -r line
+		do
+			systemctl stop "$line"
+			systemctl disable "$line"
 
-	# Delete Multiswitch
-	while IFS= read -r line
-	do
-		systemctl stop "$line"
-		systemctl disable "$line"
+			rm -r "/etc/systemd/system/$line"
+			cronman remove "$line"
 
-		rm -r "/etc/systemd/system/$line"
-		cronman remove "$line"
-
-	done <<< "$service_name"
+		done <<< "$service_name"
+	fi
 	
 	# Print Multiswitch on Dashboard
-	echo "<font size='5' color='white'>Multiswitch</font><br>"
+	echo "<font size='5' color='white'>Multiswitch</font>"
 	print_switch "no"
+	echo "<br>"
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Service Mode
