@@ -77,10 +77,10 @@ function connect_wifi {
 	echo "[$(date +'%H:%m:%S')] Starting interface" >> /var/log/wmod.log
 	ifup "$wifidev"
 	
-	if grep static /etc/network/interfaces; then 
-		echo "[$(date +'%H:%m:%S')] Kill dhclient" >> /var/log/wmod.log
-		pkill -f "dhclient"
-	fi
+	#if grep static /etc/network/interfaces; then 
+	#	echo "[$(date +'%H:%m:%S')] Kill dhclient" >> /var/log/wmod.log
+	#	pkill -f "dhclient"
+	#fi
 	
 	echo "[$(date +'%H:%m:%S')] -> Wifi up" >> /var/log/wmod.log
 	
