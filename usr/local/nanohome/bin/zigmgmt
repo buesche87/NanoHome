@@ -1,0 +1,55 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Zigbee Device Manager
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Kill after 1 minute timeout
+{
+    sleep 1m
+	statusmsg "Zigbee Device Manager" "white" "" "" "Timeout" "white"
+    kill $$
+} &
+
+# Catch parameters
+desc="$2"
+devicetype="$3"
+
+device="zigbee"
+
+# Settings
+server="localhost"
+user="zigbee"
+pass="ZIGBEE2MQTT"
+zig_join_topic="zigbee2mqtt/bridge/config/permit_join"
+zig_log_topic="zigbee2mqtt/bridge/log"
+
+
+if [ "$1" = "pair" ] && [ ! -z "$desc" ] && [ ! -z "$devicetype" ] && [ ! "$sn" = "Device ID" ] && [ ! "$desc" = "Bezeichnung" ]; then
+
+	# allow joining
+	mosquitto_pub -h $server -u $user -P $pass -t $zig_join_topic -m "true"
+	echo "Wait for device to join the zigbee network"
+	
+	while read curlog;
+	do
+
+		# Debug
+		#curlog="$(echo "Successfully interviewed '0x00158d0001dc126a', device has successfully been paired")"
+
+		if [[ "$curlog" == *"successfully been paired"* ]]; then
+			
+			sn="$(echo $curlog | awk '{ printf $3 }' | tr -d \',)"
+			
+			echo -e "$sn:$desc:$device:$devicetype" >> /usr/local/nanohome/devlist
+			devmgmt add "$sn" "$desc" "$device" "$devtype"
+			
+			statusmsg "Zigbee Device Manager" "white" "" "" "Device added - $sn: $desc" "white"
+			
+			mosquitto_pub -h $server -u $user -P $pass -t $zig_join_topic -m "false"
+			
+			exit 0
+
+		fi
+	done < <(mosquitto_sub -h $server -u $user -P $pass -t $zig_log_topic -q 2)
+
+fi

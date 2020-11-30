@@ -275,9 +275,42 @@ def draw_page():
         draw.text((2, 2),  'NanoGate',  font=fontb14, fill=255)
         draw.text((2, 22),  'Please wait...',  font=font11, fill=255)
 
+    # Menu - DHCP CLients
+    elif page_index==12:  
+        draw.rectangle((2,2,width-4,2+16), outline=0, fill=255)
+        draw.text((2, 4),  '-> DHCP Clients',  font=smartFont, fill=0)
+
+        draw.rectangle((2,16,width-4,16+16), outline=0, fill=0)
+        draw.text((2, 18),  'Zigbee pairing',  font=smartFont, fill=255)
+
+        draw.rectangle((2,30,width-4,30+16), outline=0, fill=0)
+        draw.text((2, 32),  'Shelly guide',  font=smartFont, fill=255)
+
+    # Menu - Zigbee
+    elif page_index==13:  
+        draw.rectangle((2,2,width-4,2+16), outline=0, fill=0)
+        draw.text((2, 4),  'DHCP Clients',  font=smartFont, fill=255)
+
+        draw.rectangle((2,16,width-4,16+16), outline=0, fill=255)
+        draw.text((2, 18),  '-> Zigbee pairing',  font=smartFont, fill=0)
+
+        draw.rectangle((2,30,width-4,30+16), outline=0, fill=0)
+        draw.text((2, 32),  'Shelly guide',  font=smartFont, fill=255)
+
+    # Menu - Shelly
+    elif page_index==14:  
+        draw.rectangle((2,2,width-4,2+16), outline=0, fill=0)
+        draw.text((2, 4),  'DHCP Clients',  font=smartFont, fill=255)
+
+        draw.rectangle((2,16,width-4,16+16), outline=0, fill=0)
+        draw.text((2, 18),  'Zigbee pairing',  font=smartFont, fill=255)
+
+        draw.rectangle((2,30,width-4,30+16), outline=0, fill=255)
+        draw.text((2, 32),  '-> Shelly guide',  font=smartFont, fill=0)
+
     # Draw DHCP Leases
 
-    elif page_index==12:
+    elif page_index==15:
         draw.text((2, 2),  'Last 4 DHCP Leases',  font=font11, fill=255) 
 
         os.system('ldhcp')
@@ -298,6 +331,25 @@ def draw_page():
         txt = subprocess.check_output(cmd, shell = True)
         draw.text((2, 52),  str(txt, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
 
+    # Draw Zigbee
+
+    elif page_index==16:
+        draw.text((2, 2),  'Zigbee pairing',  font=font11, fill=255) 
+
+        # os.system('zigmgmt pairing')
+        
+        cmd = "echo 'Timeout 1 minute'"
+        txt = subprocess.check_output(cmd, shell = True)
+        draw.text((2, 16),  str(txt, encoding='utf-8', errors='ignore'),  font=smartFont, fill=255)
+
+    # Draw Zigbee
+
+    elif page_index==17:
+        
+        image1 = Image.open('shelly_guide_oled.png').convert('1')
+        oled.drawImage(image1)
+        time.sleep(5)
+        update_page_index(12)
 
     oled.drawImage(image)
 
@@ -324,6 +376,14 @@ def is_showing_wifi_msgbox():
         return True
     return False
 
+def is_showing_menu_msgbox():
+    global pageIndex
+    lock.acquire()
+    page_index = pageIndex
+    lock.release()
+    if page_index==12 or page_index==13 or page_index==14:
+        return True
+    return False
 
 def update_page_index(pi):
     global pageIndex
@@ -377,13 +437,19 @@ def receive_signal(signum, stack):
             else:
                 update_page_index(0)
             draw_page()
-        elif page_index==1 and pageSleepCountdown>0:
+        elif is_showing_menu_msgbox(): # If Menu Open
+            if page_index==12: # Show DHCP Clients
+                update_page_index(15)
+            elif page_index==13: # Zigbee pairing
+                update_page_index(16)
+            elif page_index==14: # Show Shelly image
+                update_page_index(17)
+            else:
+                update_page_index(0)
+            draw_page()
+        elif page_index==1 and pageSleepCountdown>0: # Open Menu
             update_page_index(12)
             draw_page()
-        elif page_index==12 and pageSleepCountdown>0:
-            image1 = Image.open('shelly_guide_oled.png').convert('1')
-            oled.drawImage(image1)
-            time.sleep(5)
         else:
             update_page_index(1)
         draw_page()
@@ -400,6 +466,14 @@ def receive_signal(signum, stack):
                 update_page_index(8)
             elif page_index==8: # NanoGate
                 update_page_index(6)
+            draw_page()
+        elif is_showing_menu_msgbox(): # If Wifi Menu Open
+            if page_index==12: # DHCP Leases
+                update_page_index(13)
+            elif page_index==13: # Zigbee pairing
+                update_page_index(14)
+            elif page_index==14: # Shelly image
+                update_page_index(12)
             draw_page()
         elif  pageSleepCountdown>0:
             update_page_index(3)

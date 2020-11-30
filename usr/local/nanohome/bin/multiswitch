@@ -21,7 +21,8 @@ pass="MULTISWITCH2MQTT"
 # Exit If
 if [ "$dev1" = "Wenn..." ] || [ "$dev2" = "Dann..." ]; then 
 
-	exit 0
+	statusmsg "Error " "red" "" "" "Gerät nicht unterstützt" "white"
+	exit 1
 
 fi
 
@@ -266,7 +267,7 @@ elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 	# Print Multiswitch on Dashboard
 	echo "<font size='5' color='white'>Multiswitch</font>"
 	print_switch "no"
-	echo "<br>"
+	echo ""
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Service Mode

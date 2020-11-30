@@ -1,0 +1,68 @@
+Zigbee on NanoHome
+
+curl -sL https://deb.nodesource.com/setup_12.x -o nodesource_setup.sh
+
+sudo bash nodesource_setup.sh
+
+sudo apt install nodejs
+
+cd /usr/local/nanohome
+
+git clone https://github.com/Koenkk/zigbee2mqtt
+
+cd zigbee2mqtt
+
+apt install python2.7
+npm ci --production
+
+nano /usr/local/nanohome/zigbee2mqtt/data/configuration.yaml
+
+
+npm start
+
+
+--- Service ---
+
+[Unit]
+Description=zigbee2mqtt
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/npm start
+WorkingDirectory=/path/to/zigbee2mqtt
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+---
+
+systemctl start zigbee2mqtt.service
+systemctl enable zigbee2mqtt.service
+
+--- Pairing Devices ---
+
+pairing per Bezeichnung eingeben * Knopfdruck
+
+MQTT "zigbee/bridge/config/permit_join" -> "true"
+
+Pairing -> Friendlyname & Bezeichnnung in devlist aufnehmen
+
+MQTT "zigbee/bridge/config/permit_join" -> "false"
+
+
+--- Zigbee ON / OFF ---
+
+MQTT "zigbee/[FRIENDLY_NAME]/set/state" -> "ON"
+
+--- Zigbee Dimming (ikea - test) ---
+
+MQTT "zigbee/[FRIENDLY_NAME]/set/brigntness" -> "255"
+
+--- Zigbee Color (ikea - test) ---
+
+MQTT "zigbee/[FRIENDLY_NAME]/set/color_temp" -> "325"
