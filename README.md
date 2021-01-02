@@ -26,4 +26,4 @@ Guck Wetter
 
 Einfache Bedienung
 
-![settings](https://i.ibb.co/N2ZkgPt/nanohome-settings.png)
+![settings](https://i.ibb.co/mCdBhP3/nanohome-settings.png)
