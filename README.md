@@ -18,7 +18,7 @@ Miss den Stromverbrauch deiner Geräte
 
 Erstelle Carpet-Plots und überwache das Raumklima
 
-![carpetplot](https://i.ibb.co/xMXhPPV/nanohome-carpetplot.png)
+![carpetplot](https://i.ibb.co/fSVf6QV/nanohome-carpetplot.png)
 
 Guck Wetter
 
