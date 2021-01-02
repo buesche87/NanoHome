@@ -77,9 +77,6 @@ print_switch () {
 
 			dev_state_temp="$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " " $7 } ')"
 			dev_state="$(echo $dev_state_temp | sed 's,^*: ,Täglich ab ,g' | sed 's,^1: ,Montag ab ,g' | sed 's,^2: ,Dienstag ab ,g' | sed 's,^3: ,Mittwoch ab ,g' | sed 's,^4: ,Donnerstag ab ,g' | sed 's,^5: ,Freitag ab ,g' | sed 's,^6: ,Samstag ab ,g' | sed 's,^0: ,Sonntag ab ,g' | sed 's,^6-7: ,Wochenende ab ,g' | sed 's,^1-5: ,Werktags ab ,g' | sed 's,start,'"$act_msg"',g' | sed 's,stop,'"$inact_msg"',g')"
-
-
-			# return $dev_state
 			
 		done < <(printf '%s\n' "$zsp")
 

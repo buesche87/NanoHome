@@ -17,25 +17,42 @@ service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/$service_description.service.template"
 
 # functions
+
+get_status () {
+
+	# make parameters readable on dashboard
+	if [[ "$status" =~ "running" ]]; then
+		color="#c0fcb1"
+		statmsg="aktiv"
+	else
+		color="grey"
+		statmsg="inaktiv"
+	fi
+
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Print Standbykiller and their Cronjobs On Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
 print_killer () {
 
 	dev="$1"
-	status="$2"
+	condition="$2"
 	service_name="$3"
 
 	if [[ "$status" =~ "Aktiv" ]]; then
-		color="#c0fcb1"
-	else
-		color="grey"
-	fi
+	 	color="#c0fcb1"
+	 else
+	 	color="grey"
+	 fi
 
 	desc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
 	
-	echo "<font size='4'><font color='hotpink'>$desc</font>: <font color='$color'>$status</font></font>"
+	echo "<font size='4' color='hotpink'>$desc</font>"
 
 	if [ ! -z "$service_name" ]; then
 
-		status="$(systemctl status standbykiller.shelly1pm-76DAD6.service | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }')"
+		status="$(systemctl status $service_name | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }')"
 		lastmsg="$(systemctl status $service_name | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
 
 		if [[ "$status" =~ "running" ]]; then
@@ -45,14 +62,14 @@ print_killer () {
 		fi
 		
 		echo ""
-		echo "<font size='3' color='$statuscolor'>$status</font>"
+		echo "<font size='3' color='$statuscolor'>$condition</font>"
 		echo ""
 		echo "<font size='3'>Last Messages:</font>"
 		echo "<font size='2'>$lastmsg</font>"
 		echo ""
 
 	else
-		status="Inaktiv"
+		status="inaktiv"
 		lstmsg=""
 	fi
 
@@ -68,7 +85,7 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 
 		if [ ! -z "$active" ]; then
 			
-			echo "<font size='5' color='white'>Standbykiller</font><br>"
+			echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='#c0fcb'> aktiv</font><br>"
 			
 			while IFS= read -r line
 			do
@@ -84,26 +101,26 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 
 		else
 
-			statusmsg "Standbykiller " "white" "" "" "Inaktiv - Kein Standbykiller definiert" "grey"
+			statusmsg "Standbykiller " "white" " Inaktiv" "grey" "Kein Standbykiller definiert" "grey"
 
 		fi
 
 	# show active state of specific device
 	elif test -f "$service_file"; then
 
-		maxpower="$(cat $service_file | grep "standbykiller service $device" | awk '{ printf $5"\n" }')"
+		maxpower="$( grep ExecStart /etc/systemd/system/$service_name | awk '{ printf $4 }' )"
 		msg="Aktiv wenn unter ${maxpower}W"
 		
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='#c0fcb'> aktiv</font><br>"
 		
 		print_killer "$dev_desc" "$msg" "$service_name"
 
 	# show insctive state of specific device
 	else
 		
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='grey'> inaktiv</font><br>"
 		
-		print_killer "$dev_desc" "Inaktiv"
+		print_killer "$dev_desc" "inaktiv"
 
 	fi
 
