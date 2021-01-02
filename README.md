@@ -22,6 +22,6 @@ Erstelle Carpet-Plots und überwache das Raumklima
 
 Guck Wetter
 
-![carpetplot](https://i.ibb.co/5FBZ6W3/nanohome-wetter.png)
+![carpetplot](https://i.ibb.co/f41Qnsq/nanohome-wetter.png)
 
 
