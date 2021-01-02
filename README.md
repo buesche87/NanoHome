@@ -24,4 +24,6 @@ Guck Wetter
 
 ![carpetplot](https://i.ibb.co/f41Qnsq/nanohome-wetter.png)
 
+Einfache Bedienung
 
+![settings](https://i.ibb.co/N2ZkgPt/nanohome-settings.png)
