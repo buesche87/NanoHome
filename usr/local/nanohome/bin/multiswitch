@@ -6,15 +6,12 @@
 # Catch parameters
 dev1="$2"
 dev2="$3"
+value1="toggle"
+value2="toggle"
 rec="$4"
 if [ "$rec" = "Aktiv..." ]; then rec="always"; fi
 from="$5"
 to="$6"
-
-# Settings
-server="localhost"
-user="multiswitch_mqtt"
-pass="MULTISWITCH2MQTT"
 
 # Exit If
 if [ "$dev1" = "Wenn..." ] || [ "$dev2" = "Dann..." ]; then 
@@ -26,22 +23,17 @@ fi
 # Device Support
 if [ ! "$1" = "remove" ] && [ ! "$dev1" = "all" ]; then
 	. /usr/local/nanohome/dev_compatibility $dev1
-	dev1_control_topic=$(echo $control_topic)
-	dev1_status_topic=$(echo $status_topic)
 	dev1_type=$(echo $dev_type)
-	
-	. /usr/local/nanohome/dev_compatibility $dev2
-	dev2_control_topic=$(echo $control_topic)
-	dev2_type=$(echo $dev_type)
+
 fi
 
 # Environment
-service_name="multiswitch.$dev1.$dev2.service"
+service_name="multiswitch.$dev1.$value1.$dev2.$value2.service"
 service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/multiswitch.service.template"
 
 # Help Functions
-make_readable () {
+get_status () {
 
 	# make parameters readable on dashboard
 	if [[ "$status" =~ "running" ]]; then
@@ -60,16 +52,17 @@ make_readable () {
 print_switch () {
 
 	display="$1"
-	status="$(systemctl status $service_name | head -3 | tail -1 | sed -e 's/^[[:space:]]*//')"
+	servicestat="$(systemctl status $service_name | head -3 | tail -1 | sed -e 's/^[[:space:]]*//')"
+	
+	if systemctl status $service_name | grep "running" 1>/dev/null 2>&1; then
+		status="running"
+	fi
 	
 	# get description of devices from devlist
 	desc1="$(cat /usr/local/nanohome/devlist | grep $dev1 | cut -d: -f2 )"
 	desc2="$(cat /usr/local/nanohome/devlist | grep $dev2 | cut -d: -f2 )"
 
-	make_readable
-
-	# print multiswitch header
-	echo "<font size='4'><font color='hotpink'>$desc1</font><font color='white'> -> </font><font color='hotpink'>$desc2 </font><font color='$color'>[$statmsg]</font></font>"
+	get_status
 
 	# get cronjob for multiswitch
 	zsp="$(crontab -l | grep $service_name)"
@@ -85,23 +78,25 @@ print_switch () {
 			dev_state_temp="$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " " $7 } ')"
 			dev_state="$(echo $dev_state_temp | sed 's,^*: ,Täglich ab ,g' | sed 's,^1: ,Montag ab ,g' | sed 's,^2: ,Dienstag ab ,g' | sed 's,^3: ,Mittwoch ab ,g' | sed 's,^4: ,Donnerstag ab ,g' | sed 's,^5: ,Freitag ab ,g' | sed 's,^6: ,Samstag ab ,g' | sed 's,^0: ,Sonntag ab ,g' | sed 's,^6-7: ,Wochenende ab ,g' | sed 's,^1-5: ,Werktags ab ,g' | sed 's,start,'"$act_msg"',g' | sed 's,stop,'"$inact_msg"',g')"
 
-			echo "<font size='4' color='white'>$dev_state</font>"
 
+			# return $dev_state
+			
 		done < <(printf '%s\n' "$zsp")
 
 		echo ""
-
-	# print always active message if service is enabled but no cronjob active
-	elif ! test -f "$service_file" && [ "$statmsg" = "aktiv" ]; then
-
-		echo "<font size='4'>Immer aktiv</font><br>"
+	
+	else 
+	
+		dev_state=""
 
 	fi
 	
+	statusmsg "Multiswitch" "white" " $statmsg" "$color" "$desc1 -> $desc2" "hotpink" "</br>$dev_state" "white"
+	
+	
 	# print last messages from service
 	if [ ! -z "$service_name" ] && [ ! "$display" = "no" ]; then
-
-		status="$(systemctl status $service_name | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }' )"
+		
 		lastmsg="$(systemctl status $service_name | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
 
 		if [[ "$status" =~ "running" ]]; then
@@ -109,9 +104,8 @@ print_switch () {
 		else
 			statuscolor="grey"
 		fi
-		
-		echo ""
-		echo "<font size='3' color='$statuscolor'>$status</font>"
+
+		echo "<font size='3' color='$statuscolor'>$servicestat</font>"
 		echo ""
 		echo "Last Messages:"
 		echo "<font size='2'>$lastmsg</font>"
@@ -133,19 +127,12 @@ if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
 	
 		if [ ! -z "$active" ]; then
 			
-			echo "<font size='5' color='white'>Multiswitch</font><br>"
-			
 			while IFS= read -r line
 			do
-				dev1="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $4 }' )"
-				dev2="$(cat /etc/systemd/system/$line | grep multiswitch | awk '{ printf $5 }' )"
+				dev1="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $3 }' )"
+				dev2="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $4 }' )"
 				
 				service_name="$line"
-				
-				. /usr/local/nanohome/dev_compatibility $dev1
-				dev1_type=$(echo $dev_type)
-				. /usr/local/nanohome/dev_compatibility $dev2
-				dev2_type=$(echo $dev_type)
 				
 				print_switch "no"
 
@@ -157,17 +144,13 @@ if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
 
 		fi
 
-	# show active state of specific device
+	# show active state of device
 	elif test -f "$service_file"; then
-		
-		echo "<font size='5' color='white'>Multiswitch</font><br>"
 		
 		print_switch
 
-	# show inactive state of specific device
+	# show inactive state of device
 	else
-		
-		echo "<font size='5' color='white'>Multiswitch</font><br>"
 		
 		print_switch "no"
 
@@ -181,7 +164,7 @@ elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "
 	# Check if service exists
 	if test -f "$service_file"; then
 		
-		echo "<font size='5' color='white'>Multiswitch</font><br>"
+		statusmsg "Multiswitch" "white" "" "" "Service exists" "white"
 		print_switch
 
 	# create service
@@ -192,6 +175,8 @@ elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "
 
 		sed -i "s/-dev1/$dev1/" $service_file
 		sed -i "s/-dev2/$dev2/" $service_file
+		sed -i "s/-value1/$value1/" $service_file
+		sed -i "s/-value2/$value2/" $service_file		
 		
 		# Enable and Start Service
 		systemctl start $service_name
@@ -203,7 +188,6 @@ elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "
 		fi
 		
 		# Print Multiswitch on Dashboard
-		echo "<font size='5' color='white'>Multiswitch</font><br>"
 		print_switch
 
 	fi
@@ -213,7 +197,7 @@ elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "
 #/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 
-	# get all services if only one device is set
+	# remove all services if only one device is set
 	if [ "$dev2" == "" ]; then 
 		service_name="ls /etc/systemd/system/ | grep multiswitch | grep $dev1"
 	fi
@@ -230,25 +214,11 @@ elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 	done <<< "$service_name"
 	
 	# Print Multiswitch on Dashboard
-	echo "<font size='5' color='white'>Multiswitch</font><br>"
 	print_switch "no"
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Service Mode
-#/////////////////////////////////////////////////////////////////////////////////////
-elif [ "$1" = "service" ]; then
-
-	while read curvalue;
-	do
-		now=$(date +"%T")
-		mosquitto_pub -h $server -u $user -P $pass -t $dev2_control_topic -m $curvalue
-		echo "|[$now] $dev1 $curvalue -> $dev2 $curvalue"
-
-	done < <(mosquitto_sub -h $server -u $user -P $pass -t $dev1_control_topic -q 2) #control topic for real switch
 
 else
 
-	errmsg "Error" "Eingaben prüfen"
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
 
 	exit 1
 

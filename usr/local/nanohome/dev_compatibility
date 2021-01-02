@@ -3,26 +3,26 @@
 
 if [ -z "$1" ]; then
 
-	echo "----------------------------------"
+	echo "-------------------------------"
 	echo "Zu wenig Parameter definiert"
-	echo "Usage: dev_cmopatibility device-sn"
-	echo "----------------------------------"
+	echo "Usage: dev_cmopatibility device"
+	echo "-------------------------------"
 	echo
 
 	exit 1
 fi
 
 # Parameters
-sn="$1"
-dev_desc="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f2 )"
-dev_vend="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f3 )"
-dev_type="$(cat /usr/local/nanohome/devlist | grep $sn | cut -d: -f4 )"
-if [[ "$sn" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
-
+device="$1"
+dev_desc="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f2 )"
+dev_vend="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f3 )"
+dev_type="$(cat /usr/local/nanohome/devlist | grep $device | cut -d: -f4 )"
+if [[ "$device" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
+template_folder="/usr/local/nanohome/templates"
 
 if [ "$dev_type" = "" ]; then
 
-	statusmsg "Error " "red" "" "" "Gerät nicht unterstützt" "white"
+	echo "Device not supported"
 	
 	# remove device from devlist
 	sed -i '/'$sn'/d' /usr/local/nanohome/devlist
@@ -31,169 +31,57 @@ if [ "$dev_type" = "" ]; then
 	
 fi
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Sonoff
-#/////////////////////////////////////////////////////////////////////////////////////
+# Geräteunterstützung
 if [ "$dev_vend" = "sonoff" ]; then
 
-	if [ "$dev_type" = "switch" ]; then
-
-		status_topic="sonoff/$sn/stat/POWER"
-		control_topic="sonoff/$sn/cmnd/POWER"
-		off_command="OFF"
-		on_command="ON"
-		toggle_command="TOGGLE"
-		
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="no"
-		
-	else
+	status_topic="sonoff/$device/stat/POWER"
+	control_topic="sonoff/$device/cmnd/POWER"
+	off_command="OFF"
+	on_command="ON"
+	toggle_command="TOGGLE"
 	
-		statusmsg "Error " "red" "" "" "Gerät noch nicht unterstützt" "white"
-	
-	fi
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Shelly
-#/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$dev_vend" = "shelly" ]; then
-	
-	if [ "$dev_type" = "switch" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/relay/0/command"
-		status_topic="shellies/$sn/relay/0"
-		
-		# Commands
-		off_command="off"
-		on_command="on"
-		toggle_command="toggle"
-		
-		# Dashboard Elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="no"
 
-	elif [ "$dev_type" = "switch-pm" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/relay/0/command"
-		status_topic="shellies/$sn/relay/0"
-		power_topic="shellies/$sn/relay/0/power"
-		energy_topic="shellies/$sn/relay/0/energy"
-		
-		# Commands
+	if [ "$dev_type" = "switch" ]; then
+
+		control_topic="shellies/$device/relay/0/command"
+		status_topic="shellies/$device/relay/0"
+		power_topic="shellies/$device/relay/0/power"
+		energy_topic="shellies/$device/relay/0/energy"
 		off_command="off"
 		on_command="on"
 		toggle_command="toggle"
-		
-		# Dashboard Elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="yes"
 
 	elif [ "$dev_type" = "roller" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/roller/0/command"
-		pos_control="shellies/$sn/roller/0/command/pos"
-		pos_return="shellies/$sn/roller/0/pos"
-		power_topic="shellies/$sn/roller/0/power"
-		energy_topic="shellies/$sn/roller/0/energy"
-		
-		# Commands
+	
+		control_topic="shellies/$device/roller/0/command"
+		pos_control="shellies/$device/roller/0/command/pos"
+		pos_return="shellies/$device/roller/0/pos"
+		power_topic="shellies/$device/roller/0/power"
+		energy_topic="shellies/$device/roller/0/energy"
 		on_command="open"
 		off_command="close"
-		
-		# Dashboard Elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="no"
 		
 	elif [ "$dev_type" = "shutter" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/roller/0/command"
-		pos_control="shellies/$sn/roller/0/command/pos"
-		pos_return="shellies/$sn/roller/0/pos"
-		power_topic="shellies/$sn/roller/0/power"
-		energy_topic="shellies/$sn/roller/0/energy"
-		
-		# Commands
+	
+		control_topic="shellies/$device/roller/0/command"
+		pos_control="shellies/$device/roller/0/command/pos"
+		pos_return="shellies/$device/roller/0/pos"
+		power_topic="shellies/$device/roller/0/power"
+		energy_topic="shellies/$device/roller/0/energy"
 		on_command="open"
 		off_command="close"
-		
-		# Dashoard Elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="no"
 
 	elif [ "$dev_type" = "dimmer" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/light/0/command"
-		status_topic="shellies/$sn/light/0/status"
-		dim_value="shellies/$sn/light/0/set"
-		power_topic="shellies/$sn/light/0/power"
-		energy_topic="shellies/$sn/light/0/energy"
-		
-		# Commands
+	
+		control_topic="shellies/$device/light/0/command"
+		status_topic="shellies/$device/light/0/status"
+		dim_value="shellies/$device/light/0/set"
+		power_topic="shellies/$device/light/0/power"
+		energy_topic="shellies/$device/light/0/energy"
 		on_command="on"
 		off_command="off"
-		
-		# Dashboard Elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="yes"
 
-	elif [ "$dev_type" = "sensor" ]; then
-		
-		# MQTT Topics
-		control_topic="shellies/$sn/light/0/command"
-		status_topic="shellies/$sn/light/0/status"
-		dim_value="shellies/$sn/light/0/set"
-		power_topic="shellies/$sn/light/0/power"
-		energy_topic="shellies/$sn/light/0/energy"
-		
-		# Commands
-		
-		# Dashboard Elements
-		home_element="no"
-		timer_element="no"
-		standbykiller_element="no"
-	
-	else
-		
-		statusmsg "Error " "red" "" "" "Gerät noch nicht unterstützt" "white"
-
-	fi
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Zigbee
-#/////////////////////////////////////////////////////////////////////////////////////
-elif [ "$dev_vend" = "zigbee" ]; then
-	
-	if [ "$dev_type" = "switch" ]; then
-	
-		# MQTT Topics
-		control_topic="zigbee2mqtt/$sn/set/state"
-		status_topic="zigbee2mqtt/$sn/get/state"
-		
-		# Commands
-		off_command="OFF"
-		on_command="ON"
-		toggle_command="TOGGLE"
-		
-		# Dashboard elements
-		home_element="yes"
-		timer_element="yes"
-		standbykiller_element="no"
-	
-	else
-	
-		statusmsg "Error " "red" "" "" "Gerät noch nicht unterstützt" "white"
-	
 	fi
 	
 fi

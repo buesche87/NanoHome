@@ -1,12 +1,7 @@
 #!/bin/bash
 # standbykiller for NanoHome - sends OFF to topic if device falls below [W]
 
-# settings
-server="localhost"
-user="cron_mqtt"
-pass="Cron2MQTT"
-
-# Parameters
+# Catch Parameters
 device="$2"
 maxpower="$3"
 
@@ -78,8 +73,8 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 			while IFS= read -r line
 			do
 
-				dev="$(cat /etc/systemd/system/$line | grep standbykiller | awk '{ printf $4 }' )"
-				maxpower="$(cat /etc/systemd/system/$line | grep standbykiller | awk '{ printf $5 }' )"
+				dev="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $3 }' )"
+				maxpower="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $4 }' )"
 				devdesc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
 				msg="Aktiv wenn unter ${maxpower}W"
 
@@ -89,7 +84,7 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 
 		else
 
-			statusmsg "Standbykiller " "white" "" "" "Inaktiv - Kein Standbykiller aktiv" "grey"
+			statusmsg "Standbykiller " "white" "" "" "Inaktiv - Kein Standbykiller definiert" "grey"
 
 		fi
 
@@ -151,50 +146,9 @@ elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
 
 	rm -r $service_file
 	
-	echo "<font size='5' color='white'>Standbykiller</font>"
-	echo "<font size='4'><font color='hotpink'>$dev_desc</font>: <font color='grey'>Deaktiviert</font></font><br>"
-
-# service mode
-elif [ "$1" == "service" ]; then
-
-	lastmsg="off"
-	try="1"
-
-	while read curpower;
-	do
-
-		now=$(date +"%T")
-
-		if (( $(echo "$curpower == 0" | bc -l) )); then
-
-			echo "|[$now] $device: off -> nothing todo"
-			lastmsg="off"
-
-		elif (( $(echo "$curpower < $maxpower" | bc -l) )); then
-
-			if [ "$lastmsg" == "off" ]; then
-
-				echo "|[$now] $device just started -> I won't kill it yet"
-
-			elif [ try > 2 ]; then #give time to manually wake unwanted standby
-			
-				echo "|[$now] $device: ${curpower}W - standby killed"
-
-				mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $off_command >/dev/null 2>&1			
-
-			else
-				
-				echo "|[$now] $device: ${curpower}W - less than ${maxpower}W -> wait 60s and then kill standby"
-				((try=try+1))
-
-			fi
-
-		else
-			echo "|[$now] $device: ${curpower}W - more than ${maxpower}W -> keeping alive"
-			lastmsg="running"
-		fi
-
-	done < <(mosquitto_sub -h $server -u $user -P $pass -t $power_topic -q 2)
+	echo "<font size='5' color='white'>Standbykiller</font><br>"
+	
+	print_killer "$dev_desc" "Deaktiviert"
 
 else
 

@@ -15,7 +15,7 @@ user="cron_mqtt"
 pass="Cron2MQTT"
 
 # Device Support
-if [ ! "$device" = "all" ]; then
+if [[ ! "$device" == "all" ]] && [[ ! "$device" == *"multiswitch"* ]]; then
 	. /usr/local/nanohome/dev_compatibility $device
 fi
 
@@ -69,7 +69,7 @@ get_dev () {
 		# print devices
 		if echo "$active_devices" | grep "^$check_dev" 1>/dev/null 2>&1 || [ "$check_dev" = "all" ]; then
 			
-			echo "<font size='5' color='white'>Schaltuhr</font><br>"
+			echo "<font size='5' color='white'>Schaltuhr</font><font size='5' color='#c0fcb1'> aktiv</font><br>"
 			
 			while IFS= read -r line
 			do
@@ -83,15 +83,14 @@ get_dev () {
 		
 		# cronjob inactive for device
 		else
-
-			echo "<font size='5' color='white'>Schaltuhr</font><br>"
-			echo "<font size='4'><font color='hotpink'>$dev_desc</font>: <font color='grey'>Inaktiv</font></font>"
+			
+			statusmsg "Schaltuhr" "white" " Inaktiv" "grey" "$dev_desc" "hotpink" " - Keine Schaltuhr definiert" "grey"
 		
 		fi
 	
 	# no cronjob active
 	else
-		statusmsg "Schaltuhr" "white" "" "" "Inaktiv - Keine Schaltuhr aktiv" "grey"
+		statusmsg "Schaltuhr" "white" " Inaktiv" "grey" "Keine Schaltuhr aktiv" "grey"
 	fi
 }
 
@@ -156,7 +155,7 @@ show_zsp () {
 			dev_state_temp="$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " | " $16 } ')"		
 			dev_state="$(echo $dev_state_temp | sed 's,^*: ,Täglich ,g' | sed 's,^1: ,Montag ,g' | sed 's,^2: ,Dienstag ,g' | sed 's,^3: ,Mittwoch ,g' | sed 's,^4: ,Donnerstag ,g' | sed 's,^5: ,Freitag ,g' | sed 's,^6: ,Samstag ,g' | sed 's,^0: ,Sonntag ,g' | sed 's,^6-7: ,Wochenende ,g' | sed 's,^1-5: ,Werktags ,g' | sed 's, | on, '"$on_msg"',g' | sed 's, | off, '"$off_msg"',g' | sed 's,| start,'"$act_msg"',g' | sed 's,| stop,'"$inact_msg"',g' | sed 's,| close,'"$close_msg"',g' | sed 's,| open,'"$open_msg"',g')"
 
-			echo "<font size='4'><font color='hotpink'>$dev_desc</font><font color='white'>: $dev_state</font>"		
+			echo -e "<font size='4'><font color='hotpink'>$dev_desc</font><font color='white'>\t $dev_state</font>"		
 
 		fi 
 
@@ -172,7 +171,7 @@ show_zsp () {
 if [ "$1" = "add" ] && [ ! -z "$2" ] && [ ! -z "$3" ]; then
 
 	if [ "$4" = "" ] && [ "$5" = "" ]; then
-
+		
 		statusmsg "Error" "red" "" "" "Das geht nicht" "white"
 
 		exit 1
@@ -190,7 +189,7 @@ if [ "$1" = "add" ] && [ ! -z "$2" ] && [ ! -z "$3" ]; then
 	if [ "$off_min" = "" ]; then off_min="00"; fi
 
 	# Create Cronjob Entries  //////////////////////////////////////////////////
-	if [ "$dev_type" = "multiswitch" ]; then
+	if [[ "$device" == *"multiswitch"* ]]; then
 
 		cron_on="$on_min $on_hour * * $day systemctl start $device"
 		cron_off="$off_min $off_hour * * $day systemctl stop $device"
@@ -243,8 +242,8 @@ elif [ "$1" = "remove" ]; then
 	if echo "$device" | grep "multiswitch" 1>/dev/null 2>&1; then
 		exit 0
 	else
-		echo "<font size='5' color='white'>Schaltuhr</font>"
-		echo "<font size='4'><font color='hotpink'>$dev_desc</font>: <font color='grey'>Deaktiviert</font></font><br>"
+		echo "<font size='5' color='white'>Schaltuhr</font><font size='5' color='grey'> Deaktiviert</font><br>"
+		echo "<font font size='4' color='hotpink'>$dev_desc</font>"
 	fi
 	
 else
