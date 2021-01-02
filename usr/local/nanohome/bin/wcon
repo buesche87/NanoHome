@@ -143,22 +143,22 @@ elif [ "$1" = "show" ]; then
 	# check if any networks are known	
 	usedssids="$(awk '/ssid="/{ print $0 }' /etc/wpa_supplicant/wpa_supplicant.conf.wificlient | awk -F'ssid=' '{ print $2 }' ORS='\n' | sed 's/\"/''/g' | sed 's/,$//')"
 	
+	
 	if [ -z "$usedssids" ]; then
 		statusmsg "Kein WLAN konfiguriert" "white"
 	else
-		statusmsg "Bekannte WLAN:" "white" "" "" "$usedssids" "hotpink"
+		statusmsg "Bekannte WLAN:" "white" "" "" "$usedssids</br>" "hotpink"
 	fi
 
 	# Get Network Config
-	echo "<br>"
-	
+	connectedto="$(iw wlan0 link | grep SSID | sed -e 's/^[[:space:]]*//')"
 	state="$(grep 'iface wlan0' /etc/network/interfaces |  awk '{ print $4 }')"
 	address="$(ip a | grep "global" | egrep "wlan0" | awk '{ print $2 }')"
 	gateway="$(ip r | grep -m1 'default' | awk '{ print $3 }' )" 
 	nameservers="$( cat /etc/resolv.conf | grep "nameserver" | awk '{ printf $2 " " }' )"
 	
 	# Print Status Message on Dashboard
-	statusmsg "Netzwerkkonfiguration: " "white" "$state" "hotpink" "IP: $address\nGateway: $gateway\nDNS: $nameservers" "white"
+	statusmsg "Netzwerkkonfiguration: " "white" "$state" "hotpink" "$connectedto\nIP: $address\nGateway: $gateway\nDNS: $nameservers" "white"
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Delete all Networks
