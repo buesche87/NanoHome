@@ -1,27 +1,30 @@
 #!/bin/bash
-# standbykiller for NanoHome - sends OFF to topic if device falls below [W]
+#/////////////////////////////////////////////////////////////////////////////////////
+# Standbykiller for NanoHome - sends OFF to topic if device falls below [W]
+#/////////////////////////////////////////////////////////////////////////////////////
 
 # Catch Parameters
 device="$2"
 maxpower="$3"
 
-# device support
+# Device Support
 if [ ! "$device" = "all" ]; then
 	. /usr/local/nanohome/dev_compatibility $device
 fi
 
-# environment
+# Environment
 service_description="standbykiller"
 service_name="$service_description.$device.service"
 service_file="/etc/systemd/system/$service_name"
 service_template="/usr/local/nanohome/templates/$service_description.service.template"
 
-# functions
-
+# help functions
 get_status () {
-
+	
+	status="$1"
+	
 	# make parameters readable on dashboard
-	if [[ "$status" =~ "running" ]]; then
+	if [[ "$status" =~ "running" ]] || [[ "$status" =~ "wenn" ]]; then
 		color="#c0fcb1"
 		statmsg="aktiv"
 	else
@@ -38,91 +41,67 @@ print_killer () {
 
 	dev="$1"
 	condition="$2"
-	service_name="$3"
-
-	if [[ "$status" =~ "Aktiv" ]]; then
-	 	color="#c0fcb1"
-	 else
-	 	color="grey"
-	 fi
-
+	service_details="$3"
+	header="$4"
 	desc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
+
+	get_status "$condition"
 	
-	echo "<font size='4' color='hotpink'>$desc</font>"
+	if [ ! -z "$header" ]; then
+		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='$color'> $header</font><br>"
+	fi
+	
+	echo "<font size='4' color='hotpink'>$desc</font> - <font size='4' color='$color'>$condition</font>"
 
-	if [ ! -z "$service_name" ]; then
+	if [ ! -z "$service_details" ]; then
 
-		status="$(systemctl status $service_name | head -3 | tail -1 | awk '{ print $2 " " $3 " " $4 " " $6 " " $7 }')"
-		lastmsg="$(systemctl status $service_name | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
+		lastmsg="$(systemctl status $service_details | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
 
-		if [[ "$status" =~ "running" ]]; then
-			statuscolor="#c0fcb1"
-		else
-			statuscolor="grey"
-		fi
-		
-		echo ""
-		echo "<font size='3' color='$statuscolor'>$condition</font>"
 		echo ""
 		echo "<font size='3'>Last Messages:</font>"
 		echo "<font size='2'>$lastmsg</font>"
 		echo ""
 
-	else
-		status="inaktiv"
-		lstmsg=""
 	fi
 
 }
 
 # show devices
 if [ "$1" = "show" ] && [ ! -z "$device" ]; then
-
-	# show all devices
+	
 	if [ "$device" = "all" ]; then
+		active="$( ls /etc/systemd/system/ | grep standbykiller )"
+		service_name=""
+	else
+		active="$( ls /etc/systemd/system/ | grep $service_name )"
+	fi
 
-		active="$(ls /etc/systemd/system/ | grep standbykiller )"
-
-		if [ ! -z "$active" ]; then
-			
-			echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='#c0fcb'> aktiv</font><br>"
-			
-			while IFS= read -r line
-			do
-
-				dev="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $3 }' )"
-				maxpower="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $4 }' )"
-				devdesc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
-				msg="Aktiv wenn unter ${maxpower}W"
-
-				print_killer "$devdesc" "$msg"
-
-			done <<< "$active"
-
-		else
-
-			statusmsg "Standbykiller " "white" " Inaktiv" "grey" "Kein Standbykiller definiert" "grey"
-
-		fi
-
-	# show active state of specific device
-	elif test -f "$service_file"; then
-
-		maxpower="$( grep ExecStart /etc/systemd/system/$service_name | awk '{ printf $4 }' )"
-		msg="Aktiv wenn unter ${maxpower}W"
+	if [ ! -z "$active" ]; then
 		
 		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='#c0fcb'> aktiv</font><br>"
 		
-		print_killer "$dev_desc" "$msg" "$service_name"
+		while IFS= read -r line
+		do
 
-	# show insctive state of specific device
+			dev="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $3 }' )"
+			maxpower="$( grep ExecStart /etc/systemd/system/$line | awk '{ printf $4 }' )"
+			dev_desc="$(cat /usr/local/nanohome/devlist | grep $dev | cut -d: -f2 )"
+			msg="Aktiv wenn unter ${maxpower}W"
+
+			print_killer "$dev_desc" "$msg" "$service_name"
+
+		done <<< "$active"
+
 	else
 		
-		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='grey'> inaktiv</font><br>"
-		
-		print_killer "$dev_desc" "inaktiv"
+		if [ "$device" = "all" ]; then
+			statusmsg "Standbykiller" "white" " inaktiv" "grey" "Kein Standbykiller definiert" "grey"
+		else
+			print_killer "$dev_desc" "inaktiv" "" "inaktiv"
+		fi
 
 	fi
+
 
 # add device
 elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
@@ -132,9 +111,7 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 
 		msg="Aktiv wenn unter ${maxpower}W" 
 		
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
-		
-		print_killer "$dev_desc" "$msg" "$service_name"
+		print_killer "$dev_desc" "$msg" "$service_name" "aktiviert"
 
 	# create new service
 	else
@@ -149,9 +126,7 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 
 		msg="Aktiviert wenn unter ${maxpower}W"
 		
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
-		
-		print_killer "$dev_desc" "$msg" "$service_name"
+		print_killer "$dev_desc" "$msg" "" "aktiv"
 
 	fi
 
@@ -163,9 +138,7 @@ elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
 
 	rm -r $service_file
 	
-	echo "<font size='5' color='white'>Standbykiller</font><br>"
-	
-	print_killer "$dev_desc" "Deaktiviert"
+	print_killer "$dev_desc" "Deaktiviert" "" "inaktiv"
 
 else
 
