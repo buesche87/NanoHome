@@ -20,7 +20,7 @@ Erstelle Carpet-Plots und überwache das Raumklima
 
 ![carpetplot](https://i.ibb.co/fSVf6QV/nanohome-carpetplot.png)
 
-Guck Wetter
+Guck Wetter (nur mit Internet)
 
 ![carpetplot](https://i.ibb.co/f41Qnsq/nanohome-wetter.png)
 
