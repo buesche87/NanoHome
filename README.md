@@ -6,6 +6,16 @@ Hardware:
 * [NanoPi NEO Air](https://www.friendlyarm.com/index.php?route=product/product&product_id=151m)
 * [NanoHat OLED](https://www.friendlyarm.com/index.php?route=product/product&product_id=191)
 
+Install:
+* [Download](https://drive.google.com/file/d/15ZlfqEzKuynEtNOjQrP9ccKkO2nUi0pN/view?usp=sharing) Recovery-SD inkl. neustem NanoHome-Image
+* SD-Karte mit Image flashen, SD einschieben und starten
+* Per Knöpfe oder Webinterface (http://10.0.0.5) im Hotspot Modus ein Restore starten
+* SD-Karte vor dem Reboot entfernen
+
+Login:
+* Im Hotspot Modus https://10.0.0.5:3001 öffnen
+* admin / login
+
 ![home](https://i.ibb.co/gRwqN7W/nanohome-home.png)
 
 Schalte deine Shellies/Sonoff mittels MQTT, auch ohne Internet
