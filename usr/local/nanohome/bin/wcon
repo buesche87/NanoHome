@@ -172,7 +172,7 @@ elif [ "$1" = "delete" ]; then
 	
 	# Print Status Message on Dashboard
 	statusmsg "Alle konfigurierten WLAN gelöscht" "white" "" "" "IP-Adresse auf DHCP gesetzt" "white"
-	dhcp_ip
+	wmod -hotspot
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Err Exit
