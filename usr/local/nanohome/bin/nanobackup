@@ -1,7 +1,5 @@
 #!/bin/bash
-#/////////////////////////////////////////////////////////////////////////////////////
-# Nanobackup for NanoHome - NanoHome Backup tool
-#/////////////////////////////////////////////////////////////////////////////////////
+# nanobackup - NanoHome backup tool
 
 # Catch Parameters
 rectype="$1" #[backup|restore]
@@ -27,19 +25,18 @@ if [ ! $? -eq 0 ]; then
   
   if [ $? -eq 0 ]; then
 
-	echo "Normale SD-Karte gemountet"
+	statusmsg "Normale SD-Karte gemountet" "white"
 
   else
-
+	
 	statusmsg "Error" "red" "" "" "Keine SD-Karte gefunden" "white"
-
     exit 1
 
   fi
   
 else
 	
-	echo "Recovery-SD gemountet"
+	statusmsg "Recovery-SD gemountet" "white"
   
 fi
 
@@ -97,7 +94,7 @@ fi
 # show backups
 if [ "$rectype" == "show" ]; then
 
-	echo "<p><p><font size=5 color='hotpink'>Stored Backups</font><br>"
+	echo "<font size=5 color='hotpink'>Stored Backups</font><br>"
 	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $backupdir)"
 
 fi
