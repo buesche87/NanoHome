@@ -16,7 +16,7 @@ Login:
 * Im Hotspot Modus https://10.0.0.5:3001 öffnen
 * admin / login
 
-![home](https://i.ibb.co/gRwqN7W/nanohome-home.png)
+![home](https://i.ibb.co/PQYxZSc/nanohome-home.png)
 
 Schalte deine Shellies/Sonoff mittels MQTT, auch ohne Internet
 
