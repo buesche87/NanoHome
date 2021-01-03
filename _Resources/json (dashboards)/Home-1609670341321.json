@@ -153,7 +153,7 @@
         "content": "<style type=\"text/css\">\r\np.markdown-html.panel-text-content {\r\noverflow: hidden;\r\n}\r\np.markdown-html.panel-text-content iframe {\r\nheight:230px\r\n}\r\n</style>\r\n<script type=\"text/javascript\">\r\nvar weatherProperties = 'lat=47.040468&lon=8.314699&color=#FFFFFF&text-color=#FFFFFF&font=Verdana&font-size=20px&units=si';\r\n\r\n// initial load\r\ndocument.getElementById('embedweather').src = 'http://forecast.io/embed/?ts=' + (Date.now()) + '#' + weatherProperties;\r\n\r\n// refresh\r\nvar weatherRefresh = setInterval(function() { document.getElementById('embedweather').src = 'http://forecast.io/embed/?ts=' + (Date.now()) + '#' + weatherProperties; }, 1800000);\r\n\r\n</script>\r\n<iframe id=\"embedweather\" height=\"100%\" src=\"\" style=\"margin: 0; padding: 0; border: none; width:100%; position:relative; top:-50px; overflow:hidden; margin-bottom: -70px;\"></iframe>\r\n",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -180,7 +180,7 @@
         "content": "<head><link rel='stylesheet' type='text/css' href='../public/style.css'></head>\r\n\r\n<center>\r\n    <div><span id=\"status_output\">#</span></div>\r\n    <div>Last Message: <font color='hotpink'><span id=\"name_output\"></span> # <span id=\"request_output\"></span></font></div>\r\n    <!--- DEBUG <div>Topic: <span id=\"topic_output\">#</span></div> --->\r\n</center>\r\n\r\n<script>\r\n    \r\n    var mqtt;\r\n    var reconnectTimeout = 5000;\r\n    var port = 1884;\r\n    var useTLS = false;\r\n    var user = \"mqtt_grafana\";\r\n    var pwd = \"Grafana2MQTT\";\r\n    var cleansession = true;\r\n    var path = \"\";\r\n    var buttons = $('[type=button]');\r\n    var host = location.hostname;\r\n    \r\n    console.log(host);\r\n    \r\n    buttons.prop('disabled', true);\r\n   \r\n    function MQTTconnect() {\r\n        if (typeof path == \"undefined\") {\r\n            path = '/mqtt';\r\n        }\r\n        mqtt = new Paho.MQTT.Client(\r\n            host,\r\n            port,\r\n            path,\r\n            \"web_grafanaPanel\" + parseInt(Math.random() * 10000, 10)\r\n        );\r\n        var options = {\r\n            timeout: 3,\r\n            useSSL: useTLS,\r\n            cleanSession: cleansession,\r\n            onSuccess: onConnect,\r\n            onFailure: function (message) {\r\n                $('#status_output').html(\"Connection failed: \" + message.errorMessage + \"Retrying\");\r\n                setTimeout(MQTTconnect, reconnectTimeout);\r\n            }\r\n        };\r\n        mqtt.onConnectionLost = onConnectionLost;\r\n        mqtt.onMessageArrived = onMessageArrived;\r\n        if (user != null) {\r\n            options.userName = user;\r\n            options.password = pwd;\r\n        }\r\n        console.log(\"Host=\" + host + \", port=\" + port + \", path=\" + path + \" TLS = \" + useTLS + \" username=\" + user + \" password=\" + pwd);\r\n        mqtt.connect(options);\r\n    }\r\n    \r\n    function onConnect() {\r\n        $('#status_output').html('Connected to: ' + host + ':' + port + path);\r\n        // Connection succeeded; subscribe to our topic(s)\r\n        buttons.prop('disabled', false);\r\n    }\r\n\r\n    function onConnectionLost(response) {\r\n        setTimeout(MQTTconnect, reconnectTimeout);\r\n        $('#status_output').html(\"connection lost: \" + response.errorMessage + \". Reconnecting\");\r\n        buttons.prop('disabled', true);\r\n    };\r\n\r\n    function onMessageArrived(message) {\r\n        var payload = message.payloadString;\r\n        $('#request_output').html(payload);\r\n    };\r\n    \r\n    var publish = function (payload, input_topic, output_topic, device_name, qos) {\r\n        console.log('Sending: ' + JSON.stringify(payload));\r\n        \r\n        mqtt.subscribe(output_topic, {\r\n          qos: 2\r\n        });\r\n        \r\n        $('#status_output').html('Connected to ' + host + ':' + port + path);\r\n        $('#topic_output').html(input_topic);\r\n        $('#name_output').html(device_name);\r\n        \r\n        var message = new Paho.MQTT.Message(payload);\r\n        message.destinationName = input_topic;\r\n        message.qos = qos;\r\n        mqtt.send(message);\r\n        \r\n\t\t    setTimeout(() => { mqtt.unsubscribe(output_topic); }, 5000);\r\n\t\t\r\n    }\r\n\r\n    if (typeof Paho === 'undefined') {\r\n        var script = document.createElement('script');\r\n        document.body.appendChild(script);\r\n        script.onload = function () {\r\n            MQTTconnect();\r\n        }\r\n        script.src = '../public/mqttws31.min.js';\r\n    } else {\r\n       MQTTconnect();\r\n    }\r\n</script>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -207,7 +207,7 @@
         "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/tv.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -234,7 +234,7 @@
         "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/lampe.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -303,7 +303,7 @@
         "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "",
@@ -417,7 +417,7 @@
         "showThresholdLabels": true,
         "showThresholdMarkers": true
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Feuchte",
@@ -489,7 +489,7 @@
         "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/computer.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -516,7 +516,7 @@
         "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/shelly-dummy/relay/0/command','shellies/shelly-dummy/relay/0','Switch',2);\">\r\n    <table class=\"home\" style=\"width: 100%; height: 100%;\">\r\n        <tr class=\"home\">\r\n            <td class=\"home\" style=\"width: 70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n            <td class=\"home\" style=\"text-align: left;\"><font size=\"5\">Switch</font></td>\r\n        </tr>\r\n    </table>\r\n</button>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -543,7 +543,7 @@
         "content": "<table style=\"height:100%; width:100%\"> <tr style=\"height:30%\"> <td style=\"width:100%; text-align:center\"> <font size=\"5\" color=\"white\">Storen</font> </td> </tr> <tr style=\"height:70%\"> <td style=\"width:100px; text-align:center\"> <button class=\"slider\" style=\"width:32%\" onclick=\"publish('0','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2);\"><font size=\"4\">▲</font></button> <button class=\"slider\" style=\"width:32%\" onclick=\"publish('100','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2);\"><font size=\"4\">▼</font></button> <button class=\"slider\" style=\"width:32%\" onclick=\"Teststoren_shutter_pressed(); \"><font size=\"4\">≡</font></button> </td> </tr></table><script> var Teststoren_shutter_pressed = function() { publish('100','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2); setTimeout(() => { publish('99','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2); }, 20000); }</script>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -570,7 +570,7 @@
         "content": "<table style=\"height:100%; width:100%\"> <tr style=\"height:30%\"> <td style=\"width:100%; text-align:center\"> <font size=\"5\" color=\"white\">Storen</font> </td> </tr> <tr style=\"height:70%\"> <td style=\"width:100px; text-align:center\"> <button class=\"slider\" style=\"width:32%\" onclick=\"publish('0','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2);\"><font size=\"4\">▲</font></button> <button class=\"slider\" style=\"width:32%\" onclick=\"publish('100','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2);\"><font size=\"4\">▼</font></button> <button class=\"slider\" style=\"width:32%\" onclick=\"Teststoren_shutter_pressed(); \"><font size=\"4\">≡</font></button> </td> </tr></table><script> var Teststoren_shutter_pressed = function() { publish('100','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2); setTimeout(() => { publish('99','shellies/Teststoren/roller/0/command/pos','shellies/Teststoren/roller/0/pos','Teststoren',2); }, 20000); }</script>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -594,10 +594,10 @@
       "id": 1588962421,
       "links": [],
       "options": {
-        "content": "<center><font size=\"5\" color=\"white\">Rollladen</font></center>\r\n\r\n<table style=\"width:100%;height:50%\"> \r\n\t<tr style=\"height:30%\"> \r\n\t  \t<td style=\"width:20%; text-align:left; vertical-align:bottom\"><font size=\"4\" color=\"white\">▼</font></td>\r\n\t\t<td style=\"width:60%; text-align:center; vertical-align:bottom\"><font size=\"2\" color=\"white\">🔘</font></td>\r\n\t\t<td style=\"width:20%; text-align:right; vertical-align:bottom\"><font size=\"4\" color=\"white\">▲</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td colspan=\"3\" style=\"width:100%\">\r\n\t\t\t<input id=\"shellyswitch25-BCDDC277633D\" type=\"range\" class=\"slider\" min=\"50\" max=\"100\" onchange=\"update_value_shellyswitch25_BCDDC277633D()\" />\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar update_value_shellyswitch25_BCDDC277633D = function() { \r\n\r\n\tvar shellyswitch25_BCDDC277633D_value = document.getElementById(\"shellyswitch25-BCDDC277633D\").value; \r\n\tpublish(shellyswitch25_BCDDC277633D_value, 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'Rollladen', 2); \r\n\r\n}\r\n\r\n</script>",
+        "content": "<center><font size=\"5\" color=\"white\">Sonnenschutz</font></center>\r\n\r\n<table style=\"width:100%;height:50%\"> \r\n\t<tr style=\"height:30%\"> \r\n\t  \t<td style=\"width:20%; text-align:left; vertical-align:bottom\"><font size=\"4\" color=\"white\">▼</font></td>\r\n\t\t<td style=\"width:60%; text-align:center; vertical-align:bottom\"><font size=\"2\" color=\"white\">🔘</font></td>\r\n\t\t<td style=\"width:20%; text-align:right; vertical-align:bottom\"><font size=\"4\" color=\"white\">▲</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td colspan=\"3\" style=\"width:100%\">\r\n\t\t\t<input id=\"shellyswitch25-BCDDC277633D\" type=\"range\" class=\"slider\" min=\"50\" max=\"100\" onchange=\"update_value_shellyswitch25_BCDDC277633D()\" />\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar update_value_shellyswitch25_BCDDC277633D = function() { \r\n\r\n\tvar shellyswitch25_BCDDC277633D_value = document.getElementById(\"shellyswitch25-BCDDC277633D\").value; \r\n\tpublish(shellyswitch25_BCDDC277633D_value, 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'Sonnenschutz', 2); \r\n\r\n}\r\n\r\n</script>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -621,10 +621,10 @@
       "id": 1588962422,
       "links": [],
       "options": {
-        "content": "<center><font size=\"5\" color=\"white\">Rollladen</font></center>\r\n\r\n<table style=\"width:100%;height:50%\"> \r\n\t<tr style=\"height:30%\"> \r\n\t  \t<td style=\"width:20%; text-align:left; vertical-align:bottom\"><font size=\"4\" color=\"white\">▼</font></td>\r\n\t\t<td style=\"width:60%; text-align:center; vertical-align:bottom\"><font size=\"2\" color=\"white\">🔘</font></td>\r\n\t\t<td style=\"width:20%; text-align:right; vertical-align:bottom\"><font size=\"4\" color=\"white\">▲</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td colspan=\"3\" style=\"width:100%\">\r\n\t\t\t<input id=\"shellyswitch25-BCDDC277633D\" type=\"range\" class=\"slider\" min=\"50\" max=\"100\" onchange=\"update_value_shellyswitch25_BCDDC277633D()\" />\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar update_value_shellyswitch25_BCDDC277633D = function() { \r\n\r\n\tvar shellyswitch25_BCDDC277633D_value = document.getElementById(\"shellyswitch25-BCDDC277633D\").value; \r\n\tpublish(shellyswitch25_BCDDC277633D_value, 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'Rollladen', 2); \r\n\r\n}\r\n\r\n</script>",
+        "content": "<center><font size=\"5\" color=\"white\">Sonnenschutz</font></center>\r\n\r\n<table style=\"width:100%;height:50%\"> \r\n\t<tr style=\"height:30%\"> \r\n\t  \t<td style=\"width:20%; text-align:left; vertical-align:bottom\"><font size=\"4\" color=\"white\">▼</font></td>\r\n\t\t<td style=\"width:60%; text-align:center; vertical-align:bottom\"><font size=\"2\" color=\"white\">🔘</font></td>\r\n\t\t<td style=\"width:20%; text-align:right; vertical-align:bottom\"><font size=\"4\" color=\"white\">▲</font></td>\r\n\t</tr>\r\n\t<tr style=\"height:70%\">\r\n\t\t<td colspan=\"3\" style=\"width:100%\">\r\n\t\t\t<input id=\"shellyswitch25-BCDDC277633D\" type=\"range\" class=\"slider\" min=\"50\" max=\"100\" onchange=\"update_value_shellyswitch25_BCDDC277633D()\" />\r\n\t\t</td>\r\n\t</tr>\r\n</table>\r\n\r\n<script>\r\n\r\nvar update_value_shellyswitch25_BCDDC277633D = function() { \r\n\r\n\tvar shellyswitch25_BCDDC277633D_value = document.getElementById(\"shellyswitch25-BCDDC277633D\").value; \r\n\tpublish(shellyswitch25_BCDDC277633D_value, 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'shellies/shellyswitch25-BCDDC277633D/roller/0/command/pos', 'Sonnenschutz', 2); \r\n\r\n}\r\n\r\n</script>",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -672,5 +672,5 @@
   "timezone": "",
   "title": "Home",
   "uid": "XieEaLmRk",
-  "version": 635
+  "version": 639
 }

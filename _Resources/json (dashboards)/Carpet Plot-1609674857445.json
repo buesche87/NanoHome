@@ -26,15 +26,14 @@
         "colorSpace": "RGB",
         "customColors": [
           {
-            "$$hashKey": "object:122",
+            "$$hashKey": "object:152",
             "color": "#006837"
           },
           {
-            "$$hashKey": "object:123",
+            "$$hashKey": "object:153",
             "color": "#aa0526"
           }
         ],
-        "invert": false,
         "mode": "SPECTRUM",
         "nullColor": "transparent"
       },
@@ -51,7 +50,7 @@
       },
       "fragment": "HOUR",
       "gridPos": {
-        "h": 13,
+        "h": 18,
         "w": 12,
         "x": 0,
         "y": 0
@@ -66,6 +65,7 @@
       },
       "targets": [
         {
+          "alias": "Shelly",
           "groupBy": [
             {
               "params": [
@@ -133,15 +133,15 @@
     {
       "aggregate": "AVG",
       "color": {
-        "colorScheme": "interpolateGnBu",
+        "colorScheme": "interpolateBlues",
         "colorSpace": "RGB",
         "customColors": [
           {
-            "$$hashKey": "object:122",
+            "$$hashKey": "object:152",
             "color": "#8AB8FF"
           },
           {
-            "$$hashKey": "object:123",
+            "$$hashKey": "object:153",
             "color": "#1F60C4"
           }
         ],
@@ -161,7 +161,7 @@
       },
       "fragment": "HOUR",
       "gridPos": {
-        "h": 13,
+        "h": 18,
         "w": 12,
         "x": 12,
         "y": 0
@@ -176,6 +176,7 @@
       },
       "targets": [
         {
+          "alias": "Shelly",
           "groupBy": [
             {
               "params": [
@@ -190,7 +191,7 @@
               "type": "fill"
             }
           ],
-          "measurement": "humidity",
+          "measurement": "temperature",
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "A",
@@ -255,5 +256,5 @@
   "timezone": "",
   "title": "Carpet Plot",
   "uid": "ERlYRVRRk",
-  "version": 19
+  "version": 18
 }

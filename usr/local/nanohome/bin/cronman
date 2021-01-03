@@ -84,13 +84,13 @@ get_dev () {
 		# cronjob inactive for device
 		else
 			
-			statusmsg "Schaltuhr" "white" " Inaktiv" "grey" "$dev_desc" "hotpink" " - Keine Schaltuhr definiert" "grey"
+			statusmsg "Schaltuhr" "white" " inaktiv" "grey" "$dev_desc" "hotpink" " - Keine Schaltuhr definiert" "grey"
 		
 		fi
 	
 	# no cronjob active
 	else
-		statusmsg "Schaltuhr" "white" " Inaktiv" "grey" "Keine Schaltuhr aktiv" "grey"
+		statusmsg "Schaltuhr" "white" " inaktiv" "grey" "Keine Schaltuhr aktiv" "grey"
 	fi
 }
 

@@ -65,7 +65,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -165,7 +165,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -308,7 +308,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -412,7 +412,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -513,7 +513,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -656,7 +656,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -760,7 +760,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -861,7 +861,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1004,7 +1004,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -1108,7 +1108,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -1210,7 +1210,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 2,
       "points": false,
       "renderer": "flot",
@@ -1353,7 +1353,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Shelly",
@@ -1457,7 +1457,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Raumtemp",
@@ -1556,7 +1556,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 3,
       "points": false,
       "renderer": "flot",
@@ -1653,6 +1653,69 @@
       }
     },
     {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 2,
+        "w": 4,
+        "x": 20,
+        "y": 16
+      },
+      "id": 58,
+      "options": {
+        "content": "<head><link rel='stylesheet' type='text/css' href='../public/style.css'></head>",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
       "cacheTimeout": null,
       "datasource": null,
       "fieldConfig": {
@@ -1698,7 +1761,7 @@
         },
         "textMode": "value_and_name"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "targets": [
         {
           "alias": "Feuchte",
@@ -1793,7 +1856,7 @@
         "alertThreshold": true
       },
       "percentage": false,
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "pointradius": 3,
       "points": false,
       "renderer": "flot",
@@ -1928,5 +1991,5 @@
   "timezone": "browser",
   "title": "Messungen",
   "uid": "zfLSa0gRk",
-  "version": 4
+  "version": 5
 }

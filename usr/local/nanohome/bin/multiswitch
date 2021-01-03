@@ -124,7 +124,7 @@ if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
 
 		else
 
-			statusmsg "Multiswitch" "white" "inaktiv" "grey" "Kein Multiswitch aktiv" "grey"
+			statusmsg "Multiswitch" "white" " inaktiv" "grey" "Kein Multiswitch aktiv" "grey"
 
 		fi
 
