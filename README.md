@@ -7,10 +7,10 @@ Hardware:
 * [NanoHat OLED](https://www.friendlyarm.com/index.php?route=product/product&product_id=191)
 
 Install:
-* Download Recovery-SD inkl. neustem NanoHome-Image (link tbd)
+* [Download](https://drive.google.com/file/d/15ZlfqEzKuynEtNOjQrP9ccKkO2nUi0pN/view?usp=sharing) Recovery-SD inkl. neustem NanoHome-Image
 * SD-Karte mit Image flashen, SD einschieben und starten
-* Per Knöpfe oder Web im Hotspot Modus http://10.0.0.5 ein Restore starten
-* SD-Karte vor einem Reboot entfernen
+* Per Knöpfe oder Webinterface (http://10.0.0.5) im Hotspot Modus ein Restore starten
+* SD-Karte vor dem Reboot entfernen
 
 Login:
 * Im Hotspot Modus https://10.0.0.5:3001 öffnen
