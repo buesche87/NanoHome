@@ -6,6 +6,10 @@ Hardware:
 * [NanoPi NEO Air](https://www.friendlyarm.com/index.php?route=product/product&product_id=151m)
 * [NanoHat OLED](https://www.friendlyarm.com/index.php?route=product/product&product_id=191)
 
+Login:
+* Im Hotspot Modus https://10.0.0.5:3001 öffnen
+* admin / login
+
 ![home](https://i.ibb.co/gRwqN7W/nanohome-home.png)
 
 Schalte deine Shellies/Sonoff mittels MQTT, auch ohne Internet
