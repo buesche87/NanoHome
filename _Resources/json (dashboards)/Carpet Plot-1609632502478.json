@@ -26,14 +26,15 @@
         "colorSpace": "RGB",
         "customColors": [
           {
-            "$$hashKey": "object:152",
+            "$$hashKey": "object:122",
             "color": "#006837"
           },
           {
-            "$$hashKey": "object:153",
+            "$$hashKey": "object:123",
             "color": "#aa0526"
           }
         ],
+        "invert": false,
         "mode": "SPECTRUM",
         "nullColor": "transparent"
       },
@@ -50,8 +51,8 @@
       },
       "fragment": "HOUR",
       "gridPos": {
-        "h": 18,
-        "w": 16,
+        "h": 13,
+        "w": 12,
         "x": 0,
         "y": 0
       },
@@ -65,7 +66,6 @@
       },
       "targets": [
         {
-          "alias": "Shelly",
           "groupBy": [
             {
               "params": [
@@ -118,7 +118,117 @@
       "type": "petrslavotinek-carpetplot-panel",
       "xAxis": {
         "hideLabels": false,
-        "labelFormat": "%a %m-%d",
+        "labelFormat": "%d",
+        "minBucketWidthToShowWeekends": 4,
+        "show": true,
+        "showCrosshair": true,
+        "showWeekends": true
+      },
+      "yAxis": {
+        "hideLabels": false,
+        "show": true,
+        "showCrosshair": false
+      }
+    },
+    {
+      "aggregate": "AVG",
+      "color": {
+        "colorScheme": "interpolateGnBu",
+        "colorSpace": "RGB",
+        "customColors": [
+          {
+            "$$hashKey": "object:122",
+            "color": "#8AB8FF"
+          },
+          {
+            "$$hashKey": "object:123",
+            "color": "#1F60C4"
+          }
+        ],
+        "mode": "CUSTOM",
+        "nullColor": "transparent"
+      },
+      "data": {
+        "decimals": 1,
+        "unitFormat": "humidity"
+      },
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "fragment": "HOUR",
+      "gridPos": {
+        "h": 13,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "legend": {
+        "show": true
+      },
+      "scale": {
+        "max": null,
+        "min": null
+      },
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "humidity",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "location",
+              "operator": "=",
+              "value": "shellyht-B895A5"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "tooltip": {
+        "show": true
+      },
+      "transparent": true,
+      "type": "petrslavotinek-carpetplot-panel",
+      "xAxis": {
+        "hideLabels": false,
+        "labelFormat": "%d",
         "minBucketWidthToShowWeekends": 4,
         "show": true,
         "showCrosshair": true,
@@ -145,5 +255,5 @@
   "timezone": "",
   "title": "Carpet Plot",
   "uid": "ERlYRVRRk",
-  "version": 17
+  "version": 19
 }

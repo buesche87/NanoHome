@@ -39,7 +39,7 @@
         "content": "<style type=\"text/css\">\r\np.markdown-html.panel-text-content {\r\noverflow: hidden;\r\n}\r\np.markdown-html.panel-text-content iframe {\r\nheight:350px\r\n}\r\n</style>\r\n<iframe height=\"100%\" width=\"100%\" scrolling=\"no\" src=\"../public/forecast.html\" style=\"margin: 0; padding: 0; border: none; top:-100px; position:relative; overflow:hidden;\"></iframe>\r\n",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -55,7 +55,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 11,
+        "h": 10,
         "w": 12,
         "x": 12,
         "y": 0
@@ -66,7 +66,7 @@
         "content": "<style type=\"text/css\">\r\np.markdown-html.panel-text-content {\r\noverflow: hidden;\r\n}\r\np.markdown-html.panel-text-content iframe {\r\nheight:420px\r\n}\r\n</style>\r\n<iframe height=\"100%\" width=\"100%\" scrolling=\"no\" src=\"../public/weather.html\" style=\"margin: 0; padding: 0; border: none; width:100%; top:-70px; position:relative; overflow:hidden;\"></iframe>\r\n",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "",
@@ -82,10 +82,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 12,
-        "y": 11
+        "y": 10
       },
       "id": 2,
       "links": [],
@@ -93,7 +93,7 @@
         "content": "<style type=\"text/css\">\r\np.markdown-html.panel-text-content {\r\noverflow: hidden;\r\n}\r\np.markdown-html.panel-text-content iframe {\r\nheight:350px\r\n}\r\n</style>\r\n<iframe height=\"100%\" width=\"100%\" scrolling=\"no\" src=\"../public/temperature.html\" style=\"margin: 0; padding: 0; border: none; top:-70px; position:relative; overflow:hidden;\"></iframe>\r\n",
         "mode": "html"
       },
-      "pluginVersion": "7.3.3",
+      "pluginVersion": "7.3.6",
       "timeFrom": null,
       "timeShift": null,
       "title": "Temperatur",
