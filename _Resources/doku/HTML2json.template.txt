@@ -1,0 +1,10 @@
+1. Normal space suchen ersetzen "[> <] -> \"
+2. Tablespace suchen ersetzen "[>	<] -> \t"
+
+3. _DESCRIPTION_ suchen & ersetzen
+4. _DEVID_ suchen & ersetzen
+
+5. \r\n ans Ende jeder Zeile
+
+5. Whitespaces & Umbrüche entfernen
+6. In template einfügen

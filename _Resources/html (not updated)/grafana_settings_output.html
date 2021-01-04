@@ -1,0 +1,108 @@
+<head><link rel="stylesheet" type="text/css" href="../public/style.css" /></head>
+
+<h4>Output</h4>
+<hr />
+
+<div style="position: fixed;">
+    <br />
+    <div><span id="settings_output" style="text-align: left; white-space: pre; font-family: monospace; display: inline-block; unicode-bidi: embed;"></span></div>
+</div>
+
+<script>
+    
+    var mqtt;
+    var reconnectTimeout = 5000;
+    var port = 1884;
+    var useTLS = false;
+    var user = "mqtt_grafana";
+    var pwd = "Grafana2MQTT";
+    var cleansession = true;
+    var path = "";
+    var buttons = $('[type=button]');
+    var host = location.hostname;
+    
+    console.log(host);
+    
+    buttons.prop('disabled', true);
+   
+    function MQTTconnect() {
+        if (typeof path == "undefined") {
+            path = '/mqtt';
+        }
+        mqtt = new Paho.MQTT.Client(
+            host,
+            port,
+            path,
+            "web_grafanaPanel" + parseInt(Math.random() * 10000, 10)
+        );
+        var options = {
+            timeout: 3,
+            useSSL: useTLS,
+            cleanSession: cleansession,
+            onSuccess: onConnect,
+            onFailure: function (message) {
+                $('#status_output').html("Connection failed: " + message.errorMessage + "Retrying");
+                setTimeout(MQTTconnect, reconnectTimeout);
+            }
+        };
+		
+        mqtt.onConnectionLost = onConnectionLost;
+       mqtt.onMessageArrived = settings_inbound;
+	   
+		
+        if (user != null) {
+            options.userName = user;
+            options.password = pwd;
+        }
+        console.log("Host=" + host + ", port=" + port + ", path=" + path + " TLS = " + useTLS + " username=" + user + " password=" + pwd);
+        mqtt.connect(options);
+    }
+    
+    function onConnect() {
+        $('#status_output').html('Connected to: ' + host + ':' + port + path);
+        // Connection succeeded; subscribe to our topic(s)
+        buttons.prop('disabled', false);
+    }
+
+    function onConnectionLost(response) {
+        setTimeout(MQTTconnect, reconnectTimeout);
+        $('#status_output').html("connection lost: " + response.errorMessage + ". Reconnecting");
+        buttons.prop('disabled', true);
+    };
+ 
+     var publish_settings = function (settings_payload) {
+        mqtt.subscribe("output", {
+            qos: 2,
+        });
+
+        console.log("Sending: " + JSON.stringify(settings_payload));
+
+        var settings_message = new Paho.MQTT.Message(settings_payload);
+        settings_message.destinationName = "input";
+        settings_message.qos = 2;
+
+        mqtt.send(settings_message);
+
+        // Unsubscribe here if something goes havoc (30s)
+		
+    };
+
+    
+
+    function settings_inbound(message) {
+        var input_payload = message.payloadString;
+        $("#settings_output").html(input_payload);
+    }
+ 
+
+    if (typeof Paho === 'undefined') {
+        var script = document.createElement('script');
+        document.body.appendChild(script);
+        script.onload = function () {
+            MQTTconnect();
+        }
+        script.src = '../public/mqttws31.min.js';
+    } else {
+       MQTTconnect();
+    }
+</script>

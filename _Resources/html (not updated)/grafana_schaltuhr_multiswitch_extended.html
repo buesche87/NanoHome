@@ -1,0 +1,103 @@
+<h3>Multiswitch</h3>
+<hr />
+
+<center>
+
+<select class="nanohome" id="multi_dev1" onchange="multiswitch('show')" name="nanolist_multiswitch">
+	<option selected disabled>Wenn...</option>
+</select>
+
+</p>
+
+<select class="form" id="multi_value1" onchange="multiswitch('show')">
+    <option value="on">Ein</option>
+    <option value="off">Aus</option>
+    <option disabled>-------</option>
+    <option value="on">Auf</option>
+    <option value="off">Zu</option>
+</select>
+
+</p>
+
+<select class="nanohome" id="multi_dev2" onchange="multiswitch('show')" name="nanolist">
+	<option selected disabled>Dann...</option>
+</select>
+
+</p>
+
+<select class="form" id="multi_value2" onchange="multiswitch('show')">
+    <option value="on">Ein</option>
+    <option value="off">Aus</option>
+    <option disabled>-------</option>
+    <option value="on">Auf</option>
+    <option value="off">Zu</option>
+</select>
+
+</p>
+
+<select class="form" id="multi_day" onchange="show_time()">
+    <option selected disabled>Aktiv...</option>
+    <option value="always">Immer</option>
+    <option value="*">Täglich</option>
+    <option value="1">Montag</option>
+    <option value="2">Dienstag</option>
+    <option value="3">Mittwoch</option>
+    <option value="4">Donnerstag</option>
+    <option value="5">Freitag</option>
+    <option value="6">Samstag</option>
+    <option value="0">Sonntag</option>
+    <option value="6-7">Wochenende</option>
+    <option value="1-5">Werktags</option>
+</select>
+
+</p>
+
+<input class="form" id="multi_on" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+<font size="4">-</font>
+<input class="form" id="multi_off" pattern=".{5,5}" value="-" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="Aktivieren" class="form" style="background-color: #adfc95" onclick="multiswitch('add')">💾</button>
+<button title="Alle Anzeigen" class="form" style="background-color: #fff4bd" onclick="multiswitch('show all')">🔎</button>
+<button title="Deaktivieren" class="form" style="background-color: #ffbdbd" onclick="multiswitch('remove')">❌</button>
+
+</p>
+
+</center>
+
+<script>
+
+    function multiswitch(param) {
+        var multi_dev1 = document.getElementById("multi_dev1").value;
+        var multi_dev2 = document.getElementById("multi_dev2").value;
+        var multi_value1 = document.getElementById("multi_value1").value;
+        var multi_value2 = document.getElementById("multi_value2").value;
+        var multi_day = document.getElementById("multi_day").value;
+        var multi_on = document.getElementById("multi_on").value;
+        var multi_off = document.getElementById("multi_off").value;
+
+        var multiswitch_message = "multiswitch " + param + " '" + multi_dev1 + "' '" + multi_dev2 + "' '" + multi_value1 + "' '" + multi_value2 + "' '" + multi_day + "' '" + multi_on + "' '" + multi_off + "'";
+
+        publish_timer(multiswitch_message);
+
+    }
+
+    function show_time() {
+      
+        var multi_day = document.getElementById("multi_day");
+
+        if (multi_day.value !== "always") {
+          
+            document.getElementById("multi_on").value = "08:00";
+            document.getElementById("multi_off").value = "22:00";
+            
+        } else {
+          
+            document.getElementById("multi_on").value = "-";
+            document.getElementById("multi_off").value = "-";
+            
+        }
+    }
+
+</script>

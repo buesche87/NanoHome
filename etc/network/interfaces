@@ -1,0 +1,12 @@
+#/etc/network/interfaces
+#Please use DietPi-Config to modify network settings.
+
+# Local
+auto lo
+iface lo inet loopback
+
+# Wifi
+allow-hotplug wlan0
+iface wlan0 inet dhcp
+wireless-power off
+wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf

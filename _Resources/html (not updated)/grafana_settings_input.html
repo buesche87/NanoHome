@@ -1,0 +1,19 @@
+<h4>System Input</h4>
+<hr />
+
+<input title="Linux Befehle ausführen" placeholder="enter non-interactive bash commands" class="nanohome" type="text" id="input" value="Input" onfocus="if (this.value === 'Input') { this.value=''; } " autocomplete="off"/>
+
+<script>
+$("input").on("keydown",function search(e) {
+    if(e.keyCode == 13) {
+      
+        var inp = document.getElementById("input").value;
+        
+        if (inp != "") {
+            publish_settings(inp);
+          } else {
+            publish_settings("nanohelp");
+          }
+    }
+});
+</script>

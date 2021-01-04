@@ -1,0 +1,22 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Show Last 4 DHCP Leases on OLED Screen
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Settings
+Server="localhost"
+DB="NanoPi"
+Topic="ip"
+Sensor="NanoDevices"
+
+# Create Leases File
+cat /var/lib/misc/dnsmasq.leases | awk '{print $3" "$4}' > /tmp/dhcp.list
+cat /var/lib/misc/dnsmasq.leases | awk '{print $3}' > /tmp/ip.list
+
+# Output for OLED
+input="/tmp/ip.list"
+while IFS= read -r line
+do
+  output="\""$line""\"
+  curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$output
+done < "$input"

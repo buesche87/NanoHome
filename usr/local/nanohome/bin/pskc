@@ -1,0 +1,18 @@
+#!/bin/bash
+## A simple `wifi` command for Debian that will add a new WPA2 WiFi network
+## usage:
+## sudo ./pskc <psk>
+
+new_psk="$1"
+
+if [ ! -z "$1" ] && [ ! "$new_psk" = "NanoGate Wifi Key" ]; then
+
+	statusmsg "Aktualisiere NanoGate Wifi Key" "hotpink" "" "" "Zum Verbinden Wifi Modus umstellen" "white"
+
+	sed -i "s/psk=.*/psk="\""$new_psk""\"/"  /etc/wpa_supplicant/wpa_supplicant.conf.nanogate
+
+else
+
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
+
+fi

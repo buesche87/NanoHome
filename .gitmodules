@@ -1,0 +1,3 @@
+[submodule "usr/local/nanohome/NanoHatOLED"]
+	path = usr/local/nanohome/NanoHatOLED
+	url = https://github.com/buesche87/NanoHatOLED.git

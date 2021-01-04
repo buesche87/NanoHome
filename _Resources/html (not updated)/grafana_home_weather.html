@@ -1,0 +1,19 @@
+<style type="text/css">
+p.markdown-html.panel-text-content {
+overflow: hidden;
+}
+p.markdown-html.panel-text-content iframe {
+height:230px;
+}
+</style>
+<script type="text/javascript">
+var weatherProperties = 'lat=47.040468&lon=8.314699&color=#FFFFFF&text-color=#FFFFFF';
+
+// initial load
+document.getElementById('embedweather').src = 'http://forecast.io/embed/?ts=' + (Date.now()) + '#' + weatherProperties + '&units=si';
+
+// refresh
+var weatherRefresh = setInterval(function() { document.getElementById('embedweather').src = 'http://forecast.io/embed/?ts=' + (Date.now()) + '#' + weatherProperties + '&units=si'; }, 1800000);
+
+</script>
+<iframe id="embedweather" height="100%" src="#" style="margin: 0; padding: 0; border: none; width:100%; position:relative; top:-50px; overflow:hidden; margin-bottom: -70px;"></iframe>

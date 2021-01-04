@@ -1,0 +1,307 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "$$hashKey": "object:156",
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 14,
+      "links": [],
+      "options": {
+        "content": "<h4>MQTT Device Manager</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<select class=\"nanohome\" id=\"device\">\r\n    <option value=\"shelly\">Shelly</option>\r\n    <option value=\"sonoff\">Sonoff</option>\r\n</select>\r\n\r\n</p>\r\n\r\n<select class=\"nanohome\" id=\"devicetype\">\r\n    <option value=\"switch\">Switch</option>\r\n    <option value=\"sensor\">Sensor</option>\r\n    <option value=\"roller\">Roller</option>\r\n    <option value=\"shutter\">Shutter</option>\r\n</select>\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" id=\"devid\" value=\"Device ID\" placeholder=\"MQTT Device ID\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" id=\"desc\" value=\"Bezeichnung\" placeholder=\"Bezeichnung auf NnaoHome\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<button title=\"Geräteliste anzeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"showdev()\">🔎</button>\r\n<button title=\"Gerät hinzufügen\" class=\"form\" style=\"background-color: #adfc95;\" onclick=\"adddev()\">💾</button>\r\n\r\n</p>\r\n\r\n<select class=\"nanohome\" id=\"del_dev\" name=\"nanolist\">\r\n    <option selected disabled>...Geräteliste...</option>\r\n</select>\r\n\r\n</p>\r\n\r\n<button title=\"Gerät entfernen\" class=\"form\" style=\"background-color: #ffbdbd;\" onclick=\"remdev()\">❌</button>  \r\n\r\n</center>\r\n\r\n<script>\r\n    var showdev = function () {\r\n        var showdev_str = \"devmgmt show\";\r\n        publish_settings(showdev_str);\r\n    };\r\n\r\n    var adddev = function () {\r\n        var input_payload = \"<font size='5'>Gerät wird hinzugefügt</font><br><br><font size='4'>Bitte warten...</font>\";\r\n        $(\"#settings_output\").html(input_payload);\r\n\r\n        var device = document.getElementById(\"device\").value;\r\n        var devicetype = document.getElementById(\"devicetype\").value;\r\n        var sn = document.getElementById(\"devid\").value;\r\n        var desc = document.getElementById(\"desc\").value;\r\n        var adddev_str = \"devmgmt add '\" + sn + \"' '\" + desc + \"' '\" + device + \"' '\" + devicetype + \"'\";\r\n\r\n        publish_settings(adddev_str);\r\n    };\r\n\r\n    var remdev = function () {\r\n        var input_payload = \"<font size='5'>Gerät wird gelöscht</font><br><br><font size='4'>Bitte warten...</font>\";\r\n        $(\"#settings_output\").html(input_payload);\r\n\r\n        var sn = document.getElementById(\"del_dev\").value;\r\n        var text = document.getElementById(\"del_dev\");\r\n        var desc = text.options[text.selectedIndex].text;\r\n        var remdev_str = \"devmgmt remove '\" + sn + \"' '\" + desc + \"'\";\r\n\r\n        publish_settings(remdev_str);\r\n    };\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 18,
+        "w": 18,
+        "x": 6,
+        "y": 0
+      },
+      "id": 13,
+      "options": {
+        "content": "<head><link rel=\"stylesheet\" type=\"text/css\" href=\"../public/style.css\" /></head>\r\n\r\n<h4>Output</h4>\r\n<hr />\r\n\r\n<div style=\"position: fixed;\">\r\n    <br />\r\n    <div><span id=\"settings_output\" style=\"text-align: left; white-space: pre; font-family: monospace; display: inline-block; unicode-bidi: embed;\"></span></div>\r\n</div>\r\n\r\n<script>\r\n    \r\n    var mqtt;\r\n    var reconnectTimeout = 5000;\r\n    var port = 1884;\r\n    var useTLS = false;\r\n    var user = \"mqtt_grafana\";\r\n    var pwd = \"Grafana2MQTT\";\r\n    var cleansession = true;\r\n    var path = \"\";\r\n    var buttons = $('[type=button]');\r\n    var host = location.hostname;\r\n    \r\n    console.log(host);\r\n    \r\n    buttons.prop('disabled', true);\r\n   \r\n    function MQTTconnect() {\r\n        if (typeof path == \"undefined\") {\r\n            path = '/mqtt';\r\n        }\r\n        mqtt = new Paho.MQTT.Client(\r\n            host,\r\n            port,\r\n            path,\r\n            \"web_grafanaPanel\" + parseInt(Math.random() * 10000, 10)\r\n        );\r\n        var options = {\r\n            timeout: 3,\r\n            useSSL: useTLS,\r\n            cleanSession: cleansession,\r\n            onSuccess: onConnect,\r\n            onFailure: function (message) {\r\n                $('#status_output').html(\"Connection failed: \" + message.errorMessage + \"Retrying\");\r\n                setTimeout(MQTTconnect, reconnectTimeout);\r\n            }\r\n        };\r\n\t\t\r\n        mqtt.onConnectionLost = onConnectionLost;\r\n       mqtt.onMessageArrived = settings_inbound;\r\n\t   \r\n\t\t\r\n        if (user != null) {\r\n            options.userName = user;\r\n            options.password = pwd;\r\n        }\r\n        console.log(\"Host=\" + host + \", port=\" + port + \", path=\" + path + \" TLS = \" + useTLS + \" username=\" + user + \" password=\" + pwd);\r\n        mqtt.connect(options);\r\n    }\r\n    \r\n    function onConnect() {\r\n        $('#status_output').html('Connected to: ' + host + ':' + port + path);\r\n        // Connection succeeded; subscribe to our topic(s)\r\n        buttons.prop('disabled', false);\r\n    }\r\n\r\n    function onConnectionLost(response) {\r\n        setTimeout(MQTTconnect, reconnectTimeout);\r\n        $('#status_output').html(\"connection lost: \" + response.errorMessage + \". Reconnecting\");\r\n        buttons.prop('disabled', true);\r\n    };\r\n \r\n     var publish_settings = function (settings_payload) {\r\n        mqtt.subscribe(\"output\", {\r\n            qos: 2,\r\n        });\r\n\r\n        console.log(\"Sending: \" + JSON.stringify(settings_payload));\r\n\r\n        var settings_message = new Paho.MQTT.Message(settings_payload);\r\n        settings_message.destinationName = \"input\";\r\n        settings_message.qos = 2;\r\n\r\n        mqtt.send(settings_message);\r\n\r\n        // Unsubscribe here if something goes havoc (30s)\r\n\t\t\r\n    };\r\n\r\n    \r\n\r\n    function settings_inbound(message) {\r\n        var input_payload = message.payloadString;\r\n        $(\"#settings_output\").html(input_payload);\r\n    }\r\n \r\n\r\n    if (typeof Paho === 'undefined') {\r\n        var script = document.createElement('script');\r\n        document.body.appendChild(script);\r\n        script.onload = function () {\r\n            MQTTconnect();\r\n        }\r\n        script.src = '../public/mqttws31.min.js';\r\n    } else {\r\n       MQTTconnect();\r\n    }\r\n</script>",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 12
+      },
+      "id": 20,
+      "links": [],
+      "options": {
+        "content": "<h4>MQTT User Manager</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<input class=\"nanohome\" id=\"mqtt_user\" requiredminlength=\"4\" value=\"Benutzername\" placeholder=\"Benutzername\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" type=\"password\" id=\"mqtt_pwd\" requiredminlength=\"8\" value=\"Passwort\" placeholder=\"Passwort\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" />\r\n\r\n</p>\r\n\r\n<button title=\"Alle anzeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"usermgmt('show');\">🔎</button>\r\n<button title=\"Hinzufügen\" class=\"form\" style=\"background-color: #adfc95;\" onclick=\"usermgmt('add');\">💾</button>\r\n<button title=\"Löschen\" class=\"form\" style=\"background-color: #ffbdbd;\" onclick=\"usermgmt('remove');\">❌</button>\r\n<button title=\"Passwort zeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"show_mqtt_pw()\">🔑</button>\r\n\r\n</center>\r\n\r\n<script>\r\n\r\n\tfunction usermgmt(param) {\r\n\t\t\r\n        var mqtt_user = document.getElementById(\"mqtt_user\").value;\r\n        var mqtt_pwd = document.getElementById(\"mqtt_pwd\").value;\t\t\r\n\t\t\r\n\t\tvar usermgmt_message = \"usermgmt '\" + param + \"' '\" + mqtt_user + \"' '\" + mqtt_pwd + \"'\";\r\n\t\t\r\n\t\tpublish_settings(usermgmt_message);\r\n\t}\r\n\r\n    function show_mqtt_pw() {\r\n        var x = document.getElementById(\"mqtt_pwd\");\r\n        if (x.type === \"password\") {\r\n            x.type = \"text\";\r\n        } else {\r\n            x.type = \"password\";\r\n        }\r\n    }\r\n\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 6,
+        "x": 0,
+        "y": 18
+      },
+      "id": 4,
+      "links": [],
+      "options": {
+        "content": "<h4>WLAN & IP Manager</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<input class=\"nanohome\" id=\"ssid\" requiredminlength=\"4\" value=\"WLAN SSID\" placeholder=\"WLAN SSID\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" type=\"password\" id=\"psk\" requiredminlength=\"8\" value=\"WPA Key\" placeholder=\"WPA Key\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<font size=\"3\" style=\"text-align: center;\">Optional fixe IP-Adresse</font>\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" id=\"ip\" requiredminlength=\"8\" value=\"IP Adresse\" placeholder=\"IP Adresse\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" id=\"gateway\" requiredminlength=\"8\" value=\"Gateway\" placeholder=\"Gateway\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<input class=\"nanohome\" id=\"dnsserver\" requiredminlength=\"8\" value=\"DNS Server\" placeholder=\"DNS Server\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<button title=\"Zeige Einstellungen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"wifimgmt('show');\">🔎</button>\r\n<button title=\"WLAN speichern & IP setzen\" class=\"form\" style=\"background-color: #adfc95;\" onclick=\"wifimgmt('add');\">💾</button>\r\n<button title=\"Alle bekannten WLAN löschen\" class=\"form\" style=\"background-color: #ffbdbd;\" onclick=\"wifimgmt('delete');\">❌</button>\r\n<button title=\"Passwort zeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"show_key()\">🔑</button>\r\n\r\n</p>\r\n\r\n</center>\r\n\r\n<script>\r\n    function wifimgmt(param) {\r\n\t\r\n        var ssid_input = document.getElementById(\"ssid\").value;\r\n        var psk_input = document.getElementById(\"psk\").value;\r\n        var ip_input = document.getElementById(\"ip\").value;\r\n        var gateway_input = document.getElementById(\"gateway\").value;\r\n        var dns_input = document.getElementById(\"dnsserver\").value;\r\n\t\t\r\n        var wcon = \"wcon '\" + param + \"' '\" + ssid_input + \"' '\" + psk_input + \"' '\" + ip_input + \"' '\" + gateway_input + \"' '\" + dns_input + \"'\";\r\n\r\n        publish_settings(wcon);\r\n    };\r\n\r\n    function show_key() {\r\n        var x = document.getElementById(\"psk\");\r\n        if (x.type === \"password\") {\r\n            x.type = \"text\";\r\n        } else {\r\n            x.type = \"password\";\r\n        }\r\n    }\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 29
+      },
+      "id": 8,
+      "links": [],
+      "options": {
+        "content": "<h4>NanoGate Wifi Key</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<input class=\"nanohome\" type=\"text\" id=\"psk_input\" requiredminlength=\"8\" value=\"NanoGate Wifi Key\" placeholder=\"NanoGate Wifi Key\" onfocus=\"this.value=''\" onfocusout=\"if (this.value === '') { this.value = this.defaultValue; }\" autocomplete=\"off\" />\r\n\r\n</p>\r\n\r\n<button title=\"WLAN Key setzen\" class=\"form\" style=\"background-color: #ffbdbd;\" onclick=\"send_psk()\">💾</button>\r\n<button title=\"Passwort zeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"show_psk()\">🔑</button>\r\n\r\n</center>\r\n\r\n<script>\r\n\r\n    var send_psk = function () {\r\n\r\n            var psk = document.getElementById(\"psk_input\").value;\r\n            var psk_change = \"pskc \" + \"'\" + psk + \"'\";\r\n\r\n            publish_settings(psk_change);\r\n    };\r\n\r\n</script>",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 34
+      },
+      "id": 18,
+      "links": [],
+      "options": {
+        "content": "<h4>Backup & Restore</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<table style=\"margin-left: auto; margin-right: auto;\">\r\n    <tr>\r\n        <td>\r\n            <label class=\"container\">\r\n                <font size=\"3\">Dashboards</font>\r\n                <input type=\"checkbox\" id=\"grafana\" checked=\"checked\" />\r\n                <span class=\"checkmark\"></span>\r\n            </label>\r\n        </td>\r\n    </tr>\r\n    <tr>\r\n        <td>\r\n            <label class=\"container\">\r\n                <font size=\"3\">Messwerte</font>\r\n                <input type=\"checkbox\" id=\"influxdb\" checked=\"checked\" />\r\n                <span class=\"checkmark\"></span>\r\n            </label>\r\n        </td>\r\n    </tr>\r\n    <tr>\r\n        <td>\r\n            <label class=\"container\">\r\n                <font size=\"3\">Wifi</font>\r\n                <input type=\"checkbox\" id=\"wifi\" checked=\"checked\" />\r\n                <span class=\"checkmark\"></span>\r\n            </label>\r\n        </td>\r\n    </tr>\r\n</table>\r\n\r\n</p>\r\n\r\n<button title=\"Backups zeigen\" class=\"form\" style=\"background-color: #fff4bd;\" onclick=\"backuprestore('show')\">🔎</button>\r\n<button title=\"Backup erstellen\" class=\"form\" style=\"background-color: #adfc95;\" onclick=\"backuprestore('backup')\">Backup</button>\r\n<button title=\"Backup zurückspielen\" class=\"form\" style=\"background-color: #ffbdbd;\" onclick=\"backuprestore('resotre')\">Restore</button>\r\n\r\n<center>\r\n\r\n<script>\r\n\r\n\tfunction backuprestore(param) {\r\n\r\n        var input_payload = \"<font size='5' color='hotpink'>Wird ausgeführt</font><br><br><font size='4'>Bitte warten...</font>\";\r\n        $(\"#settings_output\").html(input_payload);\r\n\t\r\n        var grafana = document.getElementById(\"grafana\").checked;\r\n        var influxdb = document.getElementById(\"influxdb\").checked;\r\n        var wifi = document.getElementById(\"wifi\").checked;\r\n\r\n\t\tvar cmnd = \"nanobackup \" + param + \" \" + grafana + \" \" + influxdb + \" \" + wifi ;\r\n\t\t\r\n\t\tpublish_settings(cmnd);\r\n\t\r\n\t}\r\n\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 42
+      },
+      "id": 19,
+      "links": [],
+      "options": {
+        "content": "<h4>System Tasks</h4>\r\n<hr />\r\n\r\n<center>\r\n\r\n<button title=\"Nach Systemupdates suchen\" class=\"form\" style=\"width: 100px; background-color: #fff4bd;\" onclick=\"systemtools('checkupdate')\">🔎</button>\r\n<button title=\"Systemupdates installieren\" class=\"form\" style=\"width: 100px; background-color: #adfc95;\" onclick=\"systemtools('update')\">Update</button>\r\n<button title=\"Aktuelle Zeit setzen\" class=\"form\" style=\"width: 100px; background-color: #ffbdbd;\" onclick=\"systemtools('time')\">Time</button>\r\n\r\n</p>\r\n\r\n<button class=\"form\" style=\"width: 100px; background-color: #ffbdbd;\" onclick=\"systemtools('reboot')\">Reboot</button>\r\n<button class=\"form\" style=\"width: 100px; background-color: #ffbdbd;\" onclick=\"systemtools('recovery')\">Recovery</button>\r\n\r\n</center>\r\n\r\n<script>\r\n\r\n    function systemtools(param) {\r\n\r\n        var input_payload = \"<font size=5 color='hotpink'>Task wird ausgeführt</font><p><br>Bitte warten...\";\r\n        $(\"#settings_output\").html(input_payload);\r\n\r\n        var dt = new Date();\r\n        curdate = (dt.getFullYear()) + ((\"0\"+(dt.getMonth()+1)).slice(-2)) + ((\"0\"+dt.getDate()).slice(-2)) + \" / \" + ((\"0\"+dt.getHours()).slice(-2)) +\":\"+ ((\"0\"+dt.getMinutes()).slice(-2)) +\":\"+ ((\"0\"+dt.getSeconds()+1).slice(-2));\r\n\r\n        var cmnd = \"systemtools '\" + param + \"' '\" + curdate + \"'\";\r\n        publish_settings(cmnd);\r\n        \r\n    }\r\n\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "custom": {}
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 47
+      },
+      "id": 22,
+      "options": {
+        "content": "<h4>System Input</h4>\r\n<hr />\r\n\r\n<input title=\"Linux Befehle ausführen\" placeholder=\"enter non-interactive bash commands\" class=\"nanohome\" type=\"text\" id=\"input\" value=\"Input\" onfocus=\"if (this.value === 'Input') { this.value=''; } \" autocomplete=\"off\"/>\r\n\r\n<script>\r\n$(\"input\").on(\"keydown\",function search(e) {\r\n    if(e.keyCode == 13) {\r\n      \r\n        var inp = document.getElementById(\"input\").value;\r\n        \r\n        if (inp != \"\") {\r\n            publish_settings(inp);\r\n          } else {\r\n            publish_settings(\"nanohelp\");\r\n          }\r\n    }\r\n});\r\n</script>\r\n",
+        "mode": "html"
+      },
+      "pluginVersion": "7.3.6",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "type": "text"
+    }
+  ],
+  "schemaVersion": 26,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": true,
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ],
+    "time_options": [
+      "5m",
+      "15m",
+      "1h",
+      "6h",
+      "12h",
+      "24h",
+      "2d",
+      "7d",
+      "30d"
+    ]
+  },
+  "timezone": "",
+  "title": "Settings",
+  "uid": "sYOGRUiRz",
+  "version": 482
+}

@@ -1,0 +1,42 @@
+<h4>MQTT User Manager</h4>
+<hr />
+
+<center>
+
+<input class="nanohome" id="mqtt_user" requiredminlength="4" value="Benutzername" placeholder="Benutzername" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<input class="nanohome" type="password" id="mqtt_pwd" requiredminlength="8" value="Passwort" placeholder="Passwort" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off" />
+
+</p>
+
+<button title="Alle anzeigen" class="form" style="background-color: #fff4bd;" onclick="usermgmt('show');">🔎</button>
+<button title="Hinzufügen" class="form" style="background-color: #adfc95;" onclick="usermgmt('add');">💾</button>
+<button title="Löschen" class="form" style="background-color: #ffbdbd;" onclick="usermgmt('remove');">❌</button>
+<button title="Passwort zeigen" class="form" style="background-color: #fff4bd;" onclick="show_mqtt_pw()">🔑</button>
+
+</center>
+
+<script>
+
+	function usermgmt(param) {
+		
+        var mqtt_user = document.getElementById("mqtt_user").value;
+        var mqtt_pwd = document.getElementById("mqtt_pwd").value;		
+		
+		var usermgmt_message = "usermgmt '" + param + "' '" + mqtt_user + "' '" + mqtt_pwd + "'";
+		
+		publish_settings(usermgmt_message);
+	}
+
+    function show_mqtt_pw() {
+        var x = document.getElementById("mqtt_pwd");
+        if (x.type === "password") {
+            x.type = "text";
+        } else {
+            x.type = "password";
+        }
+    }
+
+</script>

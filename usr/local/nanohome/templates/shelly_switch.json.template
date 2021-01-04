@@ -1,0 +1,19 @@
+{
+  "datasource": null,
+  "content": "<button class=\"home\" onclick=\"publish('toggle','shellies/_DEVID_/relay/0/command','shellies/_DEVID_/relay/0','_DESCRIPTION_',2);\">\r\n\t<table class=\"home\">\r\n\t\t<tr class=\"home\">\r\n\t\t\t<td class=\"home\" style=\"width:70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n\t\t\t<td class=\"home\" style=\"text-align:left;\"><font size=\"6\">_DESCRIPTION_</font></td>\r\n\t\t</tr>\r\n\t</table>\r\n</button>",
+  "gridPos": {
+    "h": 3,
+    "w": 6,
+    "x": 0,
+    "y": 8
+  },
+  "id": _RAND_,
+  "links": [],
+  "mode": "html",
+  "options": {},
+  "timeFrom": null,
+  "timeShift": null,
+  "title": "",
+  "transparent": true,
+  "type": "text"
+}

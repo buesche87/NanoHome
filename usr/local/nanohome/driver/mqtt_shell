@@ -1,0 +1,68 @@
+#!/bin/bash
+#################################
+# MQTT_shell - Drop bash commands
+
+#Settings
+host="localhost"
+user="mqtt_shell"
+pass="MQTT2Shell"
+input_topic="input"
+output_topic="output"
+
+# Advanced Settings
+touch .mqtt_shell.pid
+touch .mqtt_shell.cmds
+touch .mqtt_shell.out
+exit_word="--quit"
+clean=".mqtt_shell.cmds .mqtt_shell.pid .mqtt_shell.out"
+p=".mqtt_shell.cache"
+pid=$(cat .mqtt_shell.pid)
+
+# Clean
+ctrl_c() {
+  echo "Cleaning up..."
+  rm -f $p;rm $clean;kill $pid 2>/dev/null
+  if [[ "$?" -eq "0" ]];
+  then
+     echo "Exit success";exit 0
+  else
+     exit 1
+  fi
+}
+
+# MQTT Listen on input_topic
+listen(){
+([ ! -p "$p" ]) && mkfifo $p
+(mosquitto_sub -h $host -u $user -P $pass -t $input_topic > $p 2>/dev/null) &
+echo "$!" > .mqtt_shell.pid
+while read line <$p
+do
+    echo $line > .mqtt_shell.cmds
+  # Kill MQTT_shell
+  if grep -q '$exit_word' .mqtt_shell.cmds; then
+    (rm -f $p;rm $cleann;kill $pid) 2>/dev/null
+    break
+  else
+    (bash .mqtt_shell.cmds | tee .mqtt_shell.out) && mosquitto_pub -h $host -u $user -P $pass -t $output_topic -f .mqtt_shell.out;>.mqtt_shell.out
+  fi
+done
+}
+
+usage(){
+echo "    MQTT_shell - Drop bash commands"
+echo "  Usage: $0 -s [Change Settings inside]"
+echo "  Subscripe to topic /"$output_topic", publish to topic /"$input_topic""
+}
+
+
+case "$1" in
+-s |--start)
+trap ctrl_c INT
+listen
+;;
+*)
+usage
+exit 1
+;;
+esac
+

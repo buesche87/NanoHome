@@ -1,0 +1,40 @@
+<h3>Standbykiller</h3>
+<hr />
+
+<center>
+
+<select class="nanohome" id="stby_device"onchange="standbykill('show')" name="nanolist_stbykill">
+</select>
+
+</p>
+
+<table align="center" style="width:100%">
+    <tr>
+        <td align="right" style="width:50%"><font size="4">Standby [W]</font></td>
+        <td align="left" style="width:50%"><input class="form" style="width:50%" id="stbypwr" maxlength="5" value="20" onfocus="this.value=''" onfocusout="if (this.value === '') { this.value = this.defaultValue; }" autocomplete="off"/></td>
+    </tr>
+</table>
+
+</p>
+
+<button title="Aktivieren" class="form" style="background-color: #adfc95" onclick="standbykill('add')">💾</button>
+<button title="Alle Anzeigen" class="form" style="background-color: #fff4bd" onclick="standbykill('show all')">🔎</button>
+<button title="Deaktivieren" class="form" style="background-color: #ffbdbd" onclick="standbykill('remove')">❌</button>
+
+</center>
+
+<script>
+
+    function standbykill(param) {
+	
+        var stby_dev = document.getElementById("stby_device").value;
+        var stby_pwr = document.getElementById("stbypwr").value;
+		
+        var stdby_kill = "standbykiller " + param + " '" + stby_dev + "' '" + stby_pwr + "'";
+
+        publish_timer(stdby_kill);
+        
+	};
+
+</script>
+
