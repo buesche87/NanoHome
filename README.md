@@ -48,14 +48,14 @@ Einfache Bedienung
   - `sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_shell`
   - `sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_bridge`
   - `influx user password -n mqtt_bridge`
-    -> Anpassen von `usr/local/nanohome/driver/*`
+    - Anpassen von `usr/local/nanohome/driver/*`
 	
   - `sudo mosquitto_passwd -c /etc/mosquitto/passwd multiswitch_mqtt`
   - `sudo mosquitto_passwd -c /etc/mosquitto/passwd cron_mqtt`
-    -> Anpassen von `/usr/local/nanohome/services/*`
+    - Anpassen von `/usr/local/nanohome/services/*`
 
   - `sudo mosquitto_passwd -c /etc/mosquitto/passwd mqtt_grafana`
-    -> Anpassen im Grafana "Status" HTML-Panel
+    - Anpassen im Grafana "Status" HTML-Panel
 
 - Grafana API Key ändern in `/usr/local/nanohome/bin/devmgmt`
 
