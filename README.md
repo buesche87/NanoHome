@@ -13,8 +13,9 @@ Install:
 * SD-Karte vor dem Reboot entfernen
 
 Login:
-* Im Hotspot Modus https://10.0.0.5:3001 öffnen
-* admin / login
+* Gerät in Hotspot Modus setzen
+* Mit NanoHome Wifi verbinden: `NanoHome_Log1n`
+* https://10.0.0.5:3001 öffnen: `admin / login`
 
 ![home](https://i.ibb.co/CQb7KV8/nanohome-home.png)
 
