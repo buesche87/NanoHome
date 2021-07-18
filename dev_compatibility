@@ -1,0 +1,87 @@
+#!/bin/bash
+# dev_compatibility
+
+if [ -z "$1" ]; then
+
+	echo "-------------------------------"
+	echo "Zu wenig Parameter definiert"
+	echo "Usage: dev_cmopatibility device"
+	echo "-------------------------------"
+	echo
+
+	exit 1
+fi
+
+# Parameters
+device="$1"
+dev_desc="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f2 )"
+dev_vend="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f3 )"
+dev_type="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f4 )"
+if [[ "$device" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
+template_folder="/opt/nanohome/templates"
+
+if [ "$dev_type" = "" ]; then
+
+	echo "Device not supported"
+	
+	# remove device from devlist
+	sed -i '/'$sn'/d' /opt/nanohome/devlist
+	
+	exit 1
+	
+fi
+
+# Geräteunterstützung
+if [ "$dev_vend" = "sonoff" ]; then
+
+	status_topic="sonoff/$device/stat/POWER"
+	control_topic="sonoff/$device/cmnd/POWER"
+	off_command="OFF"
+	on_command="ON"
+	toggle_command="TOGGLE"
+	
+elif [ "$dev_vend" = "shelly" ]; then
+
+	if [ "$dev_type" = "switch" ]; then
+
+		control_topic="shellies/$device/relay/0/command"
+		status_topic="shellies/$device/relay/0"
+		power_topic="shellies/$device/relay/0/power"
+		energy_topic="shellies/$device/relay/0/energy"
+		off_command="off"
+		on_command="on"
+		toggle_command="toggle"
+
+	elif [ "$dev_type" = "roller" ]; then
+	
+		control_topic="shellies/$device/roller/0/command"
+		pos_control="shellies/$device/roller/0/command/pos"
+		pos_return="shellies/$device/roller/0/pos"
+		power_topic="shellies/$device/roller/0/power"
+		energy_topic="shellies/$device/roller/0/energy"
+		on_command="open"
+		off_command="close"
+		
+	elif [ "$dev_type" = "shutter" ]; then
+	
+		control_topic="shellies/$device/roller/0/command"
+		pos_control="shellies/$device/roller/0/command/pos"
+		pos_return="shellies/$device/roller/0/pos"
+		power_topic="shellies/$device/roller/0/power"
+		energy_topic="shellies/$device/roller/0/energy"
+		on_command="open"
+		off_command="close"
+
+	elif [ "$dev_type" = "dimmer" ]; then
+	
+		control_topic="shellies/$device/light/0/command"
+		status_topic="shellies/$device/light/0/status"
+		dim_value="shellies/$device/light/0/set"
+		power_topic="shellies/$device/light/0/power"
+		energy_topic="shellies/$device/light/0/energy"
+		on_command="on"
+		off_command="off"
+
+	fi
+	
+fi

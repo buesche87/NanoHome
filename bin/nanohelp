@@ -1,0 +1,17 @@
+#!/bin/bash
+# Show some example coimmands on dashbaord
+
+echo "<center>"
+echo "<h3 style='color:#FF0000'>Achtung! Führt Linux-Befehle als root aus</h3>"
+echo "keine interaktiven Befehle nutzen!"
+echo "<br>"
+echo "<h4>Messungen anzeigen</h4>"
+echo "<pre>influx -database NanoPi -execute 'show series'</pre>"
+echo ""
+echo "<h4>Gesamte Messung löschen</h4>"
+echo "<pre>influx -database NanoPi -execute 'DROP MEASUREMENT \"humidity\"'</pre>"
+echo ""
+echo "<h4>Messserie löschen</h4>"
+echo "<pre>influx -database NanoPi -execute \"DROP SERIES FROM temperature WHERE location = 'wohnbereich'\"</pre>"
+echo "</center>"
+

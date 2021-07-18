@@ -1,0 +1,20 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Put CPU Temperature into InfluxDB
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Settings
+Server="localhost"
+DB="INFLUXDATABASE"
+Topic="Temperature"
+Sensor="NanoHome_CPU"
+
+# Read Sensor
+cpuTemp0=$(cat /sys/class/thermal/thermal_zone0/temp)
+cpuTemp1=$(($cpuTemp0/1000))
+cpuTemp2=$(($cpuTemp0/100))
+cpuTempM=$(($cpuTemp2 % $cpuTemp1))
+CPU=$cpuTemp1"."$cpuTempM
+
+# Send to InfluxDB
+curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$CPU

@@ -1,0 +1,50 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Multiswitch for NanoHome - multi-toggle devices
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Catch parameters
+dev1="$1"
+dev2="$2"
+value1="$3"
+value2="$4"
+
+# Settings
+server="localhost"
+user="MQTTSYSTEMUSER"
+pass="MQTTSYSTEMPASS"
+rootpath="INSTALLDIR"
+
+# Device Support
+. $rootpath/dev_compatibility $dev1
+dev1_control_topic=$(echo $control_topic)
+# dev1_status_topic=$(echo $status_topic)
+
+. $rootpath/dev_compatibility $dev2
+dev2_control_topic=$(echo $control_topic)
+dev2_type=$(echo $dev_type)
+
+if [[ "dev2_type" == *"shelly"* ]]; then
+	value2=echo ${value2^^}
+elif  [[ "dev2_type" == *"sonoff"* ]]; then
+	value2=echo ${value2,,}
+fi
+
+# dev1_status=$( mosquitto_sub -h $server -u $user -P $pass -t $dev1_status_topic -q 2 )
+# echo "$dev1_status"
+
+# Main
+while read curvalue;
+do
+
+	if [[ "dev2_type" == *"shelly"* ]]; then
+		curvalue=echo ${curvalue^^}
+	elif  [[ "dev2_type" == *"sonoff"* ]]; then
+		curvalue=echo ${curvalue,,}
+	fi
+
+	now=$(date +"%T")
+	mosquitto_pub -h $server -u $user -P $pass -t $dev2_control_topic -m $curvalue
+	echo "|[$now] $dev1 $curvalue -> $dev2 $curvalue"
+
+done < <(mosquitto_sub -h $server -u $user -P $pass -t $dev1_control_topic -q 2)
