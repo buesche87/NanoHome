@@ -38,10 +38,10 @@ TBD
 
 # Installation
 
-git clone
+`git clone`
 
-cd nanohome
+`cd nanohome`
 
-chmod +x ./install.sh
+`chmod +x ./install.sh`
 
-sudo ./install.sh
+`sudo ./install.sh`
