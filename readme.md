@@ -8,6 +8,7 @@ TBD
 ## InfluxDB (example debian buster)
 
 `curl -sL https://repos.influxdata.com/influxdb.key 133 | sudo apt-key add -`
+
 `echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list`
 
 
