@@ -39,6 +39,9 @@ TBD
 # Installation
 
 git clone
+
 cd nanohome
+
 chmod +x ./install.sh
+
 sudo ./install.sh
