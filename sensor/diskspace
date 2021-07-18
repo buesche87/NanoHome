@@ -1,0 +1,16 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Put Disk Space into InfluxDB
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Settings
+Server="localhost"
+DB="INFLUXDATABASE"
+Topic="Diskspace_Free"
+Sensor="NanoHome_Disk"
+
+# Get Disk Space
+disk=$(df -m /dev/sda1 | tail -1 | awk '{print $4}')
+
+# Send to InfluxDB
+curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$disk

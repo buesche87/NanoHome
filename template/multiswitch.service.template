@@ -1,0 +1,11 @@
+[Unit]
+Wants=mosquitto.service
+Description=multiswitchsvc -dev2 [-value2] if -dev1 [-value1]
+
+[Service]
+Type=idle
+ExecStart=/bin/bash /usr/bin/multiswitchsvc -dev1 -dev2 -value1 -value2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

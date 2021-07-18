@@ -1,0 +1,299 @@
+button.home {
+
+  background-color: #1a75c9;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 10px;
+  padding-left: 5px;
+  width: 100%;
+  height: 100%;
+  text-align: left;
+  
+}
+
+button.slider {
+
+  background-color: #1a75c9;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 3px;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  
+}
+
+button.form {
+
+  background-color: #1a75c9;
+  color: #000000;
+  border: 2px solid black;
+  border-radius: 5px;
+  padding-left: 5px;
+  font-size: 16px;
+  width: 70px;
+  height: 35px;
+  text-align: center;
+  
+}
+
+button.nanohome_show {
+
+  color: #030505;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  font-size: 16px;
+  width: 70px;
+  height: 35px;
+  background-color: #ebe0ae;
+  
+}
+
+input.nanohome, input[type=password] {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100%;
+  height: 35px;
+  text-align: center;
+  font-size: 18px;
+
+}
+
+input.form {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100px;
+  height: 35px;
+  text-align: center;
+  font-size: 18px;
+  
+}
+
+select.nanohome {
+
+  background-color: #fff4bd;
+  color: #000000;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 100%;
+  height: 35px;
+  text-align: center;
+  text-align-last: center;
+  font-size:18px;
+
+}
+
+select.form {
+
+  background-color: #4999e3;
+  color: #ffffff;
+  border: 2px black;
+  border-radius: 4px;
+  padding-left: 5px;
+  width: 150px; 
+  height: 35px;
+  text-align: center;
+  text-align-last: center;
+  font-size:18px;
+
+}
+
+hr {
+	
+	border: 0; 
+	height: 2px;
+	background-image: linear-gradient(to right, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0));
+	
+}
+
+h3, h4 {
+	text-align: center;
+}
+
+table, th, td {
+
+  border-style : hidden!important;
+  
+}
+
+/* Checkboxes */
+/* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 35px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 25px;
+  width: 25px;
+  background-color: #eee;
+}
+
+/* On mouse-over, add a grey background color */
+.container:hover input ~ .checkmark {
+  background-color: #ccc;
+}
+
+/* When the checkbox is checked, add a blue background */
+.container input:checked ~ .checkmark {
+  background-color: #c7e9ff;
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.container .checkmark:after {
+
+  left: 9px;
+  top: 5px;
+  width: 7px;
+  height: 13px;
+  border: solid #081717;
+  border-width: 0 3px 3px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+/* Slider */
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 10px 0;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 30px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 50px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -10.2px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #367ebd;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 30px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 50px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 30px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #3071a9;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 50px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 30px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #3071a9;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #367ebd;
+}
+.main-view {
+  background-color: #000000; 
+}
+.view {
+  background-color: #000000; 
+}
+.panel-container {
+  background-color: #000000; 
+}
+.dashboard-container {
+  background-color: #000000; 
+}
+.navbar {
+  background-color: #000000;
+}

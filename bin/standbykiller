@@ -1,0 +1,153 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Standbykiller for NanoHome - sends OFF to topic if device falls below [W]
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Catch Parameters
+device="$2"
+maxpower="$3"
+rootpath="INSTALLDIR"
+
+# Device Support
+if [ ! "$device" = "all" ]; then
+	. $rootpath/dev_compatibility $device
+fi
+
+# Environment
+service_description="standbykiller"
+service_name="$service_description.$device.service"
+service_file="/lib/systemd/system/$service_name"
+service_template="$rootpath/templates/$service_description.service.template"
+
+# help functions
+get_status () {
+	
+	status="$1"
+	
+	# make parameters readable on dashboard
+	if [[ "$status" =~ "running" ]] || [[ "$status" =~ "wenn" ]]; then
+		color="#c0fcb1"
+		statmsg="aktiv"
+	else
+		color="grey"
+		statmsg="inaktiv"
+	fi
+
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Print Standbykiller and their Cronjobs On Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+print_killer () {
+
+	dev="$1"
+	condition="$2"
+	service_details="$3"
+	header="$4"
+	desc="$(cat  $rootpath/devlist | grep $dev | cut -d: -f2 )"
+
+	get_status "$condition"
+	
+	if [ ! -z "$header" ]; then
+		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='$color'> $header</font><br>"
+	fi
+	
+	echo "<font size='4' color='hotpink'>$desc</font> - <font size='4' color='$color'>$condition</font>"
+
+	if [ ! -z "$service_details" ]; then
+
+		lastmsg="$(systemctl status $service_details | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
+
+		echo ""
+		echo "<font size='3'>Last Messages:</font>"
+		echo "<font size='2'>$lastmsg</font>"
+		echo ""
+
+	fi
+
+}
+
+# show devices
+if [ "$1" = "show" ] && [ ! -z "$device" ]; then
+	
+	if [ "$device" = "all" ]; then
+		active="$( ls /lib/systemd/system/ | grep standbykiller )"
+		service_name=""
+	else
+		active="$( ls /lib/systemd/system/ | grep $service_name )"
+	fi
+
+	if [ ! -z "$active" ]; then
+		
+		echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='#c0fcb'> aktiv</font><br>"
+		
+		while IFS= read -r line
+		do
+
+			dev="$( grep ExecStart /lib/systemd/system/$line | awk '{ printf $3 }' )"
+			maxpower="$( grep ExecStart /lib/systemd/system/$line | awk '{ printf $4 }' )"
+			dev_desc="$(cat $rootpath/devlist | grep $dev | cut -d: -f2 )"
+			msg="Aktiv wenn unter ${maxpower}W"
+
+			print_killer "$dev_desc" "$msg" "$service_name"
+
+		done <<< "$active"
+
+	else
+		
+		if [ "$device" = "all" ]; then
+			statusmsg "Standbykiller" "white" " inaktiv" "grey" "Kein Standbykiller definiert" "grey"
+		else
+			print_killer "$dev_desc" "inaktiv" "" "inaktiv"
+		fi
+
+	fi
+
+
+# add device
+elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
+
+	# check if service exists
+	if test -f "$service_file"; then
+
+		msg="Aktiv wenn unter ${maxpower}W" 
+		
+		print_killer "$dev_desc" "$msg" "$service_name" "aktiviert"
+
+	# create new service
+	else
+
+		cp $service_template $service_file
+
+		sed -i "s/-dev/$device/" $service_file
+		sed -i "s/-sbpwr/$maxpower/" $service_file
+
+		systemctl start $service_name
+		systemctl enable $service_name
+
+		msg="Aktiviert wenn unter ${maxpower}W"
+		
+		print_killer "$dev_desc" "$msg" "" "aktiv"
+
+	fi
+
+# remove device
+elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
+
+	systemctl stop $service_name
+	systemctl disable $service_name
+
+	rm -r $service_file
+	
+	print_killer "$dev_desc" "Deaktiviert" "" "inaktiv"
+
+else
+
+	echo "----------------------------------------------------------"
+	echo "Usage: standbykiller show|add|remove device (standbypower)"
+	echo "----------------------------------------------------------"
+	echo
+
+	exit 1
+
+fi

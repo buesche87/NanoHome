@@ -1,0 +1,259 @@
+#!/bin/bash
+#/////////////////////////////////////////////////////////////////////////////////////
+# Cron Manager for NanoHome - manage switches with crontab
+#/////////////////////////////////////////////////////////////////////////////////////
+
+# Catch Parameters
+device="$2"
+day="$3"
+on="$4"
+off="$5"
+
+# Settings
+server="localhost"
+user="MQTTSYSTEMUSER"
+pass="MQTTSYSTEMPASS"
+rootpath="INSTALLDIR"
+
+# Device Support
+if [[ ! "$device" == "all" ]] && [[ ! "$device" == *"multiswitch"* ]]; then
+	. $rootpath/dev_compatibility $device
+fi
+
+# Help Functions
+make_readable () {
+
+	. $rootpath/dev_compatibility $dev1
+	dev1_type=$(echo $dev_type)
+	
+	. $rootpath/dev_compatibility $dev2
+	dev2_type=$(echo $dev_type)
+
+	# make parameters readable on dashboard
+	if [ "$dev1_type" = "roller" ] || [ "$dev1_type" = "shutter" ]; then
+		if [ "$val1" = "on" ]; then val1="auf"; else val1="zu"; fi
+	else
+		if [ "$val1" = "on" ]; then val1="ein";	else val1="aus"; fi
+	fi
+
+	if [ "$dev2_type" = "roller" ] || [ "$dev2_type" = "shutter" ]; then
+		if [ "$val2" = "on" ]; then val2="auf"; else val2="zu"; fi		
+	else
+		if [ "$val2" = "on" ]; then val2="ein";	else val2="aus"; fi
+	fi
+
+	if [[ "$status" =~ "running" ]]; then
+		color="#c0fcb1"
+		statusmsg="aktiv"
+	else
+		color="grey"
+		statusmsg="inaktiv"
+	fi
+
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Get Devices and their Cronjobs
+#/////////////////////////////////////////////////////////////////////////////////////
+get_dev () {
+
+	# get device
+	check_dev="$1"
+	
+	# get active cronjobs
+	active_cron="$(crontab -l | grep mosquitto | awk '{ printf $14"\n" }'  | awk '!NF || !seen[$0]++' | awk -F'/' '{print $2}')"
+	active_multiswitches="$(crontab -l | grep multiswitch | awk '{ printf $8"\n" }'  | awk '!NF || !seen[$0]++')"
+	active_devices=$(echo -e "${active_cron}\n${active_multiswitches}")
+	
+	if [ ! -z "$active_devices" ]; then
+	
+		# print devices
+		if echo "$active_devices" | grep "^$check_dev" 1>/dev/null 2>&1 || [ "$check_dev" = "all" ]; then
+			
+			echo "<font size='5' color='white'>Schaltuhr</font><font size='5' color='#c0fcb1'> aktiv</font><br>"
+			
+			while IFS= read -r line
+			do
+			
+				if [ "$check_dev" = "all" ] || [ "$check_dev" == "$line" ]; then
+
+					show_zsp "$line" 
+
+				fi
+			done < <(printf '%s\n' "$active_devices")
+		
+		# cronjob inactive for device
+		else
+			
+			statusmsg "Schaltuhr" "white" " inaktiv" "grey" "$dev_desc" "hotpink" " - Keine Schaltuhr definiert" "grey"
+		
+		fi
+	
+	# no cronjob active
+	else
+		statusmsg "Schaltuhr" "white" " inaktiv" "grey" "Keine Schaltuhr aktiv" "grey"
+	fi
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Print Devices and their Cronjobs
+#/////////////////////////////////////////////////////////////////////////////////////
+show_zsp () {
+
+	# get description of device
+	curdev="$1"
+	
+	# Print Header //////////////////////////////////////////////////
+	if echo "$curdev" | grep "multiswitch" 1>/dev/null 2>&1; then
+		
+		active_cronjobs="$( crontab -l | grep multiswitch | grep $curdev )"
+		
+		dev1="$(echo $curdev | cut -d. -f2)"
+		dev2="$(echo $curdev | cut -d. -f4)"
+		desc1="$(cat $rootpath/devlist | grep $dev1 | cut -d: -f2 )"
+		desc2="$(cat $rootpath/devlist | grep $dev2 | cut -d: -f2 )"
+		val1="$(echo $curdev | cut -d. -f3)"
+		val2="$(echo $curdev | cut -d. -f5)"
+		
+		status="$(systemctl status $curdev | head -3 | tail -1 | sed -e 's/^[[:space:]]*//')"
+
+		make_readable
+
+		echo ""
+		echo "<font size='4'><font color='hotpink'>$desc1 </font><font color='white'>$val1 -> </font></font><font size='4'><font color='hotpink'>$desc2 </font><font color='white'>$val2 </font>[<font color='$color'>$statusmsg</font>]</font>"
+
+	else 
+
+		active_cronjobs="$(crontab -l | grep mosquitto | grep $curdev | awk '!NF || !seen[$0]++')"
+		dev_desc="$(cat $rootpath/devlist | grep $curdev | cut -d: -f2 )"
+	
+	fi
+		
+	# Print Cronjob Details //////////////////////////////////////////////////
+	while IFS= read -r line
+	 do
+
+		on_msg="ein"
+		off_msg="aus"
+
+		act_msg="aktiv"
+		inact_msg="inaktiv"
+		
+		open_msg="auf"
+		close_msg="zu"
+		
+		# Print Service State //////////////////////////////////////////////////
+		
+		if echo "$curdev" | grep "multiswitch" 1>/dev/null 2>&1; then
+		
+			dev_state_temp="$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " | " $7 } ')"	
+			dev_state="$(echo $dev_state_temp | sed 's,^*: ,Täglich ab ,g' | sed 's,^1: ,Montag ab ,g' | sed 's,^2: ,Dienstag ab ,g' | sed 's,^3: ,Mittwoch ab ,g' | sed 's,^4: ,Donnerstag ab ,g' | sed 's,^5: ,Freitag ab ,g' | sed 's,^6: ,Samstag ab ,g' | sed 's,^0: ,Sonntag ab ,g' | sed 's,^6-7: ,Wochenende ab ,g' | sed 's,^1-5: ,Werktags ab ,g' | sed 's, | on, '"$on_msg"',g' | sed 's, | off, '"$off_msg"',g' | sed 's,| start,'"$act_msg"',g' | sed 's,| stop,'"$inact_msg"',g')"
+		
+			echo "<font size='4' color='white'>$dev_state</font>"		
+			
+		else
+		
+			dev_state_temp="$(printf '%s\n' "$line" | awk '{ printf $5 ": " $2 ":" $1 " | " $16 } ')"		
+			dev_state="$(echo $dev_state_temp | sed 's,^*: ,Täglich ,g' | sed 's,^1: ,Montag ,g' | sed 's,^2: ,Dienstag ,g' | sed 's,^3: ,Mittwoch ,g' | sed 's,^4: ,Donnerstag ,g' | sed 's,^5: ,Freitag ,g' | sed 's,^6: ,Samstag ,g' | sed 's,^0: ,Sonntag ,g' | sed 's,^6-7: ,Wochenende ,g' | sed 's,^1-5: ,Werktags ,g' | sed 's, | on, '"$on_msg"',g' | sed 's, | off, '"$off_msg"',g' | sed 's,| start,'"$act_msg"',g' | sed 's,| stop,'"$inact_msg"',g' | sed 's,| close,'"$close_msg"',g' | sed 's,| open,'"$open_msg"',g')"
+
+			echo -e "<font size='4'><font color='hotpink'>$dev_desc</font><font color='white'>\t $dev_state</font>"		
+
+		fi 
+
+
+
+	done < <(printf '%s\n' "$active_cronjobs")
+	
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Add a new Cronjob
+#/////////////////////////////////////////////////////////////////////////////////////
+if [ "$1" = "add" ] && [ ! -z "$2" ] && [ ! -z "$3" ]; then
+
+	if [ "$4" = "" ] && [ "$5" = "" ]; then
+		
+		statusmsg "Error" "red" "" "" "Das geht nicht" "white"
+
+		exit 1
+
+	fi
+
+	# catch on/off time
+	on_hour="${on:0:2}"
+	if [ ${#on_hour} -lt 2 ]; then on_hour="0$on_hour"; fi
+	on_min="${on:3:5}"
+	if [ "$on_min" = "" ]; then on_min="00"; fi
+	off_hour="${off:0:2}"
+	if [ ${#off_hour} -lt 2 ]; then off_hour="0$off_hour"; fi
+	off_min="${off:3:5}"
+	if [ "$off_min" = "" ]; then off_min="00"; fi
+
+	# Create Cronjob Entries  //////////////////////////////////////////////////
+	if [[ "$device" == *"multiswitch"* ]]; then
+
+		cron_on="$on_min $on_hour * * $day systemctl start $device"
+		cron_off="$off_min $off_hour * * $day systemctl stop $device"
+	
+	elif [ "$dev_type" = "roller" ] || [ "$dev_type" = "shutter" ]; then
+	
+		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $roller_updown -m open"
+		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $roller_updown -m close"		
+	
+	elif [ "$dev_type" = "switch" ]; then
+
+		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m on"
+		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m off"
+	
+	else
+	
+		echo "Device not supported"
+		exit 1
+
+	fi
+
+	# Insert Cronjob Entries  //////////////////////////////////////////////////
+	if [ ! "$on" = "" ]; then
+		(crontab -l ; echo "$cron_on") | crontab -
+	fi
+
+	if [ ! "$off" = "" ]; then
+		(crontab -l ; echo "$cron_off") | crontab -
+	fi
+
+	
+	if [ ! "$dev_type" = "multiswitch" ]; then
+	
+		get_dev "$device"
+	
+	fi
+
+# show timer
+elif [ "$1" = "show" ]; then
+	
+	get_dev "$device"
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Remove Cronjob
+#/////////////////////////////////////////////////////////////////////////////////////
+elif [ "$1" = "remove" ]; then
+
+	crontab -l | grep -v "$device" | crontab -
+	
+	if echo "$device" | grep "multiswitch" 1>/dev/null 2>&1; then
+		exit 0
+	else
+		echo "<font size='5' color='white'>Schaltuhr</font><font size='5' color='grey'> Deaktiviert</font><br>"
+		echo "<font font size='4' color='hotpink'>$dev_desc</font>"
+	fi
+	
+else
+
+	echo "--------------------------------------------------------------"
+	echo "Usage: cronman show|add|remove device|all (on_time) (off_time)"
+	echo "--------------------------------------------------------------"
+	echo
+
+	exit 1
+
+fi
