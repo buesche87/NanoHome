@@ -11,7 +11,7 @@ mospid=$(pidof mosquitto)
 
 show_users () {
 	
-	list=$(cat $pwdfile | cut -d : -f 1 | grep -v cron_mqtt | grep -v mqtt_shell | grep -v multiswitch_mqtt | grep -v mqtt_bridge | grep -v mqtt_grafana)
+	list=$(cat $pwdfile | cut -d : -f 1  | grep -v mqtt_system | grep -v mqtt_grafana)
 	statusmsg "MQTT-Benutzerliste" "white" "" "" "$list" "hotpink" "\n\n<font color='white'>Zum Löschen Benutzername kopieren,\neintragen und löschen</font>" "white"
 }
 

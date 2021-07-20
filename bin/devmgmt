@@ -9,15 +9,15 @@ desc="$3"
 device="$4"
 devicetype="$5"
 random="$(date +%s)"
+rootpath="INSTALLDIR"
 
 # Settings
-home_uid="$(grep 'home_uid' /opt/nanohome/conf/uids | cut -d: -f2)"
-devmgr_uid="$(grep 'devmgr_uid' /opt/nanohome/conf/uids | cut -d: -f2)"
-zsp_uid="$(grep 'zsp_uid' /opt/nanohome/conf/uids | cut -d: -f2)"
-settings_uid="$(grep 'settings_uid' /opt/nanohome/conf/uids | cut -d: -f2)"
-api_key="$(cat /opt/nanohome/conf/api_key.json | jq -r '.key')"
-rootpath="INSTALLDIR"
-template_folder="$rootpath/templates"
+home_uid="$(grep 'home_uid' $rootpath/conf/uids | cut -d: -f2)"
+devmgr_uid="$(grep 'devmgr_uid' $rootpath/conf/uids | cut -d: -f2)"
+zsp_uid="$(grep 'zsp_uid' $rootpath/conf/uids | cut -d: -f2)"
+settings_uid="$(grep 'settings_uid' $rootpath/conf/uids | cut -d: -f2)"
+api_key="$(cat $rootpath/conf/api_key.json | jq -r '.key')"
+template_folder="$rootpath/template"
 
 # Help Functions
 get_dashboard () {
