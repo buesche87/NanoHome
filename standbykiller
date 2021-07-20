@@ -14,18 +14,19 @@ if [ ! "$device" = "all" ]; then
 fi
 
 # Environment
-service_line="standbykillersvc $device"
+service_line="standbykillersvc $device $maxpower"
 devdesc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
 
 # show devices
 if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 	
-	sk="$(grep standbykillersvc $rootpath/driver/nanohome_helper)"
+	ms="$(grep "$service_line" $rootpath/driver/nanohome_helper)"
 	
 	# show active state of device
-	if [ "$device" = "all" ] && [ ! -z "$sk" ]; then
+	if [ "$device" = "all" ] && [! -z "$ms"]; then
 	
-		statusmsg "Standbykiller" "white" " aktiv" "#c0fcb1" "$sk" "hotpink"
+		ms="$(grep "$service_line" $rootpath/driver/nanohome_helper)"
+		statusmsg "Standbykiller" "white" " aktiv" "#c0fcb1" "$ms" "hotpink"
 	
 	elif grep "$service_line" $rootpath/driver/nanohome_helper ; then
 		
@@ -37,6 +38,8 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 
 	fi
 
+
+
 # add device
 elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 	
@@ -47,7 +50,7 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 		
 	else
 	
-		echo "standbykillersvc $device $maxpower" >> $rootpath/driver/nanohome_helper
+		echo "$service_line" >> $rootpath/driver/nanohome_helper
 		systemctl restart nanohome_helper
 		statusmsg "Standbykiller" "white" " aktiviert" "#c0fcb1" "$devdesc [$maxpower]" "hotpink"
 

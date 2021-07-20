@@ -1,0 +1,14 @@
+[Unit]
+WantedBy=multi-user.target
+Description=NanoHome helper service
+
+[Service]
+Type=simple
+user=SVCUSER
+group=SVCUSER
+ExecStart=/bin/bash INSTALLDIR/driver/nanohome_helper
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

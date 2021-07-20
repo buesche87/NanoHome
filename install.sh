@@ -30,11 +30,14 @@ fi
  mkdir -p $rootpath/conf/
  mkdir -p $rootpath/driver/
  mkdir -p $rootpath/sensor/
+ mkdir -p $rootpath/template/
 
 # general
 
  touch $rootpath/devlist
  cp ./dev_compatibility $rootpath
+ cp ./template/* $rootpath/template/
+ echo "%$username ALL=NOPASSWD: /bin/systemctl restart nanohome_helper" > /etc/sudoers.d/nanohome
 
 # prepare influxdb database
 
@@ -88,6 +91,7 @@ fi
 
  cp ./service/* /lib/systemd/system/
  sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/mqtt_*
+ sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/nanohome*
  sed -i "s#SVCUSER#$username#" /lib/systemd/system/mqtt_*
 
 # modify device manager
@@ -266,12 +270,11 @@ EOF
  
 # post processing
  
- /usr/share/grafana/bin/grafana-cli plugins install grafana-clock-panel
- /usr/share/grafana/bin/grafana-cli plugins install petrslavotinek-carpetplot-panel
-
- 
  rm -rf /tmp/*.json
  chown -R $username:$username $rootpath
+ 
+ /usr/share/grafana/bin/grafana-cli plugins install grafana-clock-panel
+ /usr/share/grafana/bin/grafana-cli plugins install petrslavotinek-carpetplot-panel
 
 # start services
 

@@ -1,10 +1,12 @@
 [Unit]
+WantedBy=multi-user.target
 Wants=mosquitto.service
 Description=MQTT_shell systemd service
 
 [Service]
 Type=simple
 user=SVCUSER
+group=SVCUSER
 ExecStartPre=/bin/sleep 5
 ExecStart=/bin/bash INSTALLDIR/driver/mqtt_shell -s
 Restart=always

@@ -1,10 +1,12 @@
 [Unit]
+WantedBy=multi-user.target
 Requires=influxdb.service mosquitto.service
 Description=MQTT InfluxDB Bridge systemd service
 
 [Service]
 Type=simple
 user=SVCUSER
+group=SVCUSER
 ExecStartPre=/bin/sh -c 'while ! curl -sf http://localhost:8086/ping; do sleep 1; done'
 ExecStart=/usr/bin/python3 INSTALLDIR/driver/mqtt_bridge_shelly.py
 Restart=always
