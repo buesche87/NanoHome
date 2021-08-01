@@ -1,6 +1,6 @@
 [Unit]
 Wants=mosquitto.service
-Description=-dev [-sbpwr]
+Description=-desc [-sbpwr]
 
 [Service]
 Type=idle

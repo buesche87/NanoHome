@@ -81,10 +81,13 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 	# create new service
 	else
 
+		desc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
+
 		# Copy Service File from a template and modify it
 		cp $svctemplate $svcfile
 
 		sed -i "s/-dev/$device/" $svcfile
+		sed -i "s/-desc/$desc/" $svcfile
 		sed -i "s/-sbpwr/$maxpower/" $svcfile
 
 		# Enable and Start Service
