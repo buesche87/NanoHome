@@ -92,12 +92,17 @@ elif [ "$1" = "add" ] && [ ! "$dev1" = "all" ]; then
 
 	# create service
 	else
+
+		desc1="$(cat $rootpath/devlist | grep $dev1 | cut -d: -f2 )"
+		desc2="$(cat $rootpath/devlist | grep $dev2 | cut -d: -f2 )"
 		
 		# Copy Service File from a template and modify it
 		cp $svctemplate $svcfile
 
 		sed -i "s/-dev1/$dev1/" $svcfile
 		sed -i "s/-dev2/$dev2/" $svcfile
+		sed -i "s/-desc1/$desc1/" $svcfile
+		sed -i "s/-desc2/$desc2/" $svcfile
 		sed -i "s/-value1/$value1/" $svcfile
 		sed -i "s/-value2/$value2/" $svcfile		
 		
