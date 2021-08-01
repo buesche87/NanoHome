@@ -1,6 +1,6 @@
 [Unit]
 Wants=mosquitto.service
-Description=Stanbykiller for -dev
+Description=-dev [-sbpwr]
 
 [Service]
 Type=idle
