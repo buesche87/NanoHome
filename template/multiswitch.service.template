@@ -1,6 +1,6 @@
 [Unit]
 Wants=mosquitto.service
-Description=multiswitchsvc -dev2 [-value2] if -dev1 [-value1]
+Description=-dev1 [-value1] -> -dev2 [-value2]
 
 [Service]
 Type=idle

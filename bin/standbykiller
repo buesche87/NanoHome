@@ -14,60 +14,108 @@ if [ ! "$device" = "all" ]; then
 fi
 
 # Environment
-service_line="standbykillersvc $device"
-devdesc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
+svcname="standbykiller.$device.service"
+svclocation="~/.config/systemd/user"
+svcfile="$svclocation/$svcname"
+svctemplate="$rootpath/templates/standbykiller.service.template"
 
-# show devices
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Print Standbykiller and their Cronjobs On Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+printsvc () {
+
+	svcname="$1"
+	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
+
+	echo "<font size='4' color='hotpink'>$description</font>"
+
+	if systemctl --user is-active $svcname ; then
+
+		lastmsg="$(systemctl --user status $svcname | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
+
+		echo ""
+		echo "<font size='3'>Last Messages:</font>"
+		echo "<font size='2'>$lastmsg</font>"
+		echo ""
+
+	fi
+
+}
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Show Standbykiller
+#/////////////////////////////////////////////////////////////////////////////////////
 if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 	
-	sk="$(grep standbykillersvc $rootpath/driver/nanohome_helper)"
-	
-	# show active state of device
-	if [ "$device" = "all" ] && [ ! -z "$sk" ]; then
-	
-		statusmsg "Standbykiller" "white" " aktiv" "#c0fcb1" "$sk" "hotpink"
-	
-	elif grep "$service_line" $rootpath/driver/nanohome_helper ; then
+	active="$( ls $svclocation | grep standbykiller )"
+
+	if [ ! -z "$active" ]; then
 		
-		statusmsg "Standbykiller" "white" " aktiv" "#c0fcb1" "$devdesc [$maxpower]" "hotpink"
+		echo "<font size='5' color='white'>Standbykiller</font><br>"
 		
+		while IFS= read -r line
+		do
+
+			printsvc "$line"
+
+		done <<< "$active"
+
 	else
 
 		statusmsg "Standbykiller" "white" " inaktiv" "grey" "Kein Standbykiller aktiv" "grey"
 
 	fi
 
-# add device
+#/////////////////////////////////////////////////////////////////////////////////////
+# Add Standbykiller
+#/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
-	
-	if grep "$service_line" $rootpath/driver/nanohome_helper ; then
-	
-		statusmsg "Standbykiller" "white" "$devdesc" "hotpink" "Standbykiller exists" "white"
-		exit 1
-		
+
+	# check if service exists
+	if test -f "$svcfile"; then
+
+		statusmsg "Standbykiller" "white" "" "" "Service exists" "white"
+		printsvc "$svcname"
+
+	# create new service
 	else
-	
-		echo "standbykillersvc $device $maxpower" >> $rootpath/driver/nanohome_helper
-		systemctl restart nanohome_helper
-		statusmsg "Standbykiller" "white" " aktiviert" "#c0fcb1" "$devdesc [$maxpower]" "hotpink"
+
+		# Copy Service File from a template and modify it
+		cp $svctemplate $svcfile
+
+		sed -i "s/-dev/$device/" $svcfile
+		sed -i "s/-sbpwr/$maxpower/" $svcfile
+
+		# Enable and Start Service
+		systemctl --user start $svcname
+		systemctl --user enable $svcname
+
+		# Print Multiswitch on Dashboard
+		printsvc "$svcname"
 
 	fi
 
-# remove device
+#/////////////////////////////////////////////////////////////////////////////////////
+# Remove Standbykiller
+#/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
+	
+	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
+	
+	systemctl --user stop $svcname
+	systemctl --user disable $svcname
 
-	sed -i "/$service_line/d" $rootpath/driver/nanohome_helper
-	systemctl restart nanohome_helper
-	statusmsg "Standbykiller" "white" " deaktiviert" "grey" "$devdesc" "hotpink"
+	rm -r $svcfile
+	
+	statusmsg "Standbykiller" "white" " $description" "hotpink" " deaktiviert" "grey"
 
-
+#/////////////////////////////////////////////////////////////////////////////////////
+# Exit 1
+#/////////////////////////////////////////////////////////////////////////////////////
 else
 
-	echo "----------------------------------------------------------"
-	echo "Usage: standbykiller show|add|remove device (standbypower)"
-	echo "----------------------------------------------------------"
-	echo
-
+	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
 	exit 1
 
 fi

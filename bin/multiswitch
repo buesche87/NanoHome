@@ -9,12 +9,13 @@ dev2="$3"
 value1="toggle"
 value2="toggle"
 rec="$4"
-if [ "$rec" = "Aktiv..." ]; then rec="always"; fi
 from="$5"
 to="$6"
+if [ "$rec" = "Aktiv..." ]; then rec="always"; fi
+if [ "$dev1" = "$dev2" ]; then dev1="all"; fi
 rootpath="INSTALLDIR"
 
-# Exit If
+# Exit if
 if [ "$dev1" = "Wenn..." ] || [ "$dev2" = "Dann..." ]; then exit 1; fi
 
 # Device Support
@@ -23,48 +24,89 @@ if [ ! "$1" = "remove" ] && [ ! "$dev1" = "all" ]; then
 fi
 
 # Environment
-service_line="multiswitchsvc $dev1 $dev2 $value1 $value2"
-desc1="$(cat $rootpath/devlist | grep $dev1 | cut -d: -f2 )"
-desc2="$(cat $rootpath/devlist | grep $dev2 | cut -d: -f2 )"
+svcname="multiswitch.$dev1.$value1.$dev2.$value2.service"
+svclocation="~/.config/systemd/user"
+svcfile="$svclocation/$svcname"
+svctemplate="$rootpath/templates/multiswitch.service.template"
+
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Print Multiswitches and their Cronjobs On Dashboard
+#/////////////////////////////////////////////////////////////////////////////////////
+printsvc () {
+
+	# get description of devices from devlist
+	svcname="$1"
+	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
+	
+	echo "<font size='4' color='hotpink'>$description</font>"
+
+	# print last messages from service
+	if systemctl --user is-active $svcname ; then
+		
+		lastmsg="$(systemctl --user status $svcname | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
+
+		echo ""
+		echo "Last Messages:"
+		echo "<font size='2'>$lastmsg</font>"
+		echo ""
+
+	fi
+
+}
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Show Multiswitches
 #/////////////////////////////////////////////////////////////////////////////////////
-if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
+if [ "$1" = "show" ]; then
 
-	ms="$(grep multiswitchsvc $rootpath/driver/nanohome_helper)"
+	active="$( ls $svclocation | grep multiswitch )"
 	
-	# show active state of device
-	if [ "$dev1" = "$dev2" ] || [ "$dev1" = "all" ] && [ ! -z "$ms" ]; then
-	
-		statusmsg "Multiswitch" "white" " aktiv" "#c0fcb1" "$ms" "hotpink"
-	
-	elif grep "$service_line" $rootpath/driver/nanohome_helper ; then
+	if [ ! -z "$active" ]; then
 		
-		statusmsg "Multiswitch" "white" " aktiv" "#c0fcb1" "$desc1 -> $desc2" "hotpink"
+		echo "<font size='5' color='white'>Multiswitch</font><br>"
 		
+		while IFS= read -r line
+		do
+
+			printsvc "$line"
+
+		done <<< "$active"
+
 	else
 
 		statusmsg "Multiswitch" "white" " inaktiv" "grey" "Kein Multiswitch aktiv" "grey"
 
 	fi
 
-
 #/////////////////////////////////////////////////////////////////////////////////////
 # Add Multiswitch
 #/////////////////////////////////////////////////////////////////////////////////////
-elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "$dev2" ]; then
-	
-	if grep "$service_line" $rootpath/driver/nanohome_helper ; then
-	
-		statusmsg "Multiswitch" "white" "$desc1 -> $desc2" "hotpink" "Multiswitch exists" "white"
-		exit 1
+elif [ "$1" = "add" ] && [ ! "$dev1" = "all" ]; then
+
+	# Check if service exists
+	if test -f "$svcfile"; then
 		
+		statusmsg "Multiswitch" "white" "" "" "Service exists" "white"
+		printsvc "$svcname"
+
+	# create service
 	else
-	
-		echo "$service_line" >> $rootpath/driver/nanohome_helper
-		systemctl restart nanohome_helper
-		statusmsg "Multiswitch" "white" " aktiviert" "#c0fcb1" "$desc1 -> $desc2" "hotpink"
+		
+		# Copy Service File from a template and modify it
+		cp $svctemplate $svcfile
+
+		sed -i "s/-dev1/$dev1/" $svcfile
+		sed -i "s/-dev2/$dev2/" $svcfile
+		sed -i "s/-value1/$value1/" $svcfile
+		sed -i "s/-value2/$value2/" $svcfile		
+		
+		# Enable and Start Service
+		systemctl --user start $svcname
+		systemctl --user enable $svcname
+
+		# Print Multiswitch on Dashboard
+		printsvc "$svcname"
 
 	fi
 
@@ -75,22 +117,27 @@ elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 
 	# remove all services if only one device is set
 	if [ "$dev2" == "" ]; then 
-		sed -i "/$dev2/d" $rootpath/driver/nanohome_helper
-		systemctl restart nanohome_helper
-		statusmsg "Multiswitch" "white" " deaktiviert" "grey" "für $desc1" "hotpink"
-	else
-		sed -i "/$service_line/d" $rootpath/driver/nanohome_helper
-		systemctl restart nanohome_helper
-		statusmsg "Multiswitch" "white" " deaktiviert" "grey" "$desc1 -> $desc2" "hotpink"
+		svcname="ls $svclocation | grep multiswitch | grep $dev1"
 	fi
-	
-	
 
+	# Delete Multiswitch
+	while IFS= read -r line
+	do
+		systemctl --user stop "$line"
+		systemctl --user disable "$line"
+
+		rm -r "$svclocation/$line"
+
+	done <<< "$svcname"
+
+	statusmsg "Multiswitch" "white" " $dev1" "hotpink" " deaktiviert" "grey"
+
+#/////////////////////////////////////////////////////////////////////////////////////
+# Exit 1
+#/////////////////////////////////////////////////////////////////////////////////////
 else
 
 	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
-
 	exit 1
 
 fi
-
