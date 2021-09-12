@@ -19,24 +19,40 @@ settings_uid="$(grep 'settings_uid' $rootpath/conf/uids | cut -d: -f2)"
 api_key="$(cat $rootpath/conf/api_key.json | jq -r '.key')"
 template_folder="$rootpath/template"
 
+# variables
+option_dev='\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>'
+option_dev_http='\\r\\n\\t<option value=\\"http://'$sn'\\">'"$desc"'</option>'
+
+devmgmt_drop='...Geräteliste...</option>'
+timer_drop='name=\\"nanolist_timer\\">\\r\\n\\t<option selected disabled>...Gerät...</option>'
+killer_drop='name=\\"nanolist_stbykill\\">\\r\\n\\t<option selected disabled>...Gerät...</option>'
+switch_if_drop='...Wenn...</option>'
+switch_then_drop='...Dann...</option>'
+
+url="http://localhost:3000"
+mout="/tmp/merge_panel_output.json"
+mtemp="/tmp/merge_panel_temp.json"
+mfinal="/tmp/merge_panel_final.json"
+minp="/tmp/merge_panel_input.json"
+
 # Help Functions
 get_dashboard () {
 	
 	uid="$1"
-	curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" http://localhost:3000/api/dashboards/uid/"$uid" > /tmp/merge_panel_temp.json
+	curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" "$url"/api/dashboards/uid/"$uid" > $mtemp
 }
 
 add_json_options () {
 
-	folderid="$(cat /tmp/merge_panel_output.json | grep folderId | awk '{ sub(/^[ \t]+/, ""); print }')"
+	folderid="$(cat $out | grep folderId | awk '{ sub(/^[ \t]+/, ""); print }')"
 	json_data="{ ${folderid} \"overwrite\": true }"
 
-	jq --argjson options "$json_data" '. += $options' /tmp/merge_panel_output.json > /tmp/merge_panel_final.json
+	jq --argjson options "$json_data" '. += $options' $mout > $mfinal
 }
 
 update_dashboard () {
 
-	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @/tmp/merge_panel_final.json http://localhost:3000/api/dashboards/db > /dev/null 2>&1
+	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @$mfinal "$url"/api/dashboards/db > /dev/null 2>&1
 }
 
 #/////////////////////////////////////////////////////////////////////////////////////
@@ -65,16 +81,16 @@ add_device () {
 	
 	# Fill Dropdown in Devicemanager Dashboard //////////////////////////////////////////////////
 	get_dashboard "$devmgr_uid"
-	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#name=\\"nanolist\\">#name=\\"nanolist\\">\\r\\n\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
-	add_json_options;
-	pdate_dashboard
+	jq . $mtemp > $mout
+	sed -i "s#${devmgmt_drop}#${devmgmt_drop}${option_dev_http}#g" $mout
+	add_json_options
+	update_dashboard
 	rm /tmp/merge_panel_*
 
 	# Fill Dropdown in Settings Dashboard //////////////////////////////////////////////////
 	get_dashboard "$settings_uid"
-	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#...Geräteliste...</option>#...Geräteliste...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+	jq . $mtemp > $mout
+	sed -i "s#${devmgmt_drop}#${devmgmt_drop}${option_dev}#g" $mout
 	add_json_options
 	update_dashboard
 	rm /tmp/merge_panel_*
@@ -85,20 +101,20 @@ add_device () {
 		# Create Button on Home Dashboard //////////////////////////////////////////////////
 		# create new element from template
 		if [ "$devicetype" == "switch" ]; then
-			cp $template_folder"/"$device"_switch.json.template" "/tmp/merge_panel_input.json"
+			cp $template_folder"/"$device"_switch.json.template" $minp
 		elif [ "$devicetype" == "roller" ]; then
-			cp $template_folder"/"$device"_roller.json.template" "/tmp/merge_panel_input.json"
+			cp $template_folder"/"$device"_roller.json.template" $minp
 		elif [ "$devicetype" == "shutter" ]; then
-			cp $template_folder"/"$device"_shutter.json.template" "/tmp/merge_panel_input.json"
+			cp $template_folder"/"$device"_shutter.json.template" $minp
 		fi
 		
-		sed -i 's/_DEVID_/'$sn'/g'  /tmp/merge_panel_input.json
-		sed -i 's/_DESCRIPTION_/'"$desc"'/g'  /tmp/merge_panel_input.json
-		sed -i 's/_RAND_/'$random'/g'  /tmp/merge_panel_input.json
+		sed -i 's/_DEVID_/'$sn'/g' $minp
+		sed -i 's/_DESCRIPTION_/'"$desc"'/g' $minp
+		sed -i 's/_RAND_/'$random'/g' $minp
 
 		# merge new Button into Dashboard
 		get_dashboard "$home_uid"
-		jq --argjson panel "$(</tmp/merge_panel_input.json)" '.dashboard.panels += [$panel]' /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
+		jq --argjson panel "$(<$minp)" '.dashboard.panels += [$panel]' $mtemp > $mout
 		add_json_options
 		update_dashboard
 		rm /tmp/merge_panel_*
@@ -113,19 +129,19 @@ add_device () {
 		
 		# get timer dashboard & make it readable
 		get_dashboard "$zsp_uid"
-		jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
+		jq . $mtemp > $mout
 		
 		# add new option to timer dropdown
-		sed -i 's#name=\\"nanolist_timer\\">#name=\\"nanolist_timer\\">\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+		sed -i "s#${timer_drop}#${timer_drop}${option_dev}#g" $mout
 
 		# add new option to multiswitch dropdown
-		sed -i 's#Wenn...</option>#Wenn...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
-		sed -i 's#Dann...</option>#Dann...</option>\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+		sed -i "s#${switch_if_drop}#${switch_if_drop}${option_dev}#g" $mout
+		sed -i "s#${switch_then_drop}#${switch_then_drop}${option_dev}#g" $mout
 		
 		# add new option to standbykiller dropdown
 		if [ "$devicetype" == "switch" ]; then
 		
-			sed -i 's#name=\\"nanolist_stbykill\\">#name=\\"nanolist_stbykill\\">\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>#g' /tmp/merge_panel_output.json
+			sed -i "s#${killer_drop}#${killer_drop}${option_dev}#g" $mout
 		
 		fi
 		
@@ -147,42 +163,48 @@ remove_device () {
 
 	# remove services and timers
 	cronman remove "$sn"
+	echo ""
 	multiswitch remove "$sn"
+	echo ""
 	standbykiller remove "$sn"
+	echo ""
 	
 	# remove device from devlist
 	sed -i '/'$sn'/d' $rootpath/devlist
 	
 	# Remove from Devicemanager Dashboard //////////////////////////////////////////////////
 	get_dashboard "$devmgr_uid"
-	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#\\r\\n\\t<option value=\\"http://'$sn'.nano.lan\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+	jq . $mtemp > $mout
+	sed -i "s#${option_dev_http}##g" $mout
 	add_json_options
 	update_dashboard
 	rm /tmp/merge_panel_*
 
 	# Remove from Settings Dashboard //////////////////////////////////////////////////	
 	get_dashboard "$settings_uid"
-	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
-	sed -i 's#\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+	jq . $mtemp > $mout
+	sed -i "s#${option_dev}##g" $mout
 	add_json_options
 	update_dashboard
 	rm /tmp/merge_panel_*
 	
 	# Remove from Timer Dashboard //////////////////////////////////////////////////
 	get_dashboard "$zsp_uid"
-	jq . /tmp/merge_panel_temp.json > /tmp/merge_panel_output.json
+	jq . $mtemp > $mout
 	# if device found
-	if cat /tmp/merge_panel_output.json | grep "$sn" > /dev/null 2>&1 ; then
-		sed -i 's#\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>##g' /tmp/merge_panel_output.json
+	if cat $mout | grep "$sn" > /dev/null 2>&1 ; then
+		sed -i "s#${option_dev}##g" $mout
 		add_json_options
 		update_dashboard
 	fi
 	rm /tmp/merge_panel_*
-	
+
 	# message
-	statusmsg "Device Manager " "white" "" "" "$desc:" "hotpink" " $sn gelöscht <br> Button auf Home-Dashboard manuell löschen" "white"
+	echo -e "<font size='5' color='white'>Device Manager</font><br>"
+	echo -e "<font size='4' color='hotpink'>$desc: </font><font color='white'>gelöscht</font><br>"
+	echo -e "<font size='4' color='red'>Button auf Home-Dashboard manuell löschen</font>"	
 	exit 0
+
 
 }
 

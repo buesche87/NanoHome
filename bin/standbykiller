@@ -8,6 +8,7 @@ device="$2"
 maxpower="$3"
 rootpath="INSTALLDIR"
 
+
 # Device Support
 if [ ! "$device" = "all" ]; then
 	. $rootpath/dev_compatibility $device
@@ -15,57 +16,67 @@ fi
 
 # Environment
 svcname="standbykiller.$device.service"
-svclocation="~/.config/systemd/user"
+svclocation="/etc/systemd/system"
 svcfile="$svclocation/$svcname"
-svctemplate="$rootpath/templates/standbykiller.service.template"
+svctemplate="$rootpath/template/standbykiller.service.template"
 
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Print Standbykiller and their Cronjobs On Dashboard
-#/////////////////////////////////////////////////////////////////////////////////////
-printsvc () {
-
-	svcname="$1"
-	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
-
-	echo "<font size='4' color='hotpink'>$description</font>"
-
-	if systemctl --user is-active $svcname ; then
-
-		lastmsg="$(systemctl --user status $svcname | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
-
-		echo ""
-		echo "<font size='3'>Last Messages:</font>"
-		echo "<font size='2'>$lastmsg</font>"
-		echo ""
-
-	fi
-
+# help functions
+print_header () {
+	
+	echo "<font size='5' color='white'>Standbykiller</font><font size='5' color='$2'> $1</font><br>"
+	
 }
+
+
+print_cfg () {
+	
+	device="$1"
+	desc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
+	mp="$( cat $rootpath/killerlist | grep $device | cut -d: -f2 )"
+	
+	if [ ! -z "$mp" ]; then
+		echo "<font size='4'><font color='hotpink'>$desc</font> - <font color='#c0fcb1'>$mp W</font></font>"
+	else
+		echo "<font size='4'><font color='hotpink'>$desc</font> - <font color='grey'>inaktiv</font></font>" 
+	fi
+}
+
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Show Standbykiller
 #/////////////////////////////////////////////////////////////////////////////////////
 if [ "$1" = "show" ] && [ ! -z "$device" ]; then
-	
-	active="$( ls $svclocation | grep standbykiller )"
+
+	if [ "$device" = "all" ]; then
+		active="$( ls $svclocation | grep standbykiller | cut -d. -f2 )"
+	else
+		active="$( ls $svclocation | grep $device | cut -d. -f2 )"
+	fi
 
 	if [ ! -z "$active" ]; then
 		
-		echo "<font size='5' color='white'>Standbykiller</font><br>"
+		print_header "aktiv" "#c0fcb"
 		
-		while IFS= read -r line
-		do
+		while IFS= read -r line; do
 
-			printsvc "$line"
+			print_cfg "$line"
 
 		done <<< "$active"
 
 	else
 
-		statusmsg "Standbykiller" "white" " inaktiv" "grey" "Kein Standbykiller aktiv" "grey"
-
+		if [ "$device" = "all" ]; then
+		
+			print_header "inaktiv" "grey"
+			
+		else
+		
+			print_header "inaktiv" "grey"
+			print_cfg "$dev_desc"
+			
+		fi
 	fi
+
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Add Standbykiller
@@ -75,27 +86,27 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 	# check if service exists
 	if test -f "$svcfile"; then
 
-		statusmsg "Standbykiller" "white" "" "" "Service exists" "white"
-		printsvc "$svcname"
+		print_header "aktiv" "#c0fcb"
+		print_cfg "$device"
 
 	# create new service
 	else
-
+		
 		desc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
-
-		# Copy Service File from a template and modify it
+		
 		cp $svctemplate $svcfile
 
 		sed -i "s/-dev/$device/" $svcfile
 		sed -i "s/-desc/$desc/" $svcfile
 		sed -i "s/-sbpwr/$maxpower/" $svcfile
 
-		# Enable and Start Service
-		systemctl --user start $svcname
-		systemctl --user enable $svcname
-
-		# Print Multiswitch on Dashboard
-		printsvc "$svcname"
+		systemctl start $svcname
+		systemctl enable $svcname
+		
+		echo "$device:$maxpower" >> $rootpath/killerlist 
+		
+		print_header "aktiviert" "#c0fcb"
+		print_cfg "$device"
 
 	fi
 
@@ -103,22 +114,26 @@ elif [ "$1" = "add" ] && [ ! -z "$device" ] && [ ! -z "$maxpower" ]; then
 # Remove Standbykiller
 #/////////////////////////////////////////////////////////////////////////////////////
 elif [ "$1" = "remove" ] && [ ! -z "$device" ]; then
-	
-	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
-	
-	systemctl --user stop $svcname
-	systemctl --user disable $svcname
+
+	systemctl stop $svcname
+	systemctl disable $svcname
 
 	rm -r $svcfile
-	
-	statusmsg "Standbykiller" "white" " $description" "hotpink" " deaktiviert" "grey"
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Exit 1
-#/////////////////////////////////////////////////////////////////////////////////////
+	systemctl daemon-reload
+
+	print_header "deaktiviert" "grey"
+	print_cfg "$device"
+
+	sed -i '/'$device'/d' $rootpath/killerlist
+
 else
 
-	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
+	echo "----------------------------------------------------------"
+	echo "Usage: standbykiller show|add|remove device (standbypower)"
+	echo "----------------------------------------------------------"
+	echo
+
 	exit 1
 
 fi

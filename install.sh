@@ -31,6 +31,12 @@ fi
  mkdir -p $rootpath/driver/
  mkdir -p $rootpath/sensor/
  mkdir -p $rootpath/template/
+ mkdir -p $backupdir
+
+ touch $rootpath/devlist
+ touch $rootpath/killerlist
+ touch $rootpath/switchlist
+
 
 # general
 
@@ -71,6 +77,7 @@ fi
  ln -sf $rootpath/bin/* /usr/local/bin/
 
  sed -i "s#INSTALLDIR#$rootpath#" $rootpath/bin/*
+ sed -i "s#BACKUPDIR#$backupdir#" $rootpath/bin/*
  sed -i "s#MQTTSYSTEMUSER#$mqtt_system_user#" $rootpath/bin/*
  sed -i "s#MQTTSYSTEMPASS#$mqtt_system_pass#" $rootpath/bin/*
  sed -i "s#INFLUXDATABASE#$influxdb_name#" $rootpath/bin/*
@@ -267,6 +274,27 @@ EOF
 
  home_id="$(curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" http://localhost:3000/api/dashboards/uid/$home_uid | jq -r '.dashboard.id')"
  curl -X PUT -H "Content-Type: application/json" -d '{"homeDashboardId":'$home_id'}' http://admin:admin@localhost:3000/api/org/preferences
+
+# install grafana backup
+
+ pip3 install "pip>=20"
+
+ git clone https://github.com/ysde/grafana-backup-tool.git $rootpath/grafana-backup-tool
+
+ cd $rootpath/grafana-backup-tool
+ pip3 install $rootpath/grafana-backup-tool
+ cd -
+ 
+ gbt_conf="$rootpath/grafana-backup-tool/grafana_backup/conf/grafanaSettings.json"
+
+ echo "$( jq '.grafana.token = "'$api_key'"' $gbt_conf )" > $gbt_conf
+ echo "$( jq '.general.backup_dir = "'$backupdir'"' $gbt_conf )" > $gbt_conf
+ echo "$( '.general.verify_ssl = false' $gbt_conf )" > $gbt_conf
+
+ sed -i "s#python#python3#" $rootpath/grafana-backup-tool/backup_grafana.sh
+ sed -i "s#python#python3#" $rootpath/grafana-backup-tool/restore_grafana.sh
+
+
  
 # post processing
  

@@ -16,38 +16,10 @@ elif [ "$1" = "update" ]; then
 
 elif [ "$1" = "reboot" ]; then
 
-	if [ -e "/dev/mmcblk1p2" ]; then 
-
-		echo "<h3>Recovery-SD eingelegt</h3>"
-		echo "Gerät wird nicht neu gestartet"
-		echo "<i>Recovery</i> drücken um von Recovery-SD zu starten"
-		exit 1
-		
-	else 
-
-		echo "<font size=5 color='hotpink'>Reboot</font><p><br>Sie Seite wird in 2 Minuten neu geladen"
-		echo "<script>setTimeout(() => { window.location.reload(true); }, 120000);</script>"
-		
-		bash -c 'sleep 5 && systemctl reboot' & jobs
-
-	fi
-
-elif [ "$1" = "recovery" ]; then
-
-	if [ ! -e "/dev/mmcblk1p2" ]; then 
+	echo "<font size=5 color='hotpink'>Reboot</font><p><br>Sie Seite wird in 2 Minuten neu geladen"
+	echo "<script>setTimeout(() => { window.location.reload(true); }, 120000);</script>"
 	
-		echo "<h3>Keine Recovery-SD eingelegt</h3>"
-		echo "Gerät wird nicht neu gestartet"
-		exit 1
-		
-	else
-	
-		echo "<font size=5 color='hotpink'>Reboot in Recovery</font><p><br>Recovery über http://nanohome.nano.lan wird in 2 Minuten geöffnet"
-		echo "<script>setTimeout(() => { window.open('http://nanohome.nano.lan'); }, 120000); </script>"
-		
-		bash -c 'sleep 5 && systemctl reboot' & jobs
-		
-	fi
+	bash -c 'sleep 5 && systemctl reboot' & jobs
 
 elif [ "$1" = "time" ]; then
 

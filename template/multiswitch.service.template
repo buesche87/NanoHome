@@ -1,10 +1,10 @@
 [Unit]
 Wants=mosquitto.service
-Description=-desc1 [-value1] -> -desc2 [-value2]
+Description=-desc1 -> -desc2
 
 [Service]
 Type=idle
-ExecStart=/bin/bash /usr/bin/multiswitchsvc -dev1 -dev2 -value1 -value2
+ExecStart=/bin/bash multiswitchsvc -dev1 -dev2 -value1 -value2
 Restart=always
 
 [Install]
