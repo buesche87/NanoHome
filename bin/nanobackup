@@ -1,0 +1,61 @@
+#!/bin/bash
+# nanobackup - NanoHome backup tool
+
+# Catch Parameters
+rectype="$1" #[backup|restore]
+grafana="$2" #[true|false]
+influxdb="$3" #[true|false]
+
+# Settings
+bkpdir="BACKUPDIR"
+bkdr_grafana="$bkpdir/Grafana"
+bkdr_influxdb="$bkpdir/InfluxDB"
+rootpath="INSTALLDIR"
+
+
+mkdir -p "$bkdr_grafana"
+mkdir -p "$bkdr_influxdb"
+
+# get backup selections from interface
+if [ "$rectype" == "backup" ]; then
+
+    if [ "$grafana" == "true" ]; then
+        cd $rootpath/grafana-backup-tool/
+        ./backup_grafana.sh >> /dev/null 2>&1
+        touch "$bkdr_grafana"
+        echo "Grafana Backup..."
+    fi
+    if [ "$influxdb" == "true" ]; then
+        influxd backup -portable -database nanohome "$bkdr_influxdb" >> /dev/null 2>&1
+        touch "$bkdr_influxdb"
+        echo "InfluxDB Backup..."
+    fi
+
+	statusmsg "Backup complete" "hotpink"
+
+fi
+
+# get restore selections from interface
+if [ "$rectype" == "restore" ]; then
+
+    if [ "$grafana" == "true" ]; then
+        echo "Restoring Grafana..."
+        #cd $rootpath/grafana-backup-tool/
+        #./restore_grafana.sh
+    fi
+    if [ "$influxdb" == "true" ]; then
+        echo "Restoring InfluxDB..."
+        #influxd restore -portable $bkdr_influxdb
+    fi
+	
+	statusmsg "Restore complete" "hotpink" "" "" "Inaktiv - zu gefährlich" "white"
+	
+fi
+
+# show backups
+if [ "$rectype" == "show" ]; then
+
+	echo "<font size=5 color='hotpink'>Stored Backups</font><br>"
+	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $bkpdir)"
+
+fi

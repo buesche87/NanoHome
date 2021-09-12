@@ -6,17 +6,10 @@
 # Catch Parameters
 dev1="$2"
 dev2="$3"
-value1="toggle"
-value2="toggle"
-rec="$4"
-from="$5"
-to="$6"
-if [ "$rec" = "Aktiv..." ]; then rec="always"; fi
-if [ "$dev1" = "$dev2" ]; then dev1="all"; fi
 rootpath="INSTALLDIR"
 
-# Exit if
 if [ "$dev1" = "Wenn..." ] || [ "$dev2" = "Dann..." ]; then exit 1; fi
+if [ "$dev1" = "$dev2" ]; then dev1="all"; fi
 
 # Device Support
 if [ ! "$1" = "remove" ] && [ ! "$dev1" = "all" ]; then
@@ -24,71 +17,84 @@ if [ ! "$1" = "remove" ] && [ ! "$dev1" = "all" ]; then
 fi
 
 # Environment
-svcname="multiswitch.$dev1.$value1.$dev2.$value2.service"
-svclocation="~/.config/systemd/user"
+msident="$dev1.$dev2"
+svcname="multiswitch.$msident.service"
+svclocation="/etc/systemd/system"
 svcfile="$svclocation/$svcname"
-svctemplate="$rootpath/templates/multiswitch.service.template"
+svctemplate="$rootpath/template/multiswitch.service.template"
 
-
-#/////////////////////////////////////////////////////////////////////////////////////
-# Print Multiswitches and their Cronjobs On Dashboard
-#/////////////////////////////////////////////////////////////////////////////////////
-printsvc () {
-
-	# get description of devices from devlist
-	svcname="$1"
-	description="$( grep Description $svclocation/$svcname | cut -d= -f2 )"
+# help functions
+print_header () {
 	
-	echo "<font size='4' color='hotpink'>$description</font>"
-
-	# print last messages from service
-	if systemctl --user is-active $svcname ; then
-		
-		lastmsg="$(systemctl --user status $svcname | tail -5 | sort -r | grep '|' | cut -d'|' -f 2 )"
-
-		echo ""
-		echo "Last Messages:"
-		echo "<font size='2'>$lastmsg</font>"
-		echo ""
-
-	fi
-
+	echo "<font size='5' color='white'>Multiswitch</font><font size='5' color='$2'> $1</font><br>"
+	
 }
+
+
+print_cfg () {
+	
+	ms="$( cat $rootpath/switchlist | grep $1 | cut -d: -f2 )"
+	
+	dev1="$( echo $1 | cut -d. -f1 )"
+	dev2="$( echo $1 | cut -d. -f2 )"
+	desc1="$(cat $rootpath/devlist | grep $dev1 | cut -d: -f2 )"
+	desc2="$(cat $rootpath/devlist | grep $dev2 | cut -d: -f2 )"
+	
+	if [ ! -z "$ms" ]; then
+		echo "<font size='4'><font color='hotpink'>$desc1 -> $desc2</font> - <font color='#c0fcb1'>aktiv</font></font>"
+	else
+		echo "<font size='4'><font color='hotpink'>$desc1 -> $desc2</font> - <font color='grey'>inaktiv</font></font>" 
+	fi
+}
+
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Show Multiswitches
 #/////////////////////////////////////////////////////////////////////////////////////
-if [ "$1" = "show" ]; then
+if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
 
-	active="$( ls $svclocation | grep multiswitch )"
-	
+	if [ "$dev1" = "all" ]; then
+		active="$( ls $svclocation | grep multiswitch | cut -d. -f2 )"
+	else
+		active="$( ls $svclocation | grep $dev1.$dev2 | cut -d. -f2 )"
+	fi
+
+
 	if [ ! -z "$active" ]; then
 		
-		echo "<font size='5' color='white'>Multiswitch</font><br>"
+		print_header "aktiv" "#c0fcb"
 		
-		while IFS= read -r line
-		do
+		while IFS= read -r line; do
 
-			printsvc "$line"
+			print_cfg "$line"
 
 		done <<< "$active"
 
 	else
 
-		statusmsg "Multiswitch" "white" " inaktiv" "grey" "Kein Multiswitch aktiv" "grey"
-
+		if [ "$dev1" = "all" ]; then
+		
+			print_header "inaktiv" "grey"
+			
+		else
+		
+			print_header "inaktiv" "grey"
+			print_cfg "$msident"
+			
+		fi
 	fi
+
 
 #/////////////////////////////////////////////////////////////////////////////////////
 # Add Multiswitch
 #/////////////////////////////////////////////////////////////////////////////////////
-elif [ "$1" = "add" ] && [ ! "$dev1" = "all" ]; then
+elif [ "$1" = "add" ] && [ ! -z "$dev1" ] && [ ! -z "$dev2" ] && [ ! "$dev1" = "$dev2" ]; then
 
 	# Check if service exists
 	if test -f "$svcfile"; then
 		
-		statusmsg "Multiswitch" "white" "" "" "Service exists" "white"
-		printsvc "$svcname"
+		print_header "aktiv" "#c0fcb"
+		print_cfg "$msident"
 
 	# create service
 	else
@@ -96,22 +102,31 @@ elif [ "$1" = "add" ] && [ ! "$dev1" = "all" ]; then
 		desc1="$(cat $rootpath/devlist | grep $dev1 | cut -d: -f2 )"
 		desc2="$(cat $rootpath/devlist | grep $dev2 | cut -d: -f2 )"
 		
-		# Copy Service File from a template and modify it
+		. $rootpath/dev_compatibility $dev1
+		dev1_command=$(echo $toggle_command)
+		
+		. $rootpath/dev_compatibility $dev2
+		dev2_command=$(echo $toggle_command)
+		
+		# Copy Service File from a template and modify it		
 		cp $svctemplate $svcfile
 
 		sed -i "s/-dev1/$dev1/" $svcfile
 		sed -i "s/-dev2/$dev2/" $svcfile
+		sed -i "s/-value1/$dev1_command/" $svcfile
+		sed -i "s/-value2/$dev2_command/" $svcfile		
 		sed -i "s/-desc1/$desc1/" $svcfile
 		sed -i "s/-desc2/$desc2/" $svcfile
-		sed -i "s/-value1/$value1/" $svcfile
-		sed -i "s/-value2/$value2/" $svcfile		
-		
-		# Enable and Start Service
-		systemctl --user start $svcname
-		systemctl --user enable $svcname
 
+		# Enable and Start Service
+		systemctl start $svcname
+		systemctl enable $svcname
+		
+		echo "$dev1.$dev2:$desc1 -> $desc2" >> $rootpath/switchlist  
+		
 		# Print Multiswitch on Dashboard
-		printsvc "$svcname"
+		print_header "aktiviert" "#c0fcb"
+		print_cfg "$msident"
 
 	fi
 
@@ -122,27 +137,35 @@ elif [ "$1" = "remove" ] && [ ! -z "$dev1" ] && [ ! "$dev1" = "$dev2" ]; then
 
 	# remove all services if only one device is set
 	if [ "$dev2" == "" ]; then 
-		svcname="ls $svclocation | grep multiswitch | grep $dev1"
+		msident="ls $svclocation | grep multiswitch | grep $dev1 | cut -d: -f2"
+	else
+		svcline="$msident"
 	fi
 
+	print_header "deaktiviert" "grey"
+	
 	# Delete Multiswitch
 	while IFS= read -r line
 	do
-		systemctl --user stop "$line"
-		systemctl --user disable "$line"
+		systemctl stop "multiswitch.$line.service"
+		systemctl disable "multiswitch.$line.service"
 
-		rm -r "$svclocation/$line"
+		rm -r "$svclocation/multiswitch.$line.service"
 
-	done <<< "$svcname"
+		systemctl daemon-reload
+		
+		print_cfg "$dev1.$dev2"
 
-	statusmsg "Multiswitch" "white" " $dev1" "hotpink" " deaktiviert" "grey"
+	done <<< "$svcline"
+	
+	# Print Multiswitch on Dashboard
+	sed -i '/'$dev1'_'$dev2'/d' $rootpath/switchlist
+	
 
-#/////////////////////////////////////////////////////////////////////////////////////
-# Exit 1
-#/////////////////////////////////////////////////////////////////////////////////////
 else
 
 	statusmsg "Error" "red" "" "" "Eingabe prüfen" "white"
+
 	exit 1
 
 fi

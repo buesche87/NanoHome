@@ -18,7 +18,6 @@ rootpath="INSTALLDIR"
 # Device Support
 . $rootpath/dev_compatibility $dev1
 dev1_control_topic=$(echo $control_topic)
-# dev1_status_topic=$(echo $status_topic)
 
 . $rootpath/dev_compatibility $dev2
 dev2_control_topic=$(echo $control_topic)
@@ -29,9 +28,6 @@ if [[ "dev2_type" == *"shelly"* ]]; then
 elif  [[ "dev2_type" == *"sonoff"* ]]; then
 	value2=echo ${value2,,}
 fi
-
-# dev1_status=$( mosquitto_sub -h $server -u $user -P $pass -t $dev1_status_topic -q 2 )
-# echo "$dev1_status"
 
 # Main
 while read curvalue;

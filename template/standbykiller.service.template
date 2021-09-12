@@ -1,10 +1,10 @@
 [Unit]
 Wants=mosquitto.service
-Description=-desc [-sbpwr]
+Description=-desc -sbpwr W
 
 [Service]
 Type=idle
-ExecStart=/bin/bash /usr/bin/standbykillersvc service -dev -sbpwr
+ExecStart=/bin/bash standbykillersvc -dev -sbpwr
 Restart=always
 
 [Install]
