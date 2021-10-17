@@ -1,6 +1,6 @@
 # NanoHome
 
-This is a one-man show, don't except it to be bug-free...
+This is a one-man show, don't expect it to be bug-free...
 
 I used https://dietpi.com as distribution
 
