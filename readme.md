@@ -40,6 +40,12 @@ sudo systemctl unmask influxdb.service
 sudo service influxdb start
 ```
 
+# Edit NanoHome Config
+
+Copy `config.cfg.example` to `config.cfg`.
+
+Edit username and password entries. Don't mess with the dashboard settings, these id's are given by the installation.
+
 # Install NanoHome
 ```bash
 git clone
