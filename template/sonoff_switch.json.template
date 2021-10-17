@@ -1,6 +1,6 @@
 {
   "datasource": null,
-  "content": "<button class=\"home\" onclick=\"publish('TOGGLE','sonoff/_DEVID_/cmnd/POWER','sonoff/_DEVID_/stat/POWER','_DESCRIPTION_', 2);\">\r\n<table class=\"home\">\r\n\t<tr class=\"home\">\r\n\t\t<td class=\"home\" style=\"width:70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n\t\t<td class=\"home\" style=\"text-align:left;\"><font size=\"6\">_DESCRIPTION_</font></td>\r\n\t</tr>\r\n</table>\r\n</button>",
+  "content": "<button class=\"home\" onclick=\"publish('TOGGLE','sonoff/_DEVID_/cmnd/POWER','sonoff/_DEVID_/stat/POWER','_DESCRIPTION_', 2);\">\r\n<table style=\"width: 100%; height: 100%;\">\r\n\t<tr>\r\n\t\t<td style=\"width:70px;\"><img src=\"../public/img/onoff.png\" /></td>\r\n\t\t<td style=\"text-align:left;\"><font size=\"5\">_DESCRIPTION_</font></td>\r\n\t</tr>\r\n</table>\r\n</button>",
   "gridPos": {
     "h": 3,
     "w": 6,

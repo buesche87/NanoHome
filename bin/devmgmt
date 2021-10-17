@@ -23,11 +23,11 @@ template_folder="$rootpath/template"
 option_dev='\\r\\n\\t<option value=\\"'$sn'\\">'"$desc"'</option>'
 option_dev_http='\\r\\n\\t<option value=\\"http://'$sn'\\">'"$desc"'</option>'
 
-devmgmt_drop='...Geräteliste...</option>'
 timer_drop='name=\\"nanolist_timer\\">\\r\\n\\t<option selected disabled>...Gerät...</option>'
 killer_drop='name=\\"nanolist_stbykill\\">\\r\\n\\t<option selected disabled>...Gerät...</option>'
-switch_if_drop='...Wenn...</option>'
-switch_then_drop='...Dann...</option>'
+device_drop='\\r\\n\\t<option selected disabled>...Gerät...</option>'
+switch_if_drop='\\r\\n\\t<option selected disabled>...Wenn...</option>'
+switch_then_drop='\\r\\n\\t<option selected disabled>...Dann...</option>'
 
 url="http://localhost:3000"
 mout="/tmp/merge_panel_output.json"
@@ -44,7 +44,7 @@ get_dashboard () {
 
 add_json_options () {
 
-	folderid="$(cat $out | grep folderId | awk '{ sub(/^[ \t]+/, ""); print }')"
+	folderid="$(cat $mout | grep folderId | awk '{ sub(/^[ \t]+/, ""); print }')"
 	json_data="{ ${folderid} \"overwrite\": true }"
 
 	jq --argjson options "$json_data" '. += $options' $mout > $mfinal
@@ -82,7 +82,7 @@ add_device () {
 	# Fill Dropdown in Devicemanager Dashboard //////////////////////////////////////////////////
 	get_dashboard "$devmgr_uid"
 	jq . $mtemp > $mout
-	sed -i "s#${devmgmt_drop}#${devmgmt_drop}${option_dev_http}#g" $mout
+	sed -i "s#${device_drop}#${device_drop}${option_dev_http}#g" $mout
 	add_json_options
 	update_dashboard
 	rm /tmp/merge_panel_*
@@ -90,7 +90,7 @@ add_device () {
 	# Fill Dropdown in Settings Dashboard //////////////////////////////////////////////////
 	get_dashboard "$settings_uid"
 	jq . $mtemp > $mout
-	sed -i "s#${devmgmt_drop}#${devmgmt_drop}${option_dev}#g" $mout
+	sed -i "s#${device_drop}#${device_drop}${option_dev}#g" $mout
 	add_json_options
 	update_dashboard
 	rm /tmp/merge_panel_*
@@ -163,11 +163,8 @@ remove_device () {
 
 	# remove services and timers
 	cronman remove "$sn"
-	echo ""
 	multiswitch remove "$sn"
-	echo ""
 	standbykiller remove "$sn"
-	echo ""
 	
 	# remove device from devlist
 	sed -i '/'$sn'/d' $rootpath/devlist
@@ -198,13 +195,12 @@ remove_device () {
 		update_dashboard
 	fi
 	rm /tmp/merge_panel_*
-
+	
 	# message
 	echo -e "<font size='5' color='white'>Device Manager</font><br>"
 	echo -e "<font size='4' color='hotpink'>$desc: </font><font color='white'>gelöscht</font><br>"
 	echo -e "<font size='4' color='red'>Button auf Home-Dashboard manuell löschen</font>"	
 	exit 0
-
 
 }
 

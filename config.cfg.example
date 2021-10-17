@@ -1,0 +1,39 @@
+##################################
+# NanoHome install configuration #
+##################################
+
+# NanoHome user
+username="nanohome"
+userpass="password"
+mqtt_system_user="mqtt_system"
+mqtt_system_pass="password"
+mqtt_grafana_user="mqtt_grafana"
+mqtt_grafana_pass="password"
+influx_system_user="mqtt_system"
+influx_system_pass="password"
+rootpath="/opt/nanohome"
+backupdir="/home/nanohome/backup"
+weather_location=""
+
+# InfluxDB settings
+influxdb_name="nanohome"
+influxdb_admin="nanohome"
+influxdb_adminpass="password"
+
+# sensors
+cputemp=true
+diskspace=true
+
+# Grafana Dashboard Settings
+home_uid="XieEaLmRk"
+devmgr_uid="Uhzl9yRgk"
+zsp_uid="_H3fwdmRz"
+settings_uid="sYOGRUiRz"
+
+# Device users
+mosquitto_shelly_user="mqtt_shelly"
+mosquitto_shelly_pass="password"
+
+# MQTT Dash user
+mosquitto_dash_user="mqtt_dash"
+mosquitto_dash_pass="password"
