@@ -47,3 +47,5 @@ cd nanohome
 chmod +x ./install.sh
 sudo ./install.sh
 ```
+
+Start your Webbroser and goto http://ipaddress:3000/
