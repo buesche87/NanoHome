@@ -43,7 +43,6 @@ fi
  touch $rootpath/devlist
  cp ./dev_compatibility $rootpath
  cp ./template/* $rootpath/template/
- echo "%$username ALL=NOPASSWD: /bin/systemctl restart nanohome_helper" > /etc/sudoers.d/nanohome
 
 # prepare influxdb database
 
@@ -98,7 +97,6 @@ fi
 
  cp ./service/* /lib/systemd/system/
  sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/mqtt_*
- sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/nanohome*
  sed -i "s#SVCUSER#$username#" /lib/systemd/system/mqtt_*
 
 # modify device manager
@@ -289,7 +287,7 @@ EOF
 
  echo "$( jq '.grafana.token = "'$api_key'"' $gbt_conf )" > $gbt_conf
  echo "$( jq '.general.backup_dir = "'$backupdir'"' $gbt_conf )" > $gbt_conf
- echo "$( '.general.verify_ssl = false' $gbt_conf )" > $gbt_conf
+ echo "$( jq '.general.verify_ssl = false' $gbt_conf )" > $gbt_conf
 
  sed -i "s#python#python3#" $rootpath/grafana-backup-tool/backup_grafana.sh
  sed -i "s#python#python3#" $rootpath/grafana-backup-tool/restore_grafana.sh
