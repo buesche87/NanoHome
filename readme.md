@@ -1,7 +1,8 @@
 # NanoHome
 
-TBD
+This is a one-man show, don't expect it to be bug-free...
 
+I used https://dietpi.com as distribution
 
 # Repositories
 
@@ -39,10 +40,18 @@ sudo systemctl unmask influxdb.service
 sudo service influxdb start
 ```
 
-# Installation
+# Edit NanoHome Config
+
+Copy `config.cfg.example` to `config.cfg`.
+
+Edit username and password entries. Don't mess with the dashboard settings, these id's are given by the installation.
+
+# Install NanoHome
 ```bash
 git clone
 cd nanohome
 chmod +x ./install.sh
 sudo ./install.sh
 ```
+
+Start your Webbroser and goto http://ipaddress:3000/
