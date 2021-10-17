@@ -21,8 +21,9 @@ if [ "$rectype" == "backup" ]; then
 
     if [ "$grafana" == "true" ]; then
         cd $rootpath/grafana-backup-tool/
-        ./backup_grafana.sh >> /dev/null 2>&1
+        ./backup_grafana.sh ./grafana_backup/conf/grafanaSettings.json >> /dev/null 2>&1
         touch "$bkdr_grafana"
+		cd -
         echo "Grafana Backup..."
     fi
     if [ "$influxdb" == "true" ]; then
