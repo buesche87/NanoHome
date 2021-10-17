@@ -56,7 +56,7 @@ if [ "$1" = "show" ] && [ ! -z "$dev1" ]; then
 	if [ "$dev1" = "all" ]; then
 		active="$( ls $svclocation | grep multiswitch | cut -d. -f2 )"
 	else
-		active="$( ls $svclocation | grep $dev1.$dev2 | cut -d. -f2 )"
+		active="$( ls $svclocation | grep multiswitch.$dev1+$dev2 | cut -d. -f2 )"
 	fi
 
 

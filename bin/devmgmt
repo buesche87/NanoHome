@@ -61,7 +61,7 @@ update_dashboard () {
 show_devices () {
 
 	msg="$(cat $rootpath/devlist | awk -F':' '{printf "<font color='hotpink'>"$2 ":</font> " $1 "<br>"}')"
-	statusmsg "Geräteliste" "white" "" "" "$msg" "white"
+	statusmsg "Device Manager" "white" " - Geräteliste" "white" "$msg" "white"
 	exit 0
 
 }
@@ -151,7 +151,7 @@ add_device () {
 	fi
 	
 	# message
-	statusmsg "Device Manager " "white" "" "" "$desc:" "hotpink" " $sn hinzugefügt" "white"
+	statusmsg "Device Manager " "white" "hinzugefügt" "#c0fcb1" "$desc: " "hotpink" "$sn" "white"
 	exit 0
 
 }
@@ -163,9 +163,12 @@ remove_device () {
 
 	# remove services and timers
 	cronman remove "$sn"
+	echo ""
 	multiswitch remove "$sn"
+	echo ""
 	standbykiller remove "$sn"
-	
+	echo ""
+
 	# remove device from devlist
 	sed -i '/'$sn'/d' $rootpath/devlist
 	
@@ -197,8 +200,8 @@ remove_device () {
 	rm /tmp/merge_panel_*
 	
 	# message
-	echo -e "<font size='5' color='white'>Device Manager</font><br>"
-	echo -e "<font size='4' color='hotpink'>$desc: </font><font color='white'>gelöscht</font><br>"
+	statusmsg "Device Manager " "white" "gelöscht" "grey" "$desc: " "hotpink" "$sn" "white"
+	echo ""
 	echo -e "<font size='4' color='red'>Button auf Home-Dashboard manuell löschen</font>"	
 	exit 0
 

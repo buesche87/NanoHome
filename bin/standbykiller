@@ -27,17 +27,15 @@ print_header () {
 	
 }
 
-
 print_cfg () {
 	
-	device="$1"
-	desc="$(cat $rootpath/devlist | grep $device | cut -d: -f2 )"
-	mp="$( cat $rootpath/killerlist | grep $device | cut -d: -f2 )"
+	desc="$(cat $rootpath/devlist | grep $1 | cut -d: -f2 )"
+	mp="$(cat $rootpath/killerlist | grep $1 | cut -d: -f2 )"
 	
 	if [ ! -z "$mp" ]; then
-		echo "<font size='4'><font color='hotpink'>$desc</font> - <font color='#c0fcb1'>$mp W</font></font>"
+		echo -e "<font size='4'><font color='hotpink'>$desc</font> - <font color='#c0fcb1'>$mp W</font></font>"
 	else
-		echo "<font size='4'><font color='hotpink'>$desc</font> - <font color='grey'>inaktiv</font></font>" 
+		echo -e "<font size='4'><font color='hotpink'>$desc</font> - <font color='grey'>inaktiv</font></font>" 
 	fi
 }
 
@@ -50,7 +48,7 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 	if [ "$device" = "all" ]; then
 		active="$( ls $svclocation | grep standbykiller | cut -d. -f2 )"
 	else
-		active="$( ls $svclocation | grep $device | cut -d. -f2 )"
+		active="$( ls $svclocation | grep standbykiller.$device | cut -d. -f2 )"
 	fi
 
 	if [ ! -z "$active" ]; then
@@ -72,7 +70,7 @@ if [ "$1" = "show" ] && [ ! -z "$device" ]; then
 		else
 		
 			print_header "inaktiv" "grey"
-			print_cfg "$dev_desc"
+			print_cfg "$device"
 			
 		fi
 	fi
