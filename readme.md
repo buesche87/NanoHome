@@ -1,7 +1,8 @@
 # NanoHome
 
-TBD
+This is a one-man show, don't except it to be bug-free...
 
+I used https://dietpi.com as distribution
 
 # Repositories
 
@@ -39,7 +40,7 @@ sudo systemctl unmask influxdb.service
 sudo service influxdb start
 ```
 
-# Installation
+# Install NanoHome
 ```bash
 git clone
 cd nanohome
