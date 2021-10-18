@@ -48,10 +48,10 @@ Edit username and password entries. Don't mess with the dashboard settings, thes
 
 # Install NanoHome
 ```bash
-git clone
-cd nanohome
+git clone https://github.com/buesche87/NanoHome.git
+cd NanoHome
 chmod +x ./install.sh
 sudo ./install.sh
 ```
 
-Start your Webbroser and goto http://ipaddress:3000/
+Start your Webbroser and go to http://ipaddress:3000/
