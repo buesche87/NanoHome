@@ -1,24 +1,19 @@
 #!/bin/bash
-# dev_compatibility
-
-if [ -z "$1" ]; then
-
-	echo "-------------------------------"
-	echo "Zu wenig Parameter definiert"
-	echo "Usage: dev_cmopatibility device"
-	echo "-------------------------------"
-	echo
-
-	exit 1
-fi
+#/////////////////////////////////////////////////////////////////////////////////////
+# Device Compatibilty
+#/////////////////////////////////////////////////////////////////////////////////////
 
 # Parameters
 device="$1"
-dev_desc="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f2 )"
-dev_vend="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f3 )"
-dev_type="$(cat /opt/nanohome/devlist | grep $device | cut -d: -f4 )"
+rootpath="INSTALLDIR"
+template_folder="$rootpath/template"
+
+dev_desc="$(grep $device $rootpath/devlist | cut -d: -f2 )"
+dev_vend="$(grep $device $rootpath/devlist | cut -d: -f3 )"
+dev_type="$(grep $device $rootpath/devlist | cut -d: -f4 )"
+
 if [[ "$device" =~ "multiswitch" ]]; then dev_type="multiswitch"; fi
-template_folder="/opt/nanohome/templates"
+
 
 if [ "$dev_type" = "" ]; then
 
@@ -29,6 +24,13 @@ if [ "$dev_type" = "" ]; then
 	
 	exit 1
 	
+fi
+
+# shelly SN uppercase
+if [[ "$dev_vend" == "shelly" ]]; then 
+	tmpdev=$(echo $device | cut -d- -f1)
+	tmpsn=$(echo $device | cut -d- -f2)
+	device=$tmpdev-$(echo ${tmpsn^^})
 fi
 
 # Geräteunterstützung
