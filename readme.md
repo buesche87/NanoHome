@@ -4,6 +4,9 @@ This is a one-man show, don't expect it to be bug-free...
 
 I used https://dietpi.com as distribution
 
+You can install NanoHome on a virtual machine, Raspberry Pi or any another SBC. 
+The following steps should be everything you need on a debian based distro for it to start.
+
 # Repositories
 
 ## InfluxDB (example debian buster)
