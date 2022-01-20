@@ -6,8 +6,9 @@
 # Catch Parameters
 device="$2"
 maxpower="$3"
-rootpath="INSTALLDIR"
 
+# Load config
+. INSTALLDIR/config.cfg
 
 # Device Support
 if [ ! "$device" = "all" ]; then

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Check for recovery-sd before reboot
+# System tools
 
 
 if [ "$1" = "checkupdate" ]; then

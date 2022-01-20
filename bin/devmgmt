@@ -9,13 +9,11 @@ desc="$3"
 device="$4"
 devicetype="$5"
 random="$(date +%s)"
-rootpath="INSTALLDIR"
+
+# Load config
+. INSTALLDIR/config.cfg
 
 # Settings
-home_uid="$(grep 'home_uid' $rootpath/conf/uids | cut -d: -f2)"
-devmgr_uid="$(grep 'devmgr_uid' $rootpath/conf/uids | cut -d: -f2)"
-zsp_uid="$(grep 'zsp_uid' $rootpath/conf/uids | cut -d: -f2)"
-settings_uid="$(grep 'settings_uid' $rootpath/conf/uids | cut -d: -f2)"
 api_key="$(cat $rootpath/conf/api_key.json | jq -r '.key')"
 template_folder="$rootpath/template"
 
@@ -29,7 +27,6 @@ device_drop='\\r\\n\\t<option selected disabled>...Gerät...</option>'
 switch_if_drop='\\r\\n\\t<option selected disabled>...Wenn...</option>'
 switch_then_drop='\\r\\n\\t<option selected disabled>...Dann...</option>'
 
-url="http://localhost:3000"
 mout="/tmp/merge_panel_output.json"
 mtemp="/tmp/merge_panel_temp.json"
 mfinal="/tmp/merge_panel_final.json"
@@ -39,7 +36,7 @@ minp="/tmp/merge_panel_input.json"
 get_dashboard () {
 	
 	uid="$1"
-	curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" "$url"/api/dashboards/uid/"$uid" > $mtemp
+	curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" "http://$grafana_url"/api/dashboards/uid/"$uid" > $mtemp
 }
 
 add_json_options () {
@@ -52,7 +49,7 @@ add_json_options () {
 
 update_dashboard () {
 
-	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @$mfinal "$url"/api/dashboards/db > /dev/null 2>&1
+	curl -X POST --insecure -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" -d @$mfinal "http://$grafana_url"/api/dashboards/db > /dev/null 2>&1
 }
 
 #/////////////////////////////////////////////////////////////////////////////////////

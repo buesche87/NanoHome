@@ -5,11 +5,10 @@
 device="$1"
 maxpower="$2"
 
+# Load config
+. INSTALLDIR/config.cfg
+
 # Environment
-server="localhost"
-user="MQTTSYSTEMUSER"
-pass="MQTTSYSTEMPASS"
-rootpath="INSTALLDIR"
 lastmsg="off"
 try="1"
 . $rootpath/dev_compatibility $device
@@ -30,7 +29,7 @@ do
 			
 		elif [ try > 2 ]; then #give time to manually wake unwanted standby
 			echo "|[$now] $device: ${curpower}W - standby killed"
-			mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m $off_command >/dev/null 2>&1			
+			mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $control_topic -m $off_command >/dev/null 2>&1			
 
 		else
 			echo "|[$now] $device: ${curpower}W - less than ${maxpower}W -> wait 60s and then kill standby"
@@ -44,4 +43,4 @@ do
 
 	fi
 
-done < <(mosquitto_sub -h $server -u $user -P $pass -t $power_topic -q 2)
+done < <(mosquitto_sub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $power_topic -q 2)

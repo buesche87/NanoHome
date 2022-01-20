@@ -13,14 +13,14 @@ fi
 
 # test if user exists
 
-if getent passwd $username > /dev/null ; then
+if getent passwd $linuxuser > /dev/null ; then
  
- echo "use existing user \"$username\""
+ echo "use existing user \"$linuxuser\""
 
 else
 
- echo "create user $username"
- useradd -p $(openssl passwd -1 $userpass) $username
+ echo "create user $linuxuser"
+ useradd -p $(openssl passwd -1 $userpass) $linuxuser
 
 fi
 
@@ -41,6 +41,7 @@ fi
 # general
 
  touch $rootpath/devlist
+ cp ./config.cfg $rootpath
  cp ./dev_compatibility $rootpath
  cp ./template/* $rootpath/template/
 
@@ -76,10 +77,6 @@ fi
  ln -sf $rootpath/bin/* /usr/local/bin/
 
  sed -i "s#INSTALLDIR#$rootpath#" $rootpath/bin/*
- sed -i "s#BACKUPDIR#$backupdir#" $rootpath/bin/*
- sed -i "s#MQTTSYSTEMUSER#$mqtt_system_user#" $rootpath/bin/*
- sed -i "s#MQTTSYSTEMPASS#$mqtt_system_pass#" $rootpath/bin/*
- sed -i "s#INFLUXDATABASE#$influxdb_name#" $rootpath/bin/*
 
 # copy drivers
 
@@ -87,35 +84,22 @@ fi
  chmod +x $rootpath/driver/*
 
  sed -i "s#INSTALLDIR#$rootpath#" $rootpath/driver/*
- sed -i "s#MQTTSYSTEMUSER#$mqtt_system_user#" $rootpath/driver/*
- sed -i "s#MQTTSYSTEMPASS#$mqtt_system_pass#" $rootpath/driver/*
- sed -i "s#DATABASEUSER#$influx_system_user#" $rootpath/driver/*
- sed -i "s#DATABASEPASS#$influx_system_pass#" $rootpath/driver/*
- sed -i "s#INFLUXDATABASE#$influxdb_name#" $rootpath/bin/*
  
 # create services
 
  cp ./service/* /lib/systemd/system/
  sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/mqtt_*
- sed -i "s#SVCUSER#$username#" /lib/systemd/system/mqtt_*
+ sed -i "s#SVCUSER#$linuxuser#" /lib/systemd/system/mqtt_*
 
-# modify device manager
- 
- touch /opt/nanohome/conf/uids
- echo "home_uid:$home_uid" >> /opt/nanohome/conf/uids
- echo "devmgr_uid:$devmgr_uid" >> /opt/nanohome/conf/uids
- echo "zsp_uid:$zsp_uid" >> /opt/nanohome/conf/uids
- echo "settings_uid:$settings_uid" >> /opt/nanohome/conf/uids
 
 # create cputemp sensor
 
  if $cputemp ; then 
  
   cp ./sensor/cputemp $rootpath/bin/cputemp
-  sed -i "s#INFLUXDATABASE#$influxdb_name#" $rootpath/bin/cputemp
   chmod +x $rootpath/bin/cputemp
   
-  ( crontab -l -u $username | grep -v -F "$rootpath/bin/cputemp" ; echo "*/5 * * * * $rootpath/bin/cputemp" ) | crontab -u nanohome -
+  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/bin/cputemp" ; echo "*/5 * * * * $rootpath/bin/cputemp" ) | crontab -u nanohome -
  
  fi
  
@@ -124,10 +108,9 @@ fi
  if $diskspace ; then
  
   cp ./sensor/diskspace $rootpath/bin/diskspace
-  sed -i "s#INFLUXDATABASE#$influxdb_name#" $rootpath/bin/diskspace
   chmod +x $rootpath/bin/diskspace
  
-  ( crontab -l -u $username | grep -v -F "$rootpath/bin/diskspac" ; echo "* */1 * * * $rootpath/bin/diskspace" ) | crontab -u nanohome -
+  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/bin/diskspac" ; echo "* */1 * * * $rootpath/bin/diskspace" ) | crontab -u nanohome -
  
  fi
 
@@ -149,9 +132,9 @@ fi
   "name":"InfluxDB",
   "type":"influxdb",
   "url":"http://localhost:8086",
-  "user":"$influx_system_user",
-  "password":"$influx_system_pass",
-  "database":"$influxdb_name",
+  "user":"$influxdb_system_user",
+  "password":"$influxdb_system_pass",
+  "database":"$influxdb_database",
   "access":"proxy",
   "isDefault":true,
   "readOnly":false
@@ -162,18 +145,18 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST --data "$(generate_datasource)" "http://admin:admin@localhost:3000/api/datasources"
+ -X POST --data "$(generate_datasource)" "http://admin:admin@$grafana_url/api/datasources"
  
 # create api key
  
- api_json="$(curl -X POST -H "Content-Type: application/json" -d '{"name":"Nanohome System", "role": "Admin"}' http://admin:admin@localhost:3000/api/auth/keys)"
+ api_json="$(curl -X POST -H "Content-Type: application/json" -d '{"name":"Nanohome System", "role": "Admin"}' http://admin:admin@$grafana_url/api/auth/keys)"
  echo "$api_json" | sudo tee -a $rootpath/conf/api_key.json
  api_key="$(echo "$api_json" | jq -r '.key')"
  
 # create folders
 
- curl -X POST -H "Content-Type: application/json" -d '{"id":1, "title":"NanoHome"}' http://admin:admin@localhost:3000/api/folders
- curl -X POST -H "Content-Type: application/json" -d '{"id":2, "title":"Settings"}' http://admin:admin@localhost:3000/api/folders 
+ curl -X POST -H "Content-Type: application/json" -d '{"id":1, "title":"NanoHome"}' http://admin:admin@$grafana_url/api/folders
+ curl -X POST -H "Content-Type: application/json" -d '{"id":2, "title":"Settings"}' http://admin:admin@$grafana_url/api/folders 
  
 # create dashboards 
  
@@ -193,7 +176,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/home_final.json "http://admin:admin@localhost:3000/api/dashboards/db"
+ -X POST -d @/tmp/home_final.json "http://admin:admin@$grafana_url/api/dashboards/db"
  
 
 # devicemanager
@@ -203,7 +186,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/devicemanager_final.json "http://admin:admin@localhost:3000/api/dashboards/db"
+ -X POST -d @/tmp/devicemanager_final.json "http://admin:admin@$grafana_url/api/dashboards/db"
  
 # measurements
 
@@ -212,7 +195,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/measurements_final.json "http://admin:admin@localhost:3000/api/dashboards/db"
+ -X POST -d @/tmp/measurements_final.json "http://admin:admin@$grafana_url/api/dashboards/db"
  
 # settings
 
@@ -224,7 +207,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/settings_final.json "http://admin:admin@localhost:3000/api/dashboards/db"
+ -X POST -d @/tmp/settings_final.json "http://admin:admin@$grafana_url/api/dashboards/db"
 
 # system
 
@@ -233,7 +216,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/system_final.json "http://admin:admin@localhost:3000/api/dashboards/db"   
+ -X POST -d @/tmp/system_final.json "http://admin:admin@$grafana_url/api/dashboards/db"   
  
 # timer
 
@@ -245,7 +228,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/timer_final.json "http://admin:admin@localhost:3000/api/dashboards/db"
+ -X POST -d @/tmp/timer_final.json "http://admin:admin@$grafana_url/api/dashboards/db"
 
 # weather
 
@@ -256,7 +239,7 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/weather_final.json "http://admin:admin@localhost:3000/api/dashboards/db"   
+ -X POST -d @/tmp/weather_final.json "http://admin:admin@$grafana_url/api/dashboards/db"   
 
 
 # carpetplot
@@ -266,12 +249,12 @@ EOF
  curl -i \
  -H "Accept: application/json" \
  -H "Content-Type:application/json" \
- -X POST -d @/tmp/carpetplot_final.json "http://admin:admin@localhost:3000/api/dashboards/db"   
+ -X POST -d @/tmp/carpetplot_final.json "http://admin:admin@$grafana_url/api/dashboards/db"   
 
 # change home dashboards
 
- home_id="$(curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" http://localhost:3000/api/dashboards/uid/$home_uid | jq -r '.dashboard.id')"
- curl -X PUT -H "Content-Type: application/json" -d '{"homeDashboardId":'$home_id'}' http://admin:admin@localhost:3000/api/org/preferences
+ home_id="$(curl -X GET -H "Authorization: Bearer $api_key" -H "Content-Type: application/json" http://$grafana_url/api/dashboards/uid/$home_uid | jq -r '.dashboard.id')"
+ curl -X PUT -H "Content-Type: application/json" -d '{"homeDashboardId":'$home_id'}' http://admin:admin@$grafana_url/api/org/preferences
 
 # install grafana backup
 
@@ -297,7 +280,7 @@ EOF
 # post processing
  
  rm -rf /tmp/*.json
- chown -R $username:$username $rootpath
+ chown -R $linuxuser:$linuxuser $rootpath
  
  /usr/share/grafana/bin/grafana-cli plugins install grafana-clock-panel
  /usr/share/grafana/bin/grafana-cli plugins install petrslavotinek-carpetplot-panel

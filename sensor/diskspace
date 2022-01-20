@@ -3,9 +3,10 @@
 # Put Disk Space into InfluxDB
 #/////////////////////////////////////////////////////////////////////////////////////
 
-# Settings
-Server="localhost"
-DB="INFLUXDATABASE"
+# Load config
+. INSTALLDIR/config.cfg
+
+# Environment
 Topic="Diskspace_Free"
 Sensor="NanoHome_Disk"
 
@@ -13,4 +14,4 @@ Sensor="NanoHome_Disk"
 disk=$(df -m /dev/sda1 | tail -1 | awk '{print $4}')
 
 # Send to InfluxDB
-curl -i -XPOST 'http://'$Server':8086/write?db='$DB --data-binary $Topic' '$Sensor'='$disk
+curl -i -XPOST 'http://'$influxdb_server':8086/write?db='$influxdb_database --data-binary $Topic' '$Sensor'='$disk

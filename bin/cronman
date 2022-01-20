@@ -9,11 +9,9 @@ day="$3"
 on="$4"
 off="$5"
 
-# Settings
-server="localhost"
-user="MQTTSYSTEMUSER"
-pass="MQTTSYSTEMPASS"
-rootpath="INSTALLDIR"
+# Load config
+. INSTALLDIR/config.cfg
+
 
 # Device Support
 if [[ ! "$device" == "all" ]] && [[ ! "$device" == *"multiswitch"* ]]; then
@@ -110,13 +108,13 @@ if [ "$1" = "add" ] && [ ! -z "$2" ] && [ ! -z "$3" ]; then
 	# Create Cronjob Entries
 	if [ "$dev_type" = "roller" ] || [ "$dev_type" = "shutter" ]; then
 	
-		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $roller_updown -m open"
-		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $roller_updown -m close"		
+		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $roller_updown -m open"
+		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $roller_updown -m close"		
 	
 	elif [ "$dev_type" = "switch" ]; then
 
-		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m on"
-		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $server -u $user -P $pass -t $control_topic -m off"
+		cron_on="$on_min $on_hour * * $day mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $control_topic -m on"
+		cron_off="$off_min $off_hour * * $day mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $control_topic -m off"
 	
 	else
 	

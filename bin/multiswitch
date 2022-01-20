@@ -6,7 +6,10 @@
 # Catch Parameters
 dev1="$2"
 dev2="$3"
-rootpath="INSTALLDIR"
+
+# Load config
+. INSTALLDIR/config.cfg
+
 
 if [ "$dev1" = "Wenn..." ] || [ "$dev2" = "Dann..." ]; then exit 1; fi
 if [ "$dev1" = "$dev2" ]; then dev1="all"; fi

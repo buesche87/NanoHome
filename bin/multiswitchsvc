@@ -9,11 +9,8 @@ dev2="$2"
 value1="$3"
 value2="$4"
 
-# Settings
-server="localhost"
-user="MQTTSYSTEMUSER"
-pass="MQTTSYSTEMPASS"
-rootpath="INSTALLDIR"
+# Load config
+. INSTALLDIR/config.cfg
 
 # Device Support
 . $rootpath/dev_compatibility $dev1
@@ -40,7 +37,7 @@ do
 	fi
 
 	now=$(date +"%T")
-	mosquitto_pub -h $server -u $user -P $pass -t $dev2_control_topic -m $curvalue
+	mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $dev2_control_topic -m $curvalue
 	echo "|[$now] $dev1 $curvalue -> $dev2 $curvalue"
 
-done < <(mosquitto_sub -h $server -u $user -P $pass -t $dev1_control_topic -q 2)
+done < <(mosquitto_sub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $dev1_control_topic -q 2)

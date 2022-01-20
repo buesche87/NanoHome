@@ -6,12 +6,12 @@ rectype="$1" #[backup|restore]
 grafana="$2" #[true|false]
 influxdb="$3" #[true|false]
 
-# Settings
-bkpdir="BACKUPDIR"
-bkdr_grafana="$bkpdir/Grafana"
-bkdr_influxdb="$bkpdir/InfluxDB"
-rootpath="INSTALLDIR"
+# Load config
+. INSTALLDIR/config.cfg
 
+# Settings
+bkdr_grafana="$backupdir/Grafana"
+bkdr_influxdb="$backupdir/InfluxDB"
 
 mkdir -p "$bkdr_grafana"
 mkdir -p "$bkdr_influxdb"
@@ -57,6 +57,6 @@ fi
 if [ "$rectype" == "show" ]; then
 
 	echo "<font size=5 color='hotpink'>Stored Backups</font><br>"
-	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $bkpdir)"
+	echo "$(tree -d -D --timefmt "%d.%m.%y %T" $backupdir)"
 
 fi

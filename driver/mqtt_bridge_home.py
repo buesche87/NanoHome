@@ -12,19 +12,26 @@ from typing import NamedTuple
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
-INFLUXDB_ADDRESS = 'localhost'
-INFLUXDB_USER = "DATABASEUSER"
-INFLUXDB_PASSWORD = 'DATABASEPASS'
-INFLUXDB_DATABASE = 'INFLUXDATABASE'
+import configparser
+configparser = configparser.RawConfigParser()   
+configFilePath = r'INSTALLDIR/config.cfg'
+configparser.read(configFilePath)
 
-MQTT_ADDRESS = 'localhost'
-MQTT_USER = 'MQTTSYSTEMUSER'
-MQTT_PASSWORD = 'MQTTSYSTEMPASS'
+
+# influxdb_server = 'localhost'
+# influxdb_user = "DATABASEUSER"
+# influxdb_userpass = 'DATABASEPASS'
+# influxdb_database = 'INFLUXDATABASE'
+# 
+# mqtt_server = 'localhost'
+# mqtt_system_user = 'MQTTSYSTEMUSER'
+# mqtt_system_pass = 'MQTTSYSTEMPASS'
+
 MQTT_TOPIC = 'home/+/+'  # [home/Device]/[temperature|humidity|status]
 MQTT_REGEX = 'home/([^/]+)/([^/]+)' # Home Topic
 MQTT_CLIENT_ID = 'mqtt_home_bridge'
 
-influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
+influxdb_client = InfluxDBClient(influxdb_server, 8086, influxdb_user, influxdb_userpass, None)
 
 
 #class SensorData(NamedTuple):
@@ -78,20 +85,20 @@ def _send_sensor_data_to_influxdb(sensor_data):
 
 def _init_influxdb_database():
     databases = influxdb_client.get_list_database()
-    if len(list(filter(lambda x: x['name'] == INFLUXDB_DATABASE, databases))) == 0:
-        influxdb_client.create_database(INFLUXDB_DATABASE)
-    influxdb_client.switch_database(INFLUXDB_DATABASE)
+    if len(list(filter(lambda x: x['name'] == influxdb_database, databases))) == 0:
+        influxdb_client.create_database(influxdb_database)
+    influxdb_client.switch_database(influxdb_database)
 
 
 def main():
     _init_influxdb_database()
 
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
-    mqtt_client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
+    mqtt_client.username_pw_set(mqtt_system_user, mqtt_system_pass)
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
 
-    mqtt_client.connect(MQTT_ADDRESS, 1883)
+    mqtt_client.connect(mqtt_server, 1883)
     mqtt_client.loop_forever()
 
 

@@ -2,10 +2,10 @@
 #################################
 # MQTT_shell - Drop bash commands
 
-#Settings
-host="localhost"
-user="MQTTSYSTEMUSER"
-pass="MQTTSYSTEMPASS"
+# Load config
+. INSTALLDIR/config.cfg
+
+# Environment
 input_topic="input"
 output_topic="output"
 
@@ -33,7 +33,7 @@ ctrl_c() {
 # MQTT Listen on input_topic
 listen(){
 ([ ! -p "$p" ]) && mkfifo $p
-(mosquitto_sub -h $host -u $user -P $pass -t $input_topic > $p 2>/dev/null) &
+(mosquitto_sub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $input_topic > $p 2>/dev/null) &
 echo "$!" > .mqtt_shell.pid
 while read line <$p
 do
@@ -43,7 +43,7 @@ do
     (rm -f $p;rm $cleann;kill $pid) 2>/dev/null
     break
   else
-    (bash .mqtt_shell.cmds | tee .mqtt_shell.out) && mosquitto_pub -h $host -u $user -P $pass -t $output_topic -f .mqtt_shell.out;>.mqtt_shell.out
+    (bash .mqtt_shell.cmds | tee .mqtt_shell.out) && mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $output_topic -f .mqtt_shell.out;>.mqtt_shell.out
   fi
 done
 }
