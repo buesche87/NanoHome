@@ -12,20 +12,14 @@ from typing import NamedTuple
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
-import configparser
-configparser = configparser.RawConfigParser()   
-configFilePath = r'INSTALLDIR/config.cfg'
-configparser.read(configFilePath)
+influxdb_server = 'localhost'
+influxdb_database = 'INFLUXDATABASE'
+influxdb_user = 'DATABASEUSER'
+influxdb_userpass = 'DATABASEPASS'
 
-
-# influxdb_server = 'localhost'
-# influxdb_user = "DATABASEUSER"
-# influxdb_userpass = 'DATABASEPASS'
-# influxdb_database = 'INFLUXDATABASE'
-# 
-# mqtt_server = 'localhost'
-# mqtt_system_user = 'MQTTSYSTEMUSER'
-# mqtt_system_pass = 'MQTTSYSTEMPASS'
+mqtt_server = 'localhost'
+mqtt_system_user = 'MQTTSYSTEMUSER'
+mqtt_system_pass = 'MQTTSYSTEMPASS'
 
 MQTT_TOPIC = 'shellies/+/relay/0/+'  # [shellies/shelly-DeviceID/relay/0]/[energy|power|cmnd]
 MQTT_REGEX = 'shellies/([^/]+)/relay/0/([^/]+)' # Shellies energy & power

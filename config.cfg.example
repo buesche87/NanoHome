@@ -14,9 +14,7 @@ influxdb_server="localhost"
 influxdb_database="nanohome"
 influxdb_admin="nanohome"
 influxdb_adminpass="password"
-influxdb_user="nanohome"
-influxdb_userpass="password"
-influxdb_system_user="mqtt_system"
+influxdb_system_user="influx_system"
 influxdb_system_pass="password"
 
 
@@ -39,10 +37,10 @@ devmgr_uid="Uhzl9yRgk"
 zsp_uid="_H3fwdmRz"
 settings_uid="sYOGRUiRz"
 
-# Device users
-mosquitto_shelly_user="mqtt_shelly"
-mosquitto_shelly_pass="password"
+# Device user
+mqtt_shelly_user="mqtt_shelly"
+mqtt_shelly_pass="password"
 
 # MQTT Dash user
-mosquitto_dash_user="mqtt_dash"
-mosquitto_dash_pass="password"
+mqtt_dash_user="mqtt_dash"
+mqtt_dash_pass="password"

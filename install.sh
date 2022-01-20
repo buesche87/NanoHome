@@ -20,7 +20,7 @@ if getent passwd $linuxuser > /dev/null ; then
 else
 
  echo "create user $linuxuser"
- useradd -p $(openssl passwd -1 $userpass) $linuxuser
+ useradd -p $(openssl passwd -1 $linuxpass) $linuxuser
 
 fi
 
@@ -34,8 +34,8 @@ fi
  mkdir -p $backupdir
 
  touch $rootpath/devlist
- touch $rootpath/killerlist
- touch $rootpath/switchlist
+ touch $rootpath/killerlist ## still necessary?
+ touch $rootpath/switchlist ## still necessary?
 
 
 # general
@@ -47,28 +47,31 @@ fi
 
 # prepare influxdb database
 
- influx -execute "CREATE DATABASE $influxdb_name"
+ influx -execute "CREATE DATABASE ${influxdb_database}"
  influx -execute "CREATE USER ${influxdb_admin} WITH PASSWORD '${influxdb_adminpass}' WITH ALL PRIVILEGES"
- influx -execute "CREATE USER ${influx_system_user} WITH PASSWORD '${influx_system_pass}'"
- influx -execute "GRANT ALL ON ${influxdb_name} TO ${influx_system_user}"
+ influx -execute "CREATE USER ${influxdb_system_user} WITH PASSWORD '${influxdb_system_pass}'"
+ influx -execute "GRANT ALL ON ${influxdb_database} TO ${influxdb_system_user}"
+
+# configure mosquitto
+
+ touch /etc/mosquitto/conf.d/nanohome.conf
+ echo password_file /etc/mosquitto/passwd > /etc/mosquitto/conf.d/nanohome.conf
+ echo allow_anonymous false >> /etc/mosquitto/conf.d/nanohome.conf
+ echo listener 1883 >> /etc/mosquitto/conf.d/nanohome.conf
+ echo listener 1884 >> /etc/mosquitto/conf.d/nanohome.conf
+ echo protocol websockets >> /etc/mosquitto/conf.d/nanohome.conf
 
 # create mosquitto user
 
  touch /etc/mosquitto/passwd
+ mosquitto_passwd -U /etc/mosquitto/passwd
  mosquitto_passwd -b /etc/mosquitto/passwd $mqtt_system_user $mqtt_system_pass
 
 # create mosquitto user for external access
 
  mosquitto_passwd -b /etc/mosquitto/passwd $mqtt_grafana_user $mqtt_grafana_pass
- mosquitto_passwd -b /etc/mosquitto/passwd $mosquitto_shelly_user $mosquitto_shelly_pass
- mosquitto_passwd -b /etc/mosquitto/passwd $mosquitto_dash_user $mosquitto_dash_pass
-
-# configure mosquitto
-
- touch /etc/mosquitto/conf.d/nanohome.conf
- echo listener 1883 >> /etc/mosquitto/conf.d/nanohome.conf
- echo listener 1884 >> /etc/mosquitto/conf.d/nanohome.conf
- echo protocol websockets >> /etc/mosquitto/conf.d/nanohome.conf
+ mosquitto_passwd -b /etc/mosquitto/passwd $mqtt_shelly_user $mqtt_shelly_pass
+ mosquitto_passwd -b /etc/mosquitto/passwd $mqtt_dash_user $mqtt_dash_pass
 
 # copy binaries & make executable
 
@@ -84,22 +87,27 @@ fi
  chmod +x $rootpath/driver/*
 
  sed -i "s#INSTALLDIR#$rootpath#" $rootpath/driver/*
+ sed -i "s#INFLUXDATABASE#$influxdb_database#" $rootpath/driver/*
+ sed -i "s#DATABASEUSER#$influxdb_system_user#" $rootpath/driver/*
+ sed -i "s#DATABASEPASS#$influxdb_system_pass#" $rootpath/driver/*
+ sed -i "s#MQTTSYSTEMUSER#$mqtt_system_user#" $rootpath/driver/*
+ sed -i "s#MQTTSYSTEMPASS#$mqtt_system_pass#" $rootpath/driver/*
  
 # create services
 
- cp ./service/* /lib/systemd/system/
- sed -i "s#INSTALLDIR#$rootpath#" /lib/systemd/system/mqtt_*
- sed -i "s#SVCUSER#$linuxuser#" /lib/systemd/system/mqtt_*
+ cp ./service/* /etc/systemd/system/
+ sed -i "s#INSTALLDIR#$rootpath#" /etc/systemd/system/mqtt_*
+ sed -i "s#SVCUSER#$linuxuser#" /etc/systemd/system/mqtt_*
 
-
+ 
 # create cputemp sensor
 
  if $cputemp ; then 
  
-  cp ./sensor/cputemp $rootpath/bin/cputemp
-  chmod +x $rootpath/bin/cputemp
+  cp ./sensor/cputemp $rootpath/sensor/cputemp
+  chmod +x $rootpath/sensor/cputemp
   
-  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/bin/cputemp" ; echo "*/5 * * * * $rootpath/bin/cputemp" ) | crontab -u nanohome -
+  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/sensor/cputemp" ; echo "*/5 * * * * $rootpath/sensor/cputemp" ) | crontab -u nanohome -
  
  fi
  
@@ -107,13 +115,14 @@ fi
  
  if $diskspace ; then
  
-  cp ./sensor/diskspace $rootpath/bin/diskspace
-  chmod +x $rootpath/bin/diskspace
+  cp ./sensor/diskspace $rootpath/sensor/diskspace
+  chmod +x $rootpath/sensor/diskspace
  
-  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/bin/diskspac" ; echo "* */1 * * * $rootpath/bin/diskspace" ) | crontab -u nanohome -
+  ( crontab -l -u $linuxuser | grep -v -F "$rootpath/sensor/diskspac" ; echo "* */1 * * * $rootpath/sensor/diskspace" ) | crontab -u nanohome -
  
  fi
 
+ sed -i "s#INSTALLDIR#$rootpath#" $rootpath/sensor/*
 
 # Grafana setup
 
@@ -150,7 +159,7 @@ EOF
 # create api key
  
  api_json="$(curl -X POST -H "Content-Type: application/json" -d '{"name":"Nanohome System", "role": "Admin"}' http://admin:admin@$grafana_url/api/auth/keys)"
- echo "$api_json" | sudo tee -a $rootpath/conf/api_key.json
+ echo "$api_json" | sudo tee $rootpath/conf/api_key.json
  api_key="$(echo "$api_json" | jq -r '.key')"
  
 # create folders
