@@ -9,20 +9,17 @@ The following steps should be everything you need on a debian based distro for i
 
 # Repositories
 
-## InfluxDB (example debian buster)
+## InfluxDB (example debian bullseye)
 
 ```bash
-curl -sL https://repos.influxdata.com/influxdb.key 133 | sudo apt-key add -
-echo "deb https://repos.influxdata.com/debian buster stable" | sudo tee /etc/apt/sources.list.d/influxdb.list
+wget -qO- https://repos.influxdata.com/influxdb.key | gpg --dearmor > /etc/apt/trusted.gpg.d/influxdb.gpg
+sudo echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdb.gpg] https://repos.influxdata.com/debian bullseye stable" > /etc/apt/sources.list.d/influxdb.list
 ```
 
 ## Grafana
 ```bash
-sudo apt install -y apt-transport-https
-sudo apt install -y software-properties-common wget
 wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -
-sudo add-apt-repository "deb https://packages.grafana.com/oss/deb stable main"
-sudo apt update
+sudo echo "deb https://packages.grafana.com/oss/deb stable main" > /etc/apt/sources.list.d/grafana.list
 ```
 
 # Dependencies
@@ -30,8 +27,10 @@ sudo apt update
 
 ## Install software
 ```bash
+sudo apt update
 sudo apt install influxdb grafana mosquitto git python3
 ```
+
 ## Install dependencies
 ```bash
 sudo apt install mosquitto-clients python3-pip python3-setuptools build-essential libfreetype6-dev libjpeg-dev jq openssl python3-influxdb python3-wheel python3-paho-mqtt tree
@@ -43,15 +42,22 @@ sudo systemctl unmask influxdb.service
 sudo service influxdb start
 ```
 
+## Install NanoHome
+
+# Clone NanoHome
+```bash
+git clone https://github.com/buesche87/NanoHome.git
+```
+
 # Edit NanoHome Config
 
 Copy `config.cfg.example` to `config.cfg`.
 
 Edit username and password entries. Don't mess with the dashboard settings, these id's are given by the installation.
 
-# Install NanoHome
+# Install
+
 ```bash
-git clone https://github.com/buesche87/NanoHome.git
 cd NanoHome
 chmod +x ./install.sh
 sudo ./install.sh
