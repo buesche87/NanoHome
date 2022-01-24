@@ -33,7 +33,7 @@ sudo apt install influxdb grafana mosquitto git python3
 
 ## Install dependencies
 ```bash
-sudo apt install mosquitto-clients python3-pip python3-setuptools build-essential libfreetype6-dev libjpeg-dev jq openssl python3-influxdb python3-wheel python3-paho-mqtt tree
+sudo apt install mosquitto-clients python3-pip python3-setuptools build-essential libfreetype6-dev libjpeg-dev jq openssl python3-influxdb python3-wheel python3-paho-mqtt tree bc
 ```
 
 # unmask influxdb and start it
