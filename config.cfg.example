@@ -26,9 +26,9 @@ mqtt_grafana_user="mqtt_grafana"
 mqtt_grafana_pass="password"
 
 
-# sensors
-cputemp=true
-diskspace=true
+# sensors - change parameters in sensor files first
+cputemp=false
+diskspace=false
 
 # Grafana Settings
 grafana_url="localhost:3000"

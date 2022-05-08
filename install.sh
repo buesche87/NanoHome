@@ -45,6 +45,8 @@ fi
  cp ./dev_compatibility $rootpath
  cp ./template/* $rootpath/template/
 
+ sed -i "s#INSTALLDIR#$rootpath#" $rootpath/*
+
 # prepare influxdb database
 
  influx -execute "CREATE DATABASE ${influxdb_database}"

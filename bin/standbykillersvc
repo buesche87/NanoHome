@@ -9,37 +9,47 @@ maxpower="$2"
 . INSTALLDIR/config.cfg
 
 # Environment
-lastmsg="off"
+devstate="off"
 try="1"
 . $rootpath/dev_compatibility $device
 
-while read curpower;
-do
+while read curpower; do
 
 	now=$(date +"%T")
-
+		
+	# if power = 0W
 	if (( $(echo "$curpower == 0" | bc -l) )); then
 		echo "|[$now] $device: off -> nothing todo"
-		lastmsg="off"
-		
+		devstate="off"
+	
+	# if power below threshold
 	elif (( $(echo "$curpower < $maxpower" | bc -l) )); then
-
-		if [ "$lastmsg" == "off" ]; then
-			echo "|[$now] $device just started -> I won't kill it yet"
-			
-		elif [ try > 2 ]; then #give time to manually wake unwanted standby
+		
+		# check if device just started
+		
+		if [ "$devstate" == "on" ]; then
 			echo "|[$now] $device: ${curpower}W - standby killed"
 			mosquitto_pub -h $mqtt_server -u $mqtt_system_user -P $mqtt_system_pass -t $control_topic -m $off_command >/dev/null 2>&1			
-
-		else
-			echo "|[$now] $device: ${curpower}W - less than ${maxpower}W -> wait 60s and then kill standby"
-			((try=try+1))
-
+			devstate="off"
+			
+		elif [ "$devstate" == "off" ]; then
+			echo "|[$now] $device just started -> wait 60 seconds"
+			sleep 60
+			devstate="on"
 		fi
 
 	else
-		echo "|[$now] $device: ${curpower}W - more than ${maxpower}W -> keeping alive"
-		lastmsg="running"
+		# check if device just started
+		if [ "$devstate" == "off" ]; then
+			echo "|[$now] $device just started -> wait 60 seconds"
+			sleep 60
+			devstate="on"
+		
+		# if device was on
+		else
+			echo "|[$now] $device: ${curpower}W - more than ${maxpower}W -> keeping alive"
+			devstate="on"
+		fi
 
 	fi
 
